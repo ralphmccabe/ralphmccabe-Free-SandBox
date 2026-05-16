@@ -950,35 +950,15 @@
         <div id="noImageMsg"></div>
     </div>
 
-    <script src="idb_helper.js?v=117"></script><script src="original_script.js?v=117"></script>
+    <script src="idb_helper.js?v=121"></script><script src="original_script.js?v=121"></script>
     <script>
-        // === EMERGENCY CACHE PURGE: UNREGISTER SERVICE WORKERS ===
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                for(let registration of registrations) {
-                    registration.unregister();
-                    console.log("KILLING STALE CACHE");
-                }
-            });
-        }
-        // Clear raw cache storage as well
-        caches.keys().then(function(names) {
-            for (let name of names) caches.delete(name);
-        });
-        /*
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js?v=1.0-PRO').then(reg => {
-                    reg.onupdatefound = () => {
-                        const i = reg.installing;
-                        i.onstatechange = () => { if (i.state === 'installed' && navigator.serviceWorker.controller) window.location.reload(); };
-                    };
+                navigator.serviceWorker.register('./sw.js?v=121').then(reg => {
+                    console.log('[SW] Tactical Link Established');
                 });
             });
-            let refreshing = false;
-            navigator.serviceWorker.addEventListener('controllerchange', () => { if (!refreshing) { refreshing = true; window.location.reload(); } });
         }
-        */
         function toggleSection(id) { document.getElementById(id).classList.toggle('hidden'); }
     </script>
     <!-- ADDED SCRIPT BLOCK TO MAKE THE NEW BUTTON WORK -->
