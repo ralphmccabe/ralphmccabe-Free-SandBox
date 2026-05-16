@@ -1,5 +1,5 @@
-/* TRC-PRO-VERSION - v2.0-DEV */
-const CACHE_NAME = 'trc-pro-upgrade-v2.0';
+/* TRC-PRO-VERSION - v2.1-PROD */
+const CACHE_NAME = 'trc-pro-upgrade-v2.1';
 const ASSETS = [
     './',
     './index.html?v=6.0',

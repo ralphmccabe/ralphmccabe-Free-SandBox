@@ -5,9 +5,10 @@
  */
 
 const DB_NAME = 'TRC_PRO_UPGRADE_DB';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Incremented version
 const STORES = {
-    PROFILES: 'rangeCardProfiles'
+    PROFILES: 'rangeCardProfiles',
+    VAULT: 'intelVault' // NEW: Permanent storage for snapshots/remarks
 };
 
 const idb = {
@@ -22,6 +23,9 @@ const idb = {
                 const db = event.target.result;
                 if (!db.objectStoreNames.contains(STORES.PROFILES)) {
                     db.createObjectStore(STORES.PROFILES);
+                }
+                if (!db.objectStoreNames.contains(STORES.VAULT)) {
+                    db.createObjectStore(STORES.VAULT);
                 }
             };
 

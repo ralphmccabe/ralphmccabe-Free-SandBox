@@ -1,3 +1,8 @@
+/* 
+    TACTICAL RANGE CARD PRO - PRODUCTION CORE v2.1
+    SECURITY: AES-256 ENCRYPTED COMMS
+*/
+
 // === TACTICAL CRYPTO ENGINE (AES-256) ===
 const TacticalCrypto = {
     encrypt: function(data) {
@@ -3205,17 +3210,45 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // ========================================================================
-    // WINDOW 4: INTEL VAULT SYSTEM
+    // WINDOW 4: INTEL VAULT SYSTEM (UPGRADED TO INDEXEDDB PERMANENCE)
     // ========================================================================
-    let vaultCache = JSON.parse(localStorage.getItem('TRC_INTEL_VAULT') || '[]');
+    let vaultCache = [];
 
-    function saveIntelSnapshot(label, dataUri) {
-        if (vaultCache.length >= 20) {
-            alert("INTEL VAULT IS FULL (20/20). PLEASE DELETE OLD INTEL TO SAVE NEW IMAGES.");
+    // ASYNC INITIALIZATION
+    async function initVaultFromDB() {
+        if (!window.TRC_IDB) return;
+        try {
+            // First, migrate any legacy data from LocalStorage
+            const legacyData = localStorage.getItem('TRC_INTEL_VAULT');
+            if (legacyData) {
+                const legacy = JSON.parse(legacyData);
+                for (const item of legacy) {
+                    await TRC_IDB.set('intelVault', item.id.toString(), item);
+                }
+                localStorage.removeItem('TRC_INTEL_VAULT');
+                window.pushTacLog("MIGRATED VAULT TO PERMANENT DB", "SUCCESS");
+            }
+
+            const dbItems = await TRC_IDB.getAll('intelVault');
+            vaultCache = Object.values(dbItems).sort((a, b) => {
+                const tsA = new Date(a.timestamp).getTime();
+                const tsB = new Date(b.timestamp).getTime();
+                return tsB - tsA;
+            });
+            refreshVaultGrid();
+        } catch (err) {
+            console.error("[VAULT] DB Load Error:", err);
+            window.pushTacLog("VAULT DB READ ERROR", "ERROR");
+        }
+    }
+    initVaultFromDB();
+
+    async function saveIntelSnapshot(label, dataUri, metadata = {}) {
+        if (vaultCache.length >= 50) { // Increased limit for IDB
+            alert("INTEL VAULT IS AT CAPACITY (50/50). PLEASE DELETE OLD INTEL.");
             return;
         }
 
-        // Pull existing dynamic map measurement if available during capture
         const activeDistEl = document.getElementById('live-map-dist');
         const activeDist = (activeDistEl && activeDistEl.textContent !== "--.--") ? activeDistEl.textContent : null;
 
@@ -3224,13 +3257,16 @@ document.addEventListener('DOMContentLoaded', () => {
             label: label,
             timestamp: new Date().toISOString(),
             image: dataUri,
-            distance: activeDist // NEW: Capture real range vector in metadata
+            distance: activeDist,
+            ...metadata
         };
-        vaultCache.unshift(entry); // Newest first
         
-        localStorage.setItem('TRC_INTEL_VAULT', JSON.stringify(vaultCache));
+        vaultCache.unshift(entry);
         
-        // Flash UI if active
+        if (window.TRC_IDB) {
+            await TRC_IDB.set('intelVault', entry.id.toString(), entry);
+        }
+        
         refreshVaultGrid();
     }
 
@@ -3265,15 +3301,30 @@ document.addEventListener('DOMContentLoaded', () => {
                 <button class="delete-vault-btn absolute top-1.5 right-1.5 bg-red-950/90 text-red-300 p-1.5 rounded border border-red-700 shadow-lg hover:bg-red-600 hover:text-white transition-all z-30" title="Delete Snapshot">
                     <i data-lucide="trash-2" class="w-3 h-3"></i>
                 </button>
+
+                ${item.remarksText ? `
+                <button class="load-note-btn absolute bottom-7 right-1.5 bg-yellow-600 text-black p-1.5 rounded border border-yellow-400 shadow-lg hover:bg-yellow-400 transition-all z-30" title="Load to Notepad">
+                    <i data-lucide="edit-3" class="w-3 h-3"></i>
+                </button>
+                ` : ''}
             `;
             
             // Bind the entire card to selection
             el.addEventListener('click', (e) => {
-                // If they clicked the trash or checkbox specifically, don't maximize
-                if(e.target.closest('.delete-vault-btn') || e.target.closest('.vault-export-checkbox')) return;
+                // If they clicked the trash or checkbox or load-note specifically, don't maximize
+                if(e.target.closest('.delete-vault-btn') || e.target.closest('.vault-export-checkbox') || e.target.closest('.load-note-btn')) return;
                 e.stopPropagation();
                 selectVaultItem(item);
             });
+
+            // Bind Load Note handler
+            const loadBtn = el.querySelector('.load-note-btn');
+            if(loadBtn) {
+                loadBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    loadNoteBackToEditor(item);
+                });
+            }
 
             // Bind delete handler specific to this card
             const delBtn = el.querySelector('.delete-vault-btn');
@@ -3289,11 +3340,13 @@ document.addEventListener('DOMContentLoaded', () => {
         if(window.lucide) lucide.createIcons();
     }
 
-    function deleteVaultEntry(id) {
+    async function deleteVaultEntry(id) {
         if(!confirm("PERMANENTLY WIPE THIS INTEL FROM CACHE?")) return;
         
         vaultCache = vaultCache.filter(x => x.id !== id);
-        localStorage.setItem('TRC_INTEL_VAULT', JSON.stringify(vaultCache));
+        if (window.TRC_IDB) {
+            await TRC_IDB.delete('intelVault', id.toString());
+        }
         refreshVaultGrid();
     }
 
@@ -3314,9 +3367,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
                 
                 <!-- Non-Destructive Unload Actuator -->
-                <button class="absolute top-1 right-1 bg-red-950/90 text-red-300 border border-red-600/50 p-1 rounded z-50 hover:bg-red-600 hover:text-white transition-all shadow-lg" onclick="event.stopPropagation(); window.unloadDashboardCard(4)" title="Unload Vault Item">
-                    <i data-lucide="trash-2" class="w-2.5 h-2.5"></i>
-                </button>
+                <div class="absolute top-1 right-1 flex gap-1 z-50">
+                    ${item.remarksText ? `
+                    <button class="bg-yellow-600 text-black border border-yellow-400 p-1.5 rounded hover:bg-yellow-400 transition-all shadow-lg flex items-center gap-1 font-black text-[7px]" onclick="event.stopPropagation(); window.loadNoteBackToEditor(JSON.parse(atob('${btoa(JSON.stringify(item))}')))" title="Load back to Notepad">
+                        <i data-lucide="edit-3" class="w-2.5 h-2.5"></i> LOAD TO NOTEPAD
+                    </button>
+                    ` : ''}
+                    <button class="bg-red-950/90 text-red-300 border border-red-600/50 p-1.5 rounded hover:bg-red-600 hover:text-white transition-all shadow-lg" onclick="event.stopPropagation(); window.unloadDashboardCard(4)" title="Unload Vault Item">
+                        <i data-lucide="trash-2" class="w-2.5 h-2.5"></i>
+                    </button>
+                </div>
             </div>
         `;
         
@@ -4522,6 +4582,26 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
     }
+    // HELPER: LOAD NOTE BACK TO EDITOR
+    window.loadNoteBackToEditor = function(item) {
+        const modal = document.getElementById('remarks-modal');
+        const titleInput = document.getElementById('remarks-title-input');
+        const textInput = document.getElementById('remarks-input');
+        const counter = document.getElementById('remarks-counter');
+
+        if (!modal || !titleInput || !textInput) return;
+
+        titleInput.value = item.remarksTitle || '';
+        textInput.value = item.remarksText || '';
+        if (counter) counter.textContent = `${textInput.value.length}/100`;
+
+        modal.classList.remove('hidden');
+        textInput.focus();
+        
+        window.pushTacLog(`NOTE LOADED: ${item.remarksTitle || 'SECURE NOTE'}`, "INFO");
+        if (window.lucide) window.lucide.createIcons();
+    };
+
     // --- REMARKS NOTEPAD LOGIC ---
     const remarksIconBtn = document.getElementById('remarks-icon-btn');
     const remarksModal = document.getElementById('remarks-modal');
@@ -4598,7 +4678,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const base64Image = canvas.toDataURL('image/jpeg', 0.9);
             
-            saveIntelSnapshot('REMARKS', base64Image);
+            saveIntelSnapshot('REMARKS', base64Image, { 
+                remarksTitle: title, 
+                remarksText: text 
+            });
             
             remarksInput.value = '';
             if (remarksTitleInput) remarksTitleInput.value = '';
