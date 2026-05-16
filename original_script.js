@@ -102,6 +102,82 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // === 1B. TARGET CANVAS SYSTEM ===
+    function initTargetCanvases(type) {
+        try {
+            const dCanvas = document.getElementById(`canvas-${type}`);
+            const mCanvas = document.getElementById(`mobile-canvas-${type}`);
+            if (!dCanvas || !mCanvas) return null;
+
+            let shots = [];
+
+            function drawAll() {
+                [dCanvas, mCanvas].forEach(canvas => {
+                    const ctx = canvas.getContext('2d');
+                    const { width, height } = canvas;
+                    const centerX = width / 2;
+                    const centerY = height / 2;
+
+                    ctx.clearRect(0, 0, width, height);
+                    
+                    // Draw Concentric Rings
+                    ctx.strokeStyle = '#9ca3af';
+                    ctx.lineWidth = 1;
+                    [0.2, 0.4, 0.6, 0.8].forEach(scale => {
+                        ctx.beginPath();
+                        ctx.arc(centerX, centerY, (width / 2) * scale, 0, Math.PI * 2);
+                        ctx.stroke();
+                    });
+
+                    // Draw Crosshairs
+                    ctx.strokeStyle = '#6b7280';
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.moveTo(centerX, 0); ctx.lineTo(centerX, height);
+                    ctx.moveTo(0, centerY); ctx.lineTo(width, centerY);
+                    ctx.stroke();
+
+                    // Draw Center Point
+                    ctx.fillStyle = type === 'shot' ? '#22c55e' : '#3b82f6';
+                    ctx.beginPath(); ctx.arc(centerX, centerY, 3, 0, Math.PI * 2); ctx.fill();
+
+                    // Draw Shots
+                    shots.forEach((shot, index) => {
+                        const x = shot.nx * width;
+                        const y = shot.ny * height;
+                        ctx.fillStyle = type === 'shot' ? '#ef4444' : '#f97316';
+                        ctx.beginPath(); ctx.arc(x, y, 3.5, 0, Math.PI * 2); ctx.fill();
+                        ctx.fillStyle = '#ffffff';
+                        ctx.font = 'bold 7px monospace';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(index + 1, x, y + 2.5);
+                    });
+                });
+            }
+
+            [dCanvas, mCanvas].forEach(canvas => {
+                canvas.addEventListener('mousedown', (e) => {
+                    const rect = canvas.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    shots.push({ nx: x / rect.width, ny: y / rect.height });
+                    drawAll();
+                });
+            });
+
+            drawAll();
+
+            return {
+                getShots: () => shots,
+                setShots: (newShots) => { shots = newShots; drawAll(); },
+                clear: () => { shots = []; drawAll(); }
+            };
+        } catch (e) { return null; }
+    }
+
+    window.holdManager = initTargetCanvases('hold');
+    window.shotManager = initTargetCanvases('shot');
+
     // Special handling for date formatting
     const dateInput = document.getElementById('date');
     if (dateInput && !dateInput.value) {
@@ -4690,5 +4766,54 @@ document.addEventListener('DOMContentLoaded', () => {
             window.pushTacLog("REMARKS NOTE SAVED TO VAULT", "SUCCESS");
         });
     }
+
+    // === PERSISTENCE SHIELD: MISSION RECOVERY PROTOCOL ===
+    let autoSaveTimeout;
+    function triggerAutoSave() {
+        clearTimeout(autoSaveTimeout);
+        autoSaveTimeout = setTimeout(async () => {
+            if (!window.TRC_IDB) return;
+            const state = {};
+            inputs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) state[id] = el.value;
+            });
+            // Capture canvases
+            state.holdShots = window.holdManager?.getShots() || [];
+            state.shotShots = window.shotManager?.getShots() || [];
+            
+            await window.TRC_IDB.put('drafts', { id: '___DRAFT_RECOVERY___', data: state, timestamp: Date.now() });
+            console.log('[SHIELD] Mission State Synchronized');
+        }, 500);
+    }
+
+    // Bind auto-save to all inputs
+    inputs.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('input', triggerAutoSave);
+    });
+
+    // MISSION RECOVERY: Auto-load draft on startup
+    async function recoverMission() {
+        if (!window.TRC_IDB) return;
+        const recovery = await window.TRC_IDB.get('drafts', '___DRAFT_RECOVERY___');
+        if (recovery && recovery.data) {
+            const data = recovery.data;
+            inputs.forEach(id => {
+                const el = document.getElementById(id);
+                if (el && data[id] !== undefined) {
+                    el.value = data[id];
+                    // Trigger sync to cards
+                    el.dispatchEvent(new Event('input'));
+                }
+            });
+            if (data.holdShots) window.holdManager?.setShots(data.holdShots);
+            if (data.shotShots) window.shotManager?.setShots(data.shotShots);
+            window.pushTacLog("MISSION RECOVERY: LAST SESSION RESTORED", "SYS");
+        }
+    }
+    
+    // Delayed recovery to ensure IDB is ready
+    setTimeout(recoverMission, 1500);
 
 });
