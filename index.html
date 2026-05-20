@@ -950,15 +950,7 @@
         <div id="noImageMsg"></div>
     </div>
 
-    <script src="idb_helper.js?v=121"></script><script src="original_script.js?v=121"></script>
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js?v=121').then(reg => {
-                    console.log('[SW] Tactical Link Established');
-                });
-            });
-        }
         function toggleSection(id) { document.getElementById(id).classList.toggle('hidden'); }
     </script>
     <!-- ADDED SCRIPT BLOCK TO MAKE THE NEW BUTTON WORK -->
@@ -1689,35 +1681,43 @@
                     </div>
                 `;
                 
-                // Bind events
-                document.getElementById('cancel-update-btn').onclick = () => toast.remove();
-                document.getElementById('confirm-update-btn').onclick = () => {
-                    toast.innerHTML = `
-                        <div style="background-color: rgba(6, 78, 59, 0.98); border: 2px solid #10b981; border-radius: 8px; box-shadow: 0 0 30px rgba(16, 185, 129, 0.5); padding: 16px; color: #ffffff; font-family: monospace; display: flex; flex-direction: column; gap: 12px; pointer-events: auto; backdrop-filter: blur(8px);">
-                            <div class="flex items-center gap-2 border-b border-emerald-500/30 pb-2">
-                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-                                <span class="text-xs font-black uppercase text-emerald-400 tracking-[0.2em]">UPDATE SUCCESSFUL</span>
+                // Bind events in-memory using querySelector to prevent TypeError crashes
+                const cancelBtn = toast.querySelector('#cancel-update-btn');
+                const confirmBtn = toast.querySelector('#confirm-update-btn');
+                
+                if (cancelBtn) {
+                    cancelBtn.onclick = () => toast.remove();
+                }
+                
+                if (confirmBtn) {
+                    confirmBtn.onclick = () => {
+                        toast.innerHTML = `
+                            <div style="background-color: rgba(6, 78, 59, 0.98); border: 2px solid #10b981; border-radius: 8px; box-shadow: 0 0 30px rgba(16, 185, 129, 0.5); padding: 16px; color: #ffffff; font-family: monospace; display: flex; flex-direction: column; gap: 12px; pointer-events: auto; backdrop-filter: blur(8px);">
+                                <div class="flex items-center gap-2 border-b border-emerald-500/30 pb-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
+                                    <span class="text-xs font-black uppercase text-emerald-400 tracking-[0.2em]">UPDATE SUCCESSFUL</span>
+                                </div>
+                                <div class="text-[9px] leading-relaxed uppercase font-bold text-emerald-200 flex flex-col gap-1">
+                                    <div>DEPLOY CODE: 200 (SUCCESS)</div>
+                                    <div>DATABASE SYNCHRONIZATION: OPERATIONAL</div>
+                                    <div>REBOOTING TACTICAL SYSTEM...</div>
+                                </div>
+                                <div class="w-full bg-emerald-950 h-1.5 rounded overflow-hidden mt-1">
+                                    <div id="pwa-progress-bar" class="bg-emerald-400 h-full rounded transition-all duration-1000" style="width: 0%;"></div>
+                                </div>
                             </div>
-                            <div class="text-[9px] leading-relaxed uppercase font-bold text-emerald-200 flex flex-col gap-1">
-                                <div>DEPLOY CODE: 200 (SUCCESS)</div>
-                                <div>DATABASE SYNCHRONIZATION: OPERATIONAL</div>
-                                <div>REBOOTING TACTICAL SYSTEM...</div>
-                            </div>
-                            <div class="w-full bg-emerald-950 h-1.5 rounded overflow-hidden mt-1">
-                                <div id="pwa-progress-bar" class="bg-emerald-400 h-full rounded transition-all duration-1000" style="width: 0%;"></div>
-                            </div>
-                        </div>
-                    `;
-                    
-                    setTimeout(() => {
-                        const bar = document.getElementById('pwa-progress-bar');
-                        if (bar) bar.style.width = '100%';
-                    }, 50);
-                    
-                    setTimeout(() => {
-                        worker.postMessage({ type: 'SKIP_WAITING' });
-                    }, 1500);
-                };
+                        `;
+                        
+                        setTimeout(() => {
+                            const bar = toast.querySelector('#pwa-progress-bar');
+                            if (bar) bar.style.width = '100%';
+                        }, 50);
+                        
+                        setTimeout(() => {
+                            worker.postMessage({ type: 'SKIP_WAITING' });
+                        }, 1500);
+                    };
+                }
             };
 
             // Render loading status first
