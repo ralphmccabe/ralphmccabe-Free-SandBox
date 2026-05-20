@@ -1624,19 +1624,37 @@
                 navigator.serviceWorker.register('./sw.js').then(reg => {
                     console.log('[SW] PWA Service Worker Registered');
                     
-                    if (reg.waiting) {
-                        showUpdateToast(reg.waiting);
+                    // Robust check helper to handle slow thread sync
+                    const checkForUpdate = (r) => {
+                        if (r.waiting) {
+                            showUpdateToast(r.waiting);
+                            return true;
+                        }
+                        return false;
+                    };
+                    
+                    // 1. Immediate check
+                    if (!checkForUpdate(reg)) {
+                        // 2. Poll check every 500ms up to 10 times in case of slow browser thread sync
+                        let checkCount = 0;
+                        const poll = setInterval(() => {
+                            checkCount++;
+                            if (checkForUpdate(reg) || checkCount > 10) {
+                                clearInterval(poll);
+                            }
+                        }, 500);
                     }
                     
+                    // 3. Listener for updates discovered during the active session
                     reg.onupdatefound = () => {
                         const installingWorker = reg.installing;
-                        installingWorker.onstatechange = () => {
-                            if (installingWorker.state === 'installed') {
-                                if (navigator.serviceWorker.controller) {
+                        if (installingWorker) {
+                            installingWorker.onstatechange = () => {
+                                if (installingWorker.state === 'installed') {
                                     showUpdateToast(installingWorker);
                                 }
-                            }
-                        };
+                            };
+                        }
                     };
                 });
                 
