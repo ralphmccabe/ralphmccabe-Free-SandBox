@@ -1,5 +1,5 @@
-/* TRC-PRO-VERSION - v2.5-PROD */
-const CACHE_NAME = 'trc-pro-upgrade-v2.5';
+/* TRC-PRO-VERSION - v2.14.2-PROD */
+const CACHE_NAME = 'trc-pro-upgrade-v2.14.2-PROD';
 const ASSETS = [
     './',
     './index.html?v=6.1',
@@ -48,7 +48,7 @@ self.addEventListener('activate', event => {
 
 self.addEventListener('fetch', event => {
     event.respondWith(
-        caches.match(event.request).then(response => {
+        caches.match(event.request, { ignoreSearch: true }).then(response => {
             return response || fetch(event.request);
         })
     );

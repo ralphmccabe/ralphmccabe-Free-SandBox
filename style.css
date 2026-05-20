@@ -493,4 +493,40 @@ body.is-capturing #card-scale-wrapper {
 }
 
 
+/* ============================================================
+   TAC COMMS — 4-COLUMN MOBILE FIX
+   Keeps PTT / Chat / Map / Roster side by side on phones
+   ============================================================ */
 
+/* Force 4-col grid on ALL screen sizes — override Tailwind's sm/lg breakpoints */
+#comms-dashboard {
+    display: grid !important;
+    grid-template-columns: repeat(4, 1fr) !important;
+    grid-template-rows: 1fr !important;
+    height: 100% !important;
+    overflow: hidden !important;
+}
+
+/* On screens narrower than 600px: switch to 2x2 grid (still side by side, not stacked) */
+@media (max-width: 600px) {
+    #comms-dashboard {
+        grid-template-columns: repeat(2, 1fr) !important;
+        grid-template-rows: repeat(2, 1fr) !important;
+        overflow-y: hidden !important;
+        height: 420px !important;
+        min-height: 420px !important;
+    }
+    
+    /* Give the comms panel enough room on mobile */
+    #panel-comms {
+        height: 460px !important;
+        max-height: 460px !important;
+    }
+
+    /* Each comms column should show properly */
+    #comms-dashboard > div {
+        height: 210px !important;
+        max-height: 210px !important;
+        overflow-y: auto !important;
+    }
+}

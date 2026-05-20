@@ -18,7 +18,7 @@ const TacticalCrypto = {
     }
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+function initializeTacticalDashboard1() {
 
     // === 0. Global Security & Layout Protection ===
     // Enforce a 25-character limit on ALL text boxes to prevent layout breakage
@@ -1575,7 +1575,13 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initial call
     handleResponsiveScaling();
     if (typeof syncReconPortal === 'function') syncReconPortal();
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeTacticalDashboard1);
+} else {
+    initializeTacticalDashboard1();
+}
 
 function toggleSection(id) { document.getElementById(id).classList.toggle('hidden'); }
 window.appendCalc = function (v) {
@@ -1593,7 +1599,7 @@ window.calcCos = function () {
 };
 
 // --- Vault Swipe Controller (V1.6 Connected) ---
-document.addEventListener('DOMContentLoaded', () => {
+function initializeTacticalDashboard2() {
     let profileNames = [];
     let currentProfileIndex = -1;
 
@@ -4921,4 +4927,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Delayed recovery to ensure IDB is ready
     setTimeout(recoverMission, 1500);
 
-});
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeTacticalDashboard2);
+} else {
+    initializeTacticalDashboard2();
+}
