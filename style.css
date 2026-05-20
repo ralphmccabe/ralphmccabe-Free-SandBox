@@ -512,21 +512,20 @@ body.is-capturing #card-scale-wrapper {
     #comms-dashboard {
         grid-template-columns: repeat(2, 1fr) !important;
         grid-template-rows: repeat(2, 1fr) !important;
-        overflow-y: hidden !important;
-        height: 420px !important;
-        min-height: 420px !important;
+        overflow-y: auto !important;
+        height: auto !important;
+        min-height: 300px !important;
     }
     
     /* Give the comms panel enough room on mobile */
     #panel-comms {
-        height: 460px !important;
-        max-height: 460px !important;
+        min-height: 320px !important;
+        height: auto !important;
     }
 
     /* Each comms column should show properly */
     #comms-dashboard > div {
-        height: 210px !important;
-        max-height: 210px !important;
+        min-height: 140px !important;
         overflow-y: auto !important;
     }
 }

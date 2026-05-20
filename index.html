@@ -134,120 +134,7 @@
 
 <body class="bg-gray-800 text-gray-100 min-h-screen font-sans selection:bg-neon-green selection:text-black overflow-x-hidden">
 
-    <!-- LOCAL_TESTING_BANNER_START -->
-    <div id="local-testing-banner" style="background: repeating-linear-gradient(45deg, #7f1d1d, #7f1d1d 10px, #991b1b 10px, #991b1b 20px); border-bottom: 2px solid #ef4444; color: white; text-align: center; font-family: monospace; font-size: 10px; font-weight: bold; padding: 6px; letter-spacing: 0.05em; z-index: 99999; position: relative; display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap;">
-        <span>⚠️ LOCAL TESTING ENVIRONMENT (PORT 8445) - DO NOT PUSH TO PRODUCTION ⚠️</span>
-        <button id="snapshot-btn" onclick="takeSnapshotBackground()" style="background: #10b981; border: 1px solid #34d399; color: black; font-size: 8px; font-weight: 900; padding: 2px 8px; border-radius: 3px; cursor: pointer; text-transform: uppercase; font-family: monospace; transition: all 0.2s;">📸 DRAFT SNAPSHOT v2.5-PROD</button>
-        <button id="stage-prod-btn" onclick="stageToProduction()" style="background: #3b82f6; border: 1px solid #60a5fa; color: white; font-size: 8px; font-weight: 900; padding: 2px 8px; border-radius: 3px; cursor: pointer; text-transform: uppercase; font-family: monospace; transition: all 0.2s; white-space: nowrap;">🚀 STAGE TO "READY TO BE PUSHED"</button>
-    </div>
-    <script>
-        // ONE-TIME EMERGENCY CACHE BREAKER (Runs only once to break the trap)
-        if (!localStorage.getItem('cache_nuked_v2_4_3')) {
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(function(registrations) {
-                    for(let registration of registrations) {
-                        registration.unregister();
-                    }
-                });
-            }
-            localStorage.setItem('cache_nuked_v2_4_3', 'true');
-            console.log("Nuking cache and force reloading...");
-            setTimeout(() => window.location.reload(true), 1000);
-        }
-
-        function takeSnapshotBackground() {
-            const btn = document.getElementById('snapshot-btn');
-            btn.innerText = '⚙️ BUMPING VERSION...';
-            btn.style.background = '#4b5563';
-            btn.style.borderColor = '#9ca3af';
-            btn.disabled = true;
-
-            fetch('/api/take-snapshot', { method: 'POST' })
-            .then(res => res.json())
-            .then(data => {
-                btn.disabled = false;
-                if (data.status === 'success') {
-                    const ver = data.version || 'NEW';
-                    btn.innerText = `✅ DRAFTED ${ver}!`;
-                    btn.style.background = '#10b981';
-                    btn.style.borderColor = '#34d399';
-                    btn.style.color = 'black';
-                    // Update button label to show the new version
-                    setTimeout(() => {
-                        btn.innerText = `📸 DRAFT SNAPSHOT ${ver}`;
-                        btn.style.background = '#10b981';
-                        btn.style.borderColor = '#34d399';
-                        btn.style.color = 'black';
-                    }, 3000);
-                } else {
-                    alert('Draft Error: ' + data.message);
-                    btn.innerText = '❌ DRAFT FAILED';
-                    btn.style.background = '#dc2626';
-                    btn.style.borderColor = '#f87171';
-                    btn.style.color = 'white';
-                    setTimeout(() => {
-                        btn.innerText = '📸 DRAFT SNAPSHOT';
-                        btn.style.background = '#10b981';
-                        btn.style.borderColor = '#34d399';
-                        btn.style.color = 'black';
-                    }, 3000);
-                }
-            })
-            .catch(() => {
-                btn.disabled = false;
-                alert('⚠️ Network Error — Is the Python server running from free-trc-sandbox?');
-                btn.innerText = '📸 DRAFT SNAPSHOT';
-                btn.style.background = '#10b981';
-                btn.style.borderColor = '#34d399';
-                btn.style.color = 'black';
-            });
-        }
-
-        function stageToProduction() {
-            const btn = document.getElementById('stage-prod-btn');
-            const originalText = btn.innerText;
-            btn.innerText = '⚙️ COMPILING...';
-            btn.style.background = '#4b5563';
-            btn.disabled = true;
-
-            fetch('/api/push-production', { method: 'POST' })
-            .then(res => res.json())
-            .then(data => {
-                btn.disabled = false;
-                if (data.status === 'success') {
-                    btn.innerText = '✅ STAGED! CHECK "READY TO BE PUSHED" FOLDER';
-                    btn.style.background = '#10b981';
-                    btn.style.borderColor = '#34d399';
-                    btn.style.color = 'black';
-                    setTimeout(() => {
-                        btn.innerText = originalText;
-                        btn.style.background = '#3b82f6';
-                        btn.style.borderColor = '#60a5fa';
-                        btn.style.color = 'white';
-                    }, 4000);
-                } else {
-                    alert('Stage Error: ' + data.message);
-                    btn.innerText = '❌ STAGE FAILED';
-                    btn.style.background = '#dc2626';
-                    setTimeout(() => {
-                        btn.innerText = originalText;
-                        btn.style.background = '#3b82f6';
-                        btn.style.borderColor = '#60a5fa';
-                        btn.style.color = 'white';
-                    }, 3000);
-                }
-            })
-            .catch(() => {
-                btn.disabled = false;
-                alert('⚠️ Network Error — Is the Python server running from free-trc-sandbox?');
-                btn.innerText = originalText;
-                btn.style.background = '#3b82f6';
-                btn.style.borderColor = '#60a5fa';
-                btn.style.color = 'white';
-            });
-        }
-    </script>
-    <!-- LOCAL_TESTING_BANNER_END -->
+    
 
     <div id="mainLayout" class="flex flex-col lg:flex-row h-screen lg:overflow-hidden">
         
@@ -1764,7 +1651,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js?v=v2.14.2-PROD').then(reg => {
+                navigator.serviceWorker.register('./sw.js?v=v2.14-PROD').then(reg => {
                     console.log('[SW] PWA Service Worker Registered');
                     
                     // Robust check helper to handle slow thread sync
@@ -1816,12 +1703,11 @@
             
             const toast = document.createElement('div');
             toast.id = 'twa-update-toast';
-            // PINNED TO BOTTOM: Fixed positioning ensures it stays on screen on mobile
-            toast.style.cssText = 'position: fixed !important; bottom: 30px !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 999999 !important; width: 92% !important; max-width: 480px !important; box-sizing: border-box !important; pointer-events: none !important;';
+            toast.style.cssText = 'position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 99999; width: 92%; max-width: 480px; box-sizing: border-box; pointer-events: none;';
             
             const renderToast = (versionTitle = 'TACTICAL UPDATE DETECTED', changelog = 'New PWA components ready to install. Please save all work.') => {
                 toast.innerHTML = `
-                    <div style="background-color: rgba(43, 15, 3, 0.98); border: 2px solid #f97316; border-radius: 8px; box-shadow: 0 0 30px rgba(249, 115, 22, 0.45); padding: 16px; color: #ffffff; font-family: monospace; display: flex; flex-direction: column; gap: 10px; pointer-events: auto; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+                    <div class="animate-bounce" style="background-color: rgba(43, 15, 3, 0.98); border: 2px solid #f97316; border-radius: 8px; box-shadow: 0 0 30px rgba(249, 115, 22, 0.45); padding: 16px; color: #ffffff; font-family: monospace; display: flex; flex-direction: column; gap: 10px; pointer-events: auto; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
                         <div class="flex items-center gap-2 border-b border-orange-500/30 pb-2">
                             <span class="w-2.5 h-2.5 rounded-full bg-orange-500 animate-ping"></span>
                             <span class="text-xs font-black uppercase text-orange-400 tracking-[0.2em]">${versionTitle}</span>
@@ -1862,15 +1748,10 @@
                                 <div class="text-[9px] leading-relaxed uppercase font-bold text-emerald-200 flex flex-col gap-1">
                                     <div>DEPLOY CODE: 200 (SUCCESS)</div>
                                     <div>DATABASE SYNCHRONIZATION: OPERATIONAL</div>
-                                    <div class="text-emerald-400 font-bold mt-1">SYSTEM READY FOR REBOOT.</div>
+                                    <div>REBOOTING TACTICAL SYSTEM...</div>
                                 </div>
                                 <div class="w-full bg-emerald-950 h-1.5 rounded overflow-hidden mt-1">
                                     <div id="pwa-progress-bar" class="bg-emerald-400 h-full rounded transition-all duration-1000" style="width: 0%;"></div>
-                                </div>
-                                <div class="flex justify-end mt-2">
-                                    <button id="reboot-now-btn" class="bg-emerald-500 border border-emerald-400 hover:bg-emerald-600 text-black text-[10px] font-black uppercase px-4 py-2 rounded transition-all shadow-[0_0_15px_rgba(16,185,129,0.5)]">
-                                        [ REBOOT SYSTEM NOW ]
-                                    </button>
                                 </div>
                             </div>
                         `;
@@ -1879,18 +1760,10 @@
                             const bar = toast.querySelector('#pwa-progress-bar');
                             if (bar) bar.style.width = '100%';
                         }, 50);
-
-                        // Tell service worker to skip waiting
-                        try { worker.postMessage({ type: 'SKIP_WAITING' }); } catch(e) { console.error("Worker msg failed", e); }
                         
-                        // Wait for user to manually click reboot
-                        const rebootBtn = toast.querySelector('#reboot-now-btn');
-                        if (rebootBtn) {
-                            rebootBtn.onclick = () => {
-                                rebootBtn.innerText = 'REBOOTING...';
-                                window.location.reload(true);
-                            };
-                        }
+                        setTimeout(() => {
+                            worker.postMessage({ type: 'SKIP_WAITING' });
+                        }, 1500);
                     };
                 }
             };
@@ -1915,7 +1788,7 @@
                         const headerLine = lines[0].trim();
                         
                         let versionTitle = 'UPDATE AVAILABLE';
-                        const match = headerLine.match(/(v\d+\.\d+(?:\.\d+)?-PROD)/);
+                        const match = headerLine.match(/(v2\.\d-PROD)/);
                         if (match) {
                             versionTitle = `NEW UPDATE: ${match[1]}`;
                         }
