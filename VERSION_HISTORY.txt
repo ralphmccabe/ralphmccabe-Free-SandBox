@@ -1,0 +1,34 @@
+TACTICAL RANGE CARD PRO - STAGING VERSION HISTORY
+
+================================================================================
+v2.0-PROD: INITIAL HUD RELEASE
+--------------------------------------------------------------------------------
+- Core ballistic solving matrix and range card display.
+- Secure IndexedDB local backup caching.
+
+================================================================================
+v2.1-PROD: COMMUNICATIONS CORE INTEGRATION
+--------------------------------------------------------------------------------
+- Real-time Team Roster sync via secure Supabase connection.
+- AES-256 secure chat encryption for tactical coordination.
+
+================================================================================
+v2.2-PROD: CAMERA & VISUAL INTEL UPLINK
+--------------------------------------------------------------------------------
+- Direct hardware camera stream integration in sidebar.
+- Base64 canvas rendering engine for vault snapshots.
+
+================================================================================
+v2.3-PROD: STUCK REMARKS NOTEPAD VERSION
+--------------------------------------------------------------------------------
+- Remarks notepad container introduced.
+- Notepad locked in static coordinates (top-right, non-draggable) for HUD stability testing.
+
+================================================================================
+v2.4-PROD: DRAGGABLE NOTEPAD & DEV PANEL UPGRADE (ACTIVE RUNTIME)
+--------------------------------------------------------------------------------
+- Deployed fully draggable/floating Mouse & Touch Remarks notepad modal.
+- Integrated premium Developer Staging Panel at the top of the browser.
+- Deployed interactive E2E PWA simulated upgrade loop with success progress bar.
+- Added version history ledger directly in current folder.
+================================================================================

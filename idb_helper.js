@@ -5,10 +5,11 @@
  */
 
 const DB_NAME = 'TRC_PRO_UPGRADE_DB';
-const DB_VERSION = 2; // Incremented version
+const DB_VERSION = 3; // Incremented version to add drafts store
 const STORES = {
     PROFILES: 'rangeCardProfiles',
-    VAULT: 'intelVault' // NEW: Permanent storage for snapshots/remarks
+    VAULT: 'intelVault', // NEW: Permanent storage for snapshots/remarks
+    DRAFTS: 'drafts' // NEW: Mission recovery drafts
 };
 
 const idb = {
@@ -26,6 +27,9 @@ const idb = {
                 }
                 if (!db.objectStoreNames.contains(STORES.VAULT)) {
                     db.createObjectStore(STORES.VAULT);
+                }
+                if (!db.objectStoreNames.contains(STORES.DRAFTS)) {
+                    db.createObjectStore(STORES.DRAFTS);
                 }
             };
 
@@ -65,6 +69,15 @@ const idb = {
         });
     },
 
+    async get(storeName, key) {
+        const store = await this.getStore(storeName);
+        return new Promise((resolve, reject) => {
+            const request = store.get(key);
+            request.onsuccess = () => resolve(request.result);
+            request.onerror = (event) => reject(event.target.error);
+        });
+    },
+
     async set(storeName, key, value) {
         const store = await this.getStore(storeName, 'readwrite');
         return new Promise((resolve, reject) => {
@@ -72,6 +85,13 @@ const idb = {
             request.onsuccess = () => resolve();
             request.onerror = (event) => reject(event.target.error);
         });
+    },
+
+    async put(storeName, value) {
+        // Alias for put without explicit key if value has it, 
+        // or just a wrapper for set(storeName, value.id, value)
+        const key = value.id || value.name;
+        return this.set(storeName, key, value);
     },
 
     async delete(storeName, key) {

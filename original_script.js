@@ -33,10 +33,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Core inputs that exist in the static HTML
     const inputs = [
-        'header-notes', 'shooter-name', 'date', 'time', 'caliber', 'zero', 'barrel', 'bullet', 'load', 'powder',
-        'primer', 'col', 'rings', 'velocity', 'g1', 'weather', 'targetSize', 'groupSize', 'elevation', 'hold-data', 'final-dope',
+        'unit-name', 'call-sign', 'location-name', 'mgrs-coords', 'profile-date',
         'rifle-notes', 'wind-notes', 'scope-notes', 'shooting-angle', 'direction-notes', 'lrf-notes', 'compass-range',
-        'compass-range-2', 'box-count-input'
+        'compass-range-2', 'box-count-input',
+        'sidebar-bal-input-alt', 'sidebar-bal-input-temp', 'sidebar-bal-input-baro'
     ];
 
     // Generate Distance Table Rows and collect their Input IDs
@@ -99,6 +99,34 @@ document.addEventListener('DOMContentLoaded', () => {
             // Initial sync
             if (display) display.textContent = input.value;
             if (mobileDisplay) mobileDisplay.textContent = input.value;
+        }
+    });
+
+    // === 2.5 Dashboard <-> Sidebar Synchronization ===
+    const syncPairs = [
+        ['compass-range', 'bal-input-range'],
+        ['shooting-angle', 'bal-input-angle'],
+        ['sidebar-bal-input-alt', 'bal-input-alt'],
+        ['sidebar-bal-input-temp', 'bal-input-temp'],
+        ['sidebar-bal-input-baro', 'bal-input-baro']
+    ];
+
+    syncPairs.forEach(([sidebarId, dashId]) => {
+        const sidebarEl = document.getElementById(sidebarId);
+        const dashEl = document.getElementById(dashId);
+        if (sidebarEl && dashEl) {
+            sidebarEl.addEventListener('input', () => {
+                if (dashEl.value !== sidebarEl.value) {
+                    dashEl.value = sidebarEl.value;
+                    dashEl.dispatchEvent(new Event('input'));
+                }
+            });
+            dashEl.addEventListener('input', () => {
+                if (sidebarEl.value !== dashEl.value) {
+                    sidebarEl.value = dashEl.value;
+                    sidebarEl.dispatchEvent(new Event('input'));
+                }
+            });
         }
     });
 
@@ -830,6 +858,14 @@ document.addEventListener('DOMContentLoaded', () => {
     saveProfileBtn.onclick = () => {
         const name = prompt("Enter profile name to save tactical record:");
         if (!name) return;
+
+        const existingProfiles = getProfiles();
+        const lowerName = name.trim().toLowerCase();
+        const nameExists = Object.keys(existingProfiles).some(k => k.trim().toLowerCase() === lowerName);
+        if (nameExists) {
+            alert("NAME ALREADY EXIST");
+            return;
+        }
 
         const container = document.getElementById('card-container');
         const previewPanel = document.getElementById('previewPanel');
@@ -2239,6 +2275,14 @@ document.addEventListener('DOMContentLoaded', () => {
             const name = reconScenarioName.value.trim();
             if (!name) {
                 alert('Please set a Scenario Name first.');
+                return;
+            }
+
+            const existingProfiles = getProfiles();
+            const lowerName = name.trim().toLowerCase();
+            const nameExists = Object.keys(existingProfiles).some(k => k.trim().toLowerCase() === lowerName);
+            if (nameExists) {
+                alert("NAME ALREADY EXIST");
                 return;
             }
 
@@ -4669,7 +4713,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         titleInput.value = item.remarksTitle || '';
         textInput.value = item.remarksText || '';
-        if (counter) counter.textContent = `${textInput.value.length}/100`;
+        if (counter) counter.textContent = `${textInput.value.length}/500`;
 
         modal.classList.remove('hidden');
         textInput.focus();
@@ -4690,14 +4734,75 @@ document.addEventListener('DOMContentLoaded', () => {
     if (remarksIconBtn && remarksModal) {
         remarksIconBtn.addEventListener('click', () => {
             remarksModal.classList.toggle('hidden');
-            if (!remarksModal.classList.contains('hidden')) remarksInput.focus();
+            if (!remarksModal.classList.contains('hidden')) {
+                remarksInput.focus();
+            }
         });
 
         remarksCloseBtn.addEventListener('click', () => remarksModal.classList.add('hidden'));
 
         remarksInput.addEventListener('input', () => {
-            remarksCounter.textContent = `${remarksInput.value.length}/100`;
+            remarksCounter.textContent = `${remarksInput.value.length}/500`;
         });
+
+        // Initialize Drag and Drop for Remarks Notepad Modal (Mouse & Touch)
+        let isDragging = false;
+        let startX, startY, initialLeft, initialTop;
+        const dragHeader = remarksModal.querySelector('.cursor-move');
+        
+        if (dragHeader) {
+            const startDrag = (e) => {
+                if (e.target.closest('#remarks-close-btn') || e.target.closest('input') || e.target.closest('textarea')) return;
+                
+                isDragging = true;
+                const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+                
+                startX = clientX;
+                startY = clientY;
+                
+                const rect = remarksModal.getBoundingClientRect();
+                initialLeft = rect.left;
+                initialTop = rect.top;
+                
+                remarksModal.style.right = 'auto';
+                remarksModal.style.left = `${initialLeft}px`;
+                remarksModal.style.top = `${initialTop}px`;
+                
+                if (e.type === 'mousedown') {
+                    document.addEventListener('mousemove', drag);
+                    document.addEventListener('mouseup', stopDrag);
+                } else {
+                    document.addEventListener('touchmove', drag, { passive: false });
+                    document.addEventListener('touchend', stopDrag);
+                }
+            };
+            
+            const drag = (e) => {
+                if (!isDragging) return;
+                if (e.cancelable) e.preventDefault();
+                
+                const clientX = e.type.startsWith('touch') ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type.startsWith('touch') ? e.touches[0].clientY : e.clientY;
+                
+                const dx = clientX - startX;
+                const dy = clientY - startY;
+                
+                remarksModal.style.left = `${initialLeft + dx}px`;
+                remarksModal.style.top = `${initialTop + dy}px`;
+            };
+            
+            const stopDrag = () => {
+                isDragging = false;
+                document.removeEventListener('mousemove', drag);
+                document.removeEventListener('mouseup', stopDrag);
+                document.removeEventListener('touchmove', drag);
+                document.removeEventListener('touchend', stopDrag);
+            };
+            
+            dragHeader.addEventListener('mousedown', startDrag);
+            dragHeader.addEventListener('touchstart', startDrag, { passive: true });
+        }
 
         remarksSaveBtn.addEventListener('click', () => {
             const text = remarksInput.value.trim();
@@ -4733,19 +4838,19 @@ document.addEventListener('DOMContentLoaded', () => {
             ctx.lineTo(360, 75);
             ctx.stroke();
 
-            // Text
+            // Text Wrap & Render
             ctx.fillStyle = '#fef08a'; // yellow-200
-            ctx.font = '16px monospace';
+            ctx.font = '12px monospace'; // smaller font size to support up to 500 characters in standard card format
             const words = text.split(' ');
             let line = '';
-            let y = 110;
+            let y = 95;
             for(let n = 0; n < words.length; n++) {
                 const testLine = line + words[n] + ' ';
                 const metrics = ctx.measureText(testLine);
                 if (metrics.width > 340 && n > 0) {
                     ctx.fillText(line.trim(), 200, y);
                     line = words[n] + ' ';
-                    y += 24;
+                    y += 18;
                 } else {
                     line = testLine;
                 }
@@ -4761,7 +4866,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             remarksInput.value = '';
             if (remarksTitleInput) remarksTitleInput.value = '';
-            remarksCounter.textContent = '0/100';
+            remarksCounter.textContent = '0/500';
             remarksModal.classList.add('hidden');
             window.pushTacLog("REMARKS NOTE SAVED TO VAULT", "SUCCESS");
         });
