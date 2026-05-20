@@ -1651,7 +1651,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js?v=v2.14-PROD').then(reg => {
+                navigator.serviceWorker.register('./sw.js?v=v2.14.2-PROD').then(reg => {
                     console.log('[SW] PWA Service Worker Registered');
                     
                     // Robust check helper to handle slow thread sync
@@ -1703,11 +1703,12 @@
             
             const toast = document.createElement('div');
             toast.id = 'twa-update-toast';
-            toast.style.cssText = 'position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 99999; width: 92%; max-width: 480px; box-sizing: border-box; pointer-events: none;';
+            // PINNED TO BOTTOM: Fixed positioning ensures it stays on screen on mobile
+            toast.style.cssText = 'position: fixed !important; bottom: 30px !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 999999 !important; width: 92% !important; max-width: 480px !important; box-sizing: border-box !important; pointer-events: none !important;';
             
             const renderToast = (versionTitle = 'TACTICAL UPDATE DETECTED', changelog = 'New PWA components ready to install. Please save all work.') => {
                 toast.innerHTML = `
-                    <div class="animate-bounce" style="background-color: rgba(43, 15, 3, 0.98); border: 2px solid #f97316; border-radius: 8px; box-shadow: 0 0 30px rgba(249, 115, 22, 0.45); padding: 16px; color: #ffffff; font-family: monospace; display: flex; flex-direction: column; gap: 10px; pointer-events: auto; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+                    <div style="background-color: rgba(43, 15, 3, 0.98); border: 2px solid #f97316; border-radius: 8px; box-shadow: 0 0 30px rgba(249, 115, 22, 0.45); padding: 16px; color: #ffffff; font-family: monospace; display: flex; flex-direction: column; gap: 10px; pointer-events: auto; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
                         <div class="flex items-center gap-2 border-b border-orange-500/30 pb-2">
                             <span class="w-2.5 h-2.5 rounded-full bg-orange-500 animate-ping"></span>
                             <span class="text-xs font-black uppercase text-orange-400 tracking-[0.2em]">${versionTitle}</span>
@@ -1748,10 +1749,15 @@
                                 <div class="text-[9px] leading-relaxed uppercase font-bold text-emerald-200 flex flex-col gap-1">
                                     <div>DEPLOY CODE: 200 (SUCCESS)</div>
                                     <div>DATABASE SYNCHRONIZATION: OPERATIONAL</div>
-                                    <div>REBOOTING TACTICAL SYSTEM...</div>
+                                    <div class="text-emerald-400 font-bold mt-1">SYSTEM READY FOR REBOOT.</div>
                                 </div>
                                 <div class="w-full bg-emerald-950 h-1.5 rounded overflow-hidden mt-1">
                                     <div id="pwa-progress-bar" class="bg-emerald-400 h-full rounded transition-all duration-1000" style="width: 0%;"></div>
+                                </div>
+                                <div class="flex justify-end mt-2">
+                                    <button id="reboot-now-btn" class="bg-emerald-500 border border-emerald-400 hover:bg-emerald-600 text-black text-[10px] font-black uppercase px-4 py-2 rounded transition-all shadow-[0_0_15px_rgba(16,185,129,0.5)]">
+                                        [ REBOOT SYSTEM NOW ]
+                                    </button>
                                 </div>
                             </div>
                         `;
@@ -1760,10 +1766,18 @@
                             const bar = toast.querySelector('#pwa-progress-bar');
                             if (bar) bar.style.width = '100%';
                         }, 50);
+
+                        // Tell service worker to skip waiting
+                        try { worker.postMessage({ type: 'SKIP_WAITING' }); } catch(e) { console.error("Worker msg failed", e); }
                         
-                        setTimeout(() => {
-                            worker.postMessage({ type: 'SKIP_WAITING' });
-                        }, 1500);
+                        // Wait for user to manually click reboot
+                        const rebootBtn = toast.querySelector('#reboot-now-btn');
+                        if (rebootBtn) {
+                            rebootBtn.onclick = () => {
+                                rebootBtn.innerText = 'REBOOTING...';
+                                window.location.reload(true);
+                            };
+                        }
                     };
                 }
             };
@@ -1788,7 +1802,7 @@
                         const headerLine = lines[0].trim();
                         
                         let versionTitle = 'UPDATE AVAILABLE';
-                        const match = headerLine.match(/(v2\.\d-PROD)/);
+                        const match = headerLine.match(/(v\d+\.\d+(?:\.\d+)?-PROD)/);
                         if (match) {
                             versionTitle = `NEW UPDATE: ${match[1]}`;
                         }
