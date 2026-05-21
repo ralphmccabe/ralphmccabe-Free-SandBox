@@ -26,6 +26,13 @@ function initializeTacticalDashboard1() {
         el.setAttribute('maxlength', '25');
     });
 
+    // type="number" ignores maxlength — enforce 25-char cap globally via JS
+    document.querySelectorAll('input[type="number"]').forEach(el => {
+        el.addEventListener('input', () => {
+            if (el.value.length > 25) el.value = el.value.slice(0, 25);
+        });
+    });
+
     // === 1. Setup & Table Generation ===
     const tableBody = document.getElementById('distance-table-body');
     const mobileTableBody = document.getElementById('mobile-distance-table-body'); // NEW
@@ -36,8 +43,16 @@ function initializeTacticalDashboard1() {
         'unit-name', 'call-sign', 'location-name', 'mgrs-coords', 'profile-date',
         'rifle-notes', 'wind-notes', 'scope-notes', 'shooting-angle', 'direction-notes', 'lrf-notes', 'compass-range',
         'compass-range-2', 'box-count-input',
-        'sidebar-bal-input-alt', 'sidebar-bal-input-temp', 'sidebar-bal-input-baro'
+        'sidebar-bal-input-alt', 'sidebar-bal-input-temp', 'sidebar-bal-input-baro',
+        // Reload Data
+        'caliber', 'zero', 'barrel', 'bullet', 'load', 'powder', 'primer', 'col', 'rings',
+        'velocity', 'g1', 'weather', 'targetSize', 'groupSize',
+        // Session Info
+        'header-notes', 'shooter-name',
+        // Solution & Equipment
+        'elevation', 'hold-data', 'final-dope'
     ];
+
 
     // Generate Distance Table Rows and collect their Input IDs
     distances.forEach(dist => {
@@ -53,14 +68,14 @@ function initializeTacticalDashboard1() {
             const row = document.createElement('div');
             row.className = 'grid grid-cols-4 border-b border-black flex-1 items-center text-center';
             row.innerHTML = `
-                <div class="border-r border-black h-full flex items-center justify-center font-handwriting text-blue-800">
-                    <span id="display-${clicksId}"></span>
+                <div class="border-r border-black h-full flex items-center justify-center font-handwriting text-blue-800 min-w-0 px-0.5">
+                    <span id="display-${clicksId}" class="truncate w-full text-center"></span>
                 </div>
-                <div class="col-span-2 border-r border-black h-full flex items-center justify-center bg-gray-50/30">
-                    <span id="display-${distInputId}" class="text-sm font-bold">${dist}</span>
+                <div class="col-span-2 border-r border-black h-full flex items-center justify-center bg-gray-50/30 min-w-0 px-0.5">
+                    <span id="display-${distInputId}" class="text-sm font-bold truncate w-full text-center">${dist}</span>
                 </div>
-                <div class="h-full flex items-center justify-center font-handwriting text-blue-800">
-                    <span id="display-${udlrId}"></span>
+                <div class="h-full flex items-center justify-center font-handwriting text-blue-800 min-w-0 px-0.5">
+                    <span id="display-${udlrId}" class="truncate w-full text-center"></span>
                 </div>
             `;
             tableBody.appendChild(row);
@@ -71,14 +86,14 @@ function initializeTacticalDashboard1() {
             const row = document.createElement('div');
             row.className = 'grid grid-cols-4 border-b border-black flex items-center text-center border-l-0 border-r-0'; // Mobile styling adjustments
             row.innerHTML = `
-                <div class="border-r border-black h-full py-1 flex items-center justify-center font-handwriting text-blue-800">
-                    <span id="mobile-display-${clicksId}"></span>
+                <div class="border-r border-black h-full py-1 flex items-center justify-center font-handwriting text-blue-800 min-w-0 px-0.5">
+                    <span id="mobile-display-${clicksId}" class="truncate w-full text-center"></span>
                 </div>
-                <div class="col-span-2 border-r border-black h-full py-1 flex items-center justify-center bg-gray-50/30">
-                    <span id="mobile-display-${distInputId}" class="text-[10px] font-bold">${dist}</span>
+                <div class="col-span-2 border-r border-black h-full py-1 flex items-center justify-center bg-gray-50/30 min-w-0 px-0.5">
+                    <span id="mobile-display-${distInputId}" class="text-[10px] font-bold truncate w-full text-center">${dist}</span>
                 </div>
-                <div class="h-full py-1 flex items-center justify-center font-handwriting text-blue-800">
-                    <span id="mobile-display-${udlrId}"></span>
+                <div class="h-full py-1 flex items-center justify-center font-handwriting text-blue-800 min-w-0 px-0.5">
+                    <span id="mobile-display-${udlrId}" class="truncate w-full text-center"></span>
                 </div>
             `;
             mobileTableBody.appendChild(row);
@@ -102,33 +117,27 @@ function initializeTacticalDashboard1() {
         }
     });
 
-    // === 2.5 Dashboard <-> Sidebar Synchronization ===
-    const syncPairs = [
-        ['compass-range', 'bal-input-range'],
-        ['shooting-angle', 'bal-input-angle'],
-        ['sidebar-bal-input-alt', 'bal-input-alt'],
-        ['sidebar-bal-input-temp', 'bal-input-temp'],
-        ['sidebar-bal-input-baro', 'bal-input-baro']
-    ];
+    // === 2.1 Barometric Pressure Auto-Formatter ===
+    const baroInput = document.getElementById('bal-input-baro');
+    if (baroInput) {
+        baroInput.addEventListener('input', function(e) {
+            // Only format if the user isn't actively backspacing the decimal
+            if (e.inputType === 'deleteContentBackward') return;
+            
+            let val = this.value.replace(/[^0-9]/g, '');
+            if (val.length > 2) {
+                val = val.substring(0, 2) + '.' + val.substring(2, 4);
+            }
+            if (this.value !== val) {
+                this.value = val;
+                // Dispatch input event to trigger the generic sync listener
+                this.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+        });
+    }
 
-    syncPairs.forEach(([sidebarId, dashId]) => {
-        const sidebarEl = document.getElementById(sidebarId);
-        const dashEl = document.getElementById(dashId);
-        if (sidebarEl && dashEl) {
-            sidebarEl.addEventListener('input', () => {
-                if (dashEl.value !== sidebarEl.value) {
-                    dashEl.value = sidebarEl.value;
-                    dashEl.dispatchEvent(new Event('input'));
-                }
-            });
-            dashEl.addEventListener('input', () => {
-                if (sidebarEl.value !== dashEl.value) {
-                    sidebarEl.value = dashEl.value;
-                    sidebarEl.dispatchEvent(new Event('input'));
-                }
-            });
-        }
-    });
+    // === 2.5 Dashboard <-> Sidebar Synchronization ===
+    // SYNC DISABLED: Dashboard ballistic solver is fully independent of the range card form
 
     // === 1B. TARGET CANVAS SYSTEM ===
     function initTargetCanvases(type) {
@@ -3050,6 +3059,14 @@ function initializeTacticalDashboard2() {
                             const fieldElevFeet = Math.round(data.elevation * 3.28084);
                             elevEl.textContent = fieldElevFeet.toLocaleString();
                         }
+                        
+                        // AUTO-SYNC TO BALLISTIC SOLVER INPUTS
+                        document.getElementById('bal-input-temp').value = Math.round(tempF);
+                        document.getElementById('bal-input-baro').value = inHg.toFixed(2);
+                        document.getElementById('bal-input-wind').value = Math.round(c.wind_speed_10m);
+                        document.getElementById('bal-input-wind-dir').value = Math.round(c.wind_direction_10m);
+                        runSolverMatrix(); // Force instant re-calculation so HUD updates
+                        
 
                         // Success State Update
                         statusEl.textContent = 'SYNCED';
@@ -3412,8 +3429,8 @@ function initializeTacticalDashboard2() {
             const el = document.createElement('div');
             el.className = "bg-gray-900 border border-gray-800 rounded hover:border-emerald-500 transition-all p-1 cursor-pointer group relative overflow-hidden";
             el.innerHTML = `
-                <div class="aspect-square bg-black overflow-hidden relative border border-gray-800 mb-1">
-                    <img src="${item.image}" class="w-full h-full object-cover opacity-90 group-hover:opacity-100 transition-all">
+                <div class="aspect-square bg-black overflow-hidden relative border border-gray-800 mb-1 flex items-center justify-center">
+                    <img src="${item.image}" class="max-w-full max-h-full object-contain opacity-90 group-hover:opacity-100 transition-all">
                 </div>
                 <div class="text-[7px] font-mono text-gray-400 uppercase truncate pr-4">${item.label}</div>
                 <div class="text-[6px] text-gray-600">${new Date(item.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
@@ -3630,6 +3647,112 @@ function initializeTacticalDashboard2() {
     const placeholder = document.getElementById('surveillance-placeholder');
     const label = document.getElementById('feed-label-source');
 
+    // --- TACTICAL HUD SENSOR LOGIC ---
+    let hudAnimationId = null;
+    let currentHudHeading = 0;
+    let currentHudPitch = 0;
+    let deviceOrientationActive = false;
+
+    function handleOrientation(e) {
+        deviceOrientationActive = true; // Hard-latch active mode the moment data flows
+        
+        // e.webkitCompassHeading is iOS specific absolute heading. alpha is absolute on Android if AbsoluteOrientationSensor is used.
+        let heading = e.webkitCompassHeading;
+        if (heading === undefined || heading === null) heading = e.alpha; // Fallback
+        
+        if (heading === null || heading === undefined) heading = 0;
+        
+        // Pitch is beta (front-to-back tilt)
+        let pitch = e.beta;
+        if (pitch === null || pitch === undefined) pitch = 0;
+
+        currentHudHeading = heading;
+        currentHudPitch = pitch - 90; // Adjust for phone held in portrait
+    }
+
+    function updateTacticalHUD() {
+        if (!deviceOrientationActive) {
+            // Mock test animation for PC testing
+            currentHudHeading = (currentHudHeading + 0.2) % 360;
+            currentHudPitch = Math.sin(Date.now() / 1500) * 15;
+        }
+
+        // 1. Compass Update
+        const compassValue = document.getElementById('hud-compass-value');
+        const compassTape = document.getElementById('hud-compass-tape');
+        if (compassValue) {
+            const dirs = ["N","NE","E","SE","S","SW","W","NW","N"];
+            const ord = dirs[Math.round(((currentHudHeading % 360) / 45))];
+            compassValue.textContent = Math.round(currentHudHeading).toString().padStart(3, '0') + '° ' + ord;
+        }
+        if (compassTape) {
+            if (!compassTape.innerHTML.includes('E')) {
+                let tapeStr = "";
+                for (let i = 0; i <= 360; i += 15) {
+                    let dir = i;
+                    if (i === 0 || i === 360) dir = 'N';
+                    else if (i === 90) dir = 'E';
+                    else if (i === 180) dir = 'S';
+                    else if (i === 270) dir = 'W';
+                    tapeStr += `<span class="inline-block w-8 text-center">${dir}</span>`;
+                }
+                compassTape.innerHTML = tapeStr + tapeStr + tapeStr; // Extra buffer
+            }
+            // Approx 32px per 15 degrees = 2.13px per degree
+            const offset = (currentHudHeading * (32/15));
+            compassTape.style.transform = `translateX(-${offset}px)`;
+        }
+
+        // 2. Pitch Inclinometer Update
+        const pitchAngle = document.getElementById('hud-pitch-angle');
+        const pitchCos = document.getElementById('hud-pitch-cos');
+        const pitchLadder = document.getElementById('hud-pitch-ladder');
+        
+        let p = Math.round(currentHudPitch);
+        if (pitchAngle) pitchAngle.textContent = `A: ${Math.abs(p)}° ${p > 0 ? 'UP' : (p < 0 ? 'DN' : '')}`;
+        if (pitchCos) {
+            let cosVal = Math.cos(p * Math.PI / 180);
+            pitchCos.textContent = `C: ${cosVal.toFixed(2)}`;
+        }
+        if (pitchLadder) {
+            if (!pitchLadder.innerHTML.includes('div')) {
+                let ladStr = "";
+                for(let i=45; i>=-45; i-=5) {
+                    if (i===0) ladStr += `<div class="h-6 flex items-center justify-end w-full"><div class="w-full h-[1px] bg-emerald-400"></div></div>`;
+                    else ladStr += `<div class="h-6 flex items-center justify-end w-full gap-1"><span class="text-[5px] text-emerald-500">${Math.abs(i)}</span><div class="w-2/3 h-[1px] bg-emerald-500/50"></div></div>`;
+                }
+                pitchLadder.innerHTML = ladStr;
+            }
+            // 24px height per 5 degrees = 4.8px per degree
+            const pOffset = (currentHudPitch * 4.8);
+            pitchLadder.style.transform = `translateY(${pOffset}px)`;
+        }
+
+        hudAnimationId = requestAnimationFrame(updateTacticalHUD);
+    }
+
+    function initTacticalHUD() {
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientation', handleOrientation, true);
+            setTimeout(() => {
+                if (currentHudHeading === 0 && currentHudPitch === -90) {
+                    deviceOrientationActive = false; // PC mock fallback
+                } else {
+                    deviceOrientationActive = true;
+                }
+            }, 500);
+        } else {
+            deviceOrientationActive = false;
+        }
+        hudAnimationId = requestAnimationFrame(updateTacticalHUD);
+    }
+
+    function stopTacticalHUD() {
+        if (hudAnimationId) cancelAnimationFrame(hudAnimationId);
+        window.removeEventListener('deviceorientation', handleOrientation, true);
+    }
+    // --- END TACTICAL HUD SENSOR LOGIC ---
+
     async function startFeed() {
         if (activeStream) {
             activeStream.getTracks().forEach(track => track.stop());
@@ -3668,6 +3791,8 @@ function initializeTacticalDashboard2() {
 
             label.textContent = currentFacingMode === "environment" ? "REAR CAM" : "SCOPE CAM / FRONT";
             
+            initTacticalHUD(); // START HUD LOGIC
+            
         } catch (err) {
             console.error("Camera failed:", err);
             alert("Camera Access Denied. Ensure site permissions allow camera access.");
@@ -3691,6 +3816,8 @@ function initializeTacticalDashboard2() {
         // HIDE FOOTER ON STOP
         const survFooter = document.getElementById('surveillance-footer');
         if(survFooter) survFooter.classList.add('hidden');
+        
+        stopTacticalHUD(); // STOP HUD LOGIC
 
         label.textContent = "OFFLINE";
     }
@@ -3730,6 +3857,136 @@ function initializeTacticalDashboard2() {
             canvas.height = videoEl.videoHeight || 480;
             const ctx = canvas.getContext('2d');
             ctx.drawImage(videoEl, 0, 0, canvas.width, canvas.height);
+            
+            // --- TACTICAL HUD FULL GRAPHIC BURN-IN ---
+            // Dynamic scaler: Mobile cameras are high resolution (1080p+), so we must scale the UI up to match
+            const scale = Math.max(1, canvas.width / 400); 
+            ctx.scale(scale, scale);
+            
+            const cw = canvas.width / scale;
+            const ch = canvas.height / scale;
+            
+            ctx.lineWidth = 1;
+            const cx = cw / 2;
+            const cy = ch / 2;
+            
+            // 1. Center Reticle
+            ctx.strokeStyle = "rgba(16, 185, 129, 0.7)";
+            ctx.beginPath();
+            ctx.moveTo(cx - 20, cy); ctx.lineTo(cx + 20, cy); // Horizontal cross
+            ctx.moveTo(cx, cy - 20); ctx.lineTo(cx, cy + 20); // Vertical cross
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(cx, cy, 8, 0, Math.PI * 2); // Center circle
+            ctx.stroke();
+            
+            // Gather live HUD strings
+            const tAng = document.getElementById('hud-pitch-angle')?.textContent || "A: --°";
+            const tCos = document.getElementById('hud-pitch-cos')?.textContent || "C: 1.00";
+            const tTmp = document.getElementById('hud-tel-temp')?.textContent || "--°";
+            const tDa = document.getElementById('hud-tel-da')?.textContent || "--";
+            const tBaro = document.getElementById('hud-tel-baro')?.textContent || "--";
+            const tHumi = document.getElementById('hud-tel-humi')?.textContent || "--";
+            const tWnd = document.getElementById('hud-tel-wind')?.textContent || "--";
+            const tElev = document.getElementById('hud-dope-elev')?.textContent || "--";
+            const tHold = document.getElementById('hud-dope-hold')?.textContent || "--";
+            const tRng = document.getElementById('hud-dope-rng')?.textContent || "--";
+            
+            ctx.font = "bold 12px monospace";
+            
+            // 2. Dynamic Compass Tape (Top)
+            ctx.save();
+            ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+            ctx.fillRect(cx - 100, 15, 200, 25);
+            ctx.strokeStyle = "rgba(16, 185, 129, 0.4)";
+            ctx.strokeRect(cx - 100, 15, 200, 25);
+            
+            ctx.beginPath();
+            ctx.rect(cx - 100, 15, 200, 25);
+            ctx.clip(); // Clip drawing to inside the box
+            
+            ctx.fillStyle = "#34d399";
+            ctx.font = "bold 10px monospace";
+            ctx.textAlign = "center";
+            
+            const pxPerDeg = 3;
+            const centerDeg = typeof currentHudHeading !== 'undefined' ? currentHudHeading : 0;
+            
+            for (let i = -40; i <= 40; i++) {
+                const deg = Math.round(centerDeg + i);
+                const normalizedDeg = (deg + 360) % 360;
+                const x = cx + (i * pxPerDeg);
+                
+                if (normalizedDeg % 15 === 0) {
+                    ctx.fillRect(x - 0.5, 30, 1, 10); // Tick mark
+                    let label = normalizedDeg.toString();
+                    if (normalizedDeg === 0) label = "N";
+                    if (normalizedDeg === 90) label = "E";
+                    if (normalizedDeg === 180) label = "S";
+                    if (normalizedDeg === 270) label = "W";
+                    ctx.fillText(label, x, 26);
+                } else if (normalizedDeg % 5 === 0) {
+                    ctx.fillRect(x - 0.5, 35, 1, 5); // Minor tick
+                }
+            }
+            ctx.restore();
+            
+            // Center pointer for compass
+            ctx.fillStyle = "#10b981";
+            ctx.beginPath();
+            ctx.moveTo(cx - 4, 40); ctx.lineTo(cx + 4, 40); ctx.lineTo(cx, 35); ctx.fill();
+            
+            ctx.font = "bold 12px monospace";
+            
+            // 3. Pitch Inclinometer (Right)
+            ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+            ctx.fillRect(cw - 65, cy - 40, 60, 80);
+            ctx.strokeRect(cw - 65, cy - 40, 60, 80);
+            ctx.textAlign = "right";
+            ctx.fillStyle = "#34d399";
+            ctx.fillText(tAng, cw - 12, cy - 20);
+            ctx.fillText(tCos, cw - 12, cy);
+            
+            // 4. Telemetry Block (Bottom Left)
+            ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+            ctx.fillRect(15, ch - 105, 140, 90);
+            ctx.strokeRect(15, ch - 105, 140, 90);
+            ctx.textAlign = "left";
+            ctx.fillStyle = "#10b981";
+            ctx.font = "bold 10px monospace";
+            ctx.fillText("ATMOSPHERIC TELEMETRY", 20, ch - 90);
+            ctx.beginPath(); ctx.moveTo(15, ch - 85); ctx.lineTo(155, ch - 85); ctx.stroke();
+            
+            ctx.fillStyle = "#34d399";
+            ctx.fillText(`TEMP: ${tTmp}`, 20, ch - 70);
+            ctx.fillText(`PRES: ${tBaro}`, 20, ch - 57);
+            ctx.fillText(`HUMI: ${tHumi}`, 20, ch - 44);
+            ctx.fillText(`WIND: ${tWnd}`, 20, ch - 31);
+            ctx.fillStyle = "#10b981";
+            ctx.fillText(`D.A.: ${tDa}`, 20, ch - 18);
+            
+            // 5. Active DOPE Block (Bottom Right)
+            ctx.fillStyle = "rgba(0, 0, 0, 0.6)";
+            ctx.fillRect(cw - 115, ch - 85, 100, 70);
+            ctx.strokeRect(cw - 115, ch - 85, 100, 70);
+            ctx.textAlign = "right";
+            ctx.fillStyle = "#10b981";
+            ctx.fillText("ACTIVE DOPE", cw - 20, ch - 70);
+            ctx.beginPath(); ctx.moveTo(cw - 115, ch - 65); ctx.lineTo(cw - 15, ch - 65); ctx.stroke();
+            
+            ctx.fillStyle = "#34d399";
+            ctx.fillText(`ELEV: ${tElev}`, cw - 20, ch - 50);
+            ctx.fillText(`HOLD: ${tHold}`, cw - 20, ch - 37);
+            ctx.fillStyle = "#10b981";
+            ctx.fillText(`RNG: ${tRng}`, cw - 20, ch - 24);
+            
+            // Time Stamp
+            const dateStr = new Date().toISOString().replace('T', ' ').slice(0, 19) + "Z";
+            ctx.textAlign = "center";
+            ctx.font = "10px monospace";
+            ctx.fillStyle = "rgba(52, 211, 153, 0.6)";
+            ctx.fillText(dateStr, cx, ch - 15);
+            // --- END BURN-IN ---
             
             // Get Base64
             const shotData = canvas.toDataURL('image/jpeg', 0.85);
@@ -4018,6 +4275,29 @@ function initializeTacticalDashboard2() {
         const windUnitEl = document.getElementById('sol-wind-unit');
         if (windUnitEl) windUnitEl.textContent = opticMode;
 
+        // --- HUD LIVE SYNC ---
+        const hTelTemp = document.getElementById('hud-tel-temp');
+        if (hTelTemp) hTelTemp.textContent = tempF + '°';
+        const hTelBaro = document.getElementById('hud-tel-baro');
+        if (hTelBaro) hTelBaro.textContent = baroInHg.toFixed(2);
+        const hTelWind = document.getElementById('hud-tel-wind');
+        if (hTelWind) hTelWind.textContent = `${windMph} MPH @ ${windDirDeg}°`;
+        
+        // Approximate DA for HUD (simplified model for visual display)
+        // Standard formula: DA = Altitude + 120*(Temp - Standard Temp at Alt)
+        const stdTemp = 59 - (0.00356 * altitude);
+        const calcDA = Math.round(altitude + 120 * (tempF - stdTemp));
+        const hTelDa = document.getElementById('hud-tel-da');
+        if (hTelDa) hTelDa.textContent = calcDA;
+
+        const hDopeElev = document.getElementById('hud-dope-elev');
+        if (hDopeElev) hDopeElev.textContent = `${elevDirectionCode} ${Math.abs(opticElevValue).toFixed(2)}`;
+        const hDopeHold = document.getElementById('hud-dope-hold');
+        if (hDopeHold) hDopeHold.textContent = `${directionCode} ${opticWindValue.toFixed(2)}`;
+        const hDopeRng = document.getElementById('hud-dope-rng');
+        if (hDopeRng) hDopeRng.textContent = `${Math.round(rawRangeYds)} YDS`;
+        // --- END HUD LIVE SYNC ---
+
         const btn = document.getElementById('master-solve-btn');
         if (btn) {
             btn.classList.add('animate-pulse', 'bg-emerald-300', 'text-black');
@@ -4136,35 +4416,8 @@ function initializeTacticalDashboard2() {
         });
     }
 
-    // === GLOBAL ENVIRONMENT SYNC (SIDEBAR <-> DASHBOARD) ===
-    ['alt', 'temp', 'baro'].forEach(key => {
-        const sideEl = document.getElementById(`sidebar-bal-input-${key}`);
-        const dashEl = document.getElementById(`bal-input-${key}`);
-        if(sideEl && dashEl) {
-            // When user types in sidebar, push to dashboard & recalc
-            sideEl.addEventListener('input', (e) => {
-                dashEl.value = e.target.value;
-                runSolverMatrix();
-            });
-            // When user types in dashboard, push back to sidebar 
-            dashEl.addEventListener('input', (e) => {
-                sideEl.value = e.target.value;
-            });
-        }
-    });
-
-    // === MUZZLE VELOCITY GLOBAL SYNC (SIDEBAR <-> DASHBOARD) ===
-    const sideMv = document.getElementById('velocity');
-    const dashMv = document.getElementById('bal-input-mv');
-    if (sideMv && dashMv) {
-        sideMv.addEventListener('input', (e) => {
-            dashMv.value = e.target.value;
-            runSolverMatrix();
-        });
-        dashMv.addEventListener('input', (e) => {
-            sideMv.value = e.target.value;
-        });
-    }
+    // === SYNC DISABLED: Dashboard ballistic solver is fully independent of the range card form ===
+    // Each form must be filled in manually by the user.
 
     // Auto-calculate when any value manually changes
     ['bal-input-range', 'bal-input-shot-dir', 'bal-input-wind', 'bal-input-wind-dir', 'bal-input-mv', 'bal-input-bc', 'bal-input-sh', 'bal-input-zr', 'bal-input-alt', 'bal-input-temp', 'bal-input-baro', 'bal-input-angle', 'bal-input-cos'].forEach(id => {
@@ -4325,6 +4578,29 @@ function initializeTacticalDashboard2() {
                 alert("IDENTITY VERIFICATION FAILED: ALL FIELDS REQUIRED, INCLUDING MISSION CODE.");
                 return;
             }
+
+            // === MISSION CODE COMPLEXITY ENFORCEMENT ===
+            const letterCount   = (passcode.match(/[a-zA-Z]/g) || []).length;
+            const digitCount    = (passcode.match(/[0-9]/g) || []).length;
+            const specialCount  = (passcode.match(/[^a-zA-Z0-9]/g) || []).length;
+
+            if (passcode.length < 10) {
+                alert("MISSION CODE REJECTED: Minimum 10 characters required.");
+                return;
+            }
+            if (letterCount < 5) {
+                alert(`MISSION CODE REJECTED: Requires at least 5 letters. Detected: ${letterCount}`);
+                return;
+            }
+            if (digitCount < 2) {
+                alert(`MISSION CODE REJECTED: Requires at least 2 numbers. Detected: ${digitCount}`);
+                return;
+            }
+            if (specialCount < 3) {
+                alert(`MISSION CODE REJECTED: Requires at least 3 special characters (e.g. !@#$%). Detected: ${specialCount}`);
+                return;
+            }
+            // ==========================================
 
             // Lock in the team secret
             localStorage.setItem('trc_team_secret', passcode);
@@ -4724,6 +5000,11 @@ function initializeTacticalDashboard2() {
         modal.classList.remove('hidden');
         textInput.focus();
         
+        // Ensure user is dropped back to the main dashboard
+        document.querySelectorAll('.dash-panel.is-maximized').forEach(el => {
+            window.toggleFullscreen(el.id);
+        });
+        
         window.pushTacLog(`NOTE LOADED: ${item.remarksTitle || 'SECURE NOTE'}`, "INFO");
         if (window.lucide) window.lucide.createIcons();
     };
@@ -4845,23 +5126,52 @@ function initializeTacticalDashboard2() {
             ctx.stroke();
 
             // Text Wrap & Render
+            ctx.textAlign = 'left';
             ctx.fillStyle = '#fef08a'; // yellow-200
-            ctx.font = '12px monospace'; // smaller font size to support up to 500 characters in standard card format
-            const words = text.split(' ');
-            let line = '';
+            ctx.font = '12px monospace';
+            
             let y = 95;
-            for(let n = 0; n < words.length; n++) {
-                const testLine = line + words[n] + ' ';
-                const metrics = ctx.measureText(testLine);
-                if (metrics.width > 340 && n > 0) {
-                    ctx.fillText(line.trim(), 200, y);
-                    line = words[n] + ' ';
+            const maxWidth = 340;
+            const x = 30; // Left padding
+
+            const paragraphs = text.split('\n');
+            for (let p = 0; p < paragraphs.length; p++) {
+                const words = paragraphs[p].split(' ');
+                let line = '';
+                for (let n = 0; n < words.length; n++) {
+                    let word = words[n];
+                    
+                    // Force-break massive strings that exceed the canvas width on their own
+                    while (ctx.measureText(word).width > maxWidth) {
+                        let chunk = '';
+                        for (let c = 0; c < word.length; c++) {
+                            if (ctx.measureText(chunk + word[c] + '-').width > maxWidth) break;
+                            chunk += word[c];
+                        }
+                        if (line !== '') {
+                            ctx.fillText(line.trim(), x, y);
+                            y += 18;
+                            line = '';
+                        }
+                        ctx.fillText(chunk + '-', x, y);
+                        y += 18;
+                        word = word.substring(chunk.length);
+                    }
+
+                    const testLine = line + word + ' ';
+                    if (ctx.measureText(testLine).width > maxWidth && line !== '') {
+                        ctx.fillText(line.trim(), x, y);
+                        line = word + ' ';
+                        y += 18;
+                    } else {
+                        line = testLine;
+                    }
+                }
+                if (line.trim() !== '') {
+                    ctx.fillText(line.trim(), x, y);
                     y += 18;
-                } else {
-                    line = testLine;
                 }
             }
-            ctx.fillText(line.trim(), 200, y);
 
             const base64Image = canvas.toDataURL('image/jpeg', 0.9);
             
