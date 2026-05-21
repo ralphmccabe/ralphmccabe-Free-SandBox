@@ -1,169 +1,46 @@
 TACTICAL RANGE CARD PRO - STAGING VERSION HISTORY
 
---------------------------------------------------====================
+============================================================
 v2.0-PROD: INITIAL HUD RELEASE
---------------------------------------------------------------------------------
 - Core ballistic solving matrix and range card display.
 - Secure IndexedDB local backup caching.
 
---------------------------------------------------====================
+============================================================
 v2.1-PROD: COMMUNICATIONS CORE INTEGRATION
---------------------------------------------------------------------------------
 - Real-time Team Roster sync via secure Supabase connection.
 - AES-256 secure chat encryption for tactical coordination.
 
---------------------------------------------------====================
-v2.2-PROD: CAMERA & VISUAL INTEL UPLINK
---------------------------------------------------------------------------------
-- Direct hardware camera stream integration in sidebar.
-- Base64 canvas rendering engine for vault snapshots.
-
---------------------------------------------------====================
-v2.3-PROD: STUCK REMARKS NOTEPAD VERSION
---------------------------------------------------------------------------------
-- Remarks notepad container introduced.
-- Notepad locked in static coordinates (top-right, non-draggable) for HUD stability testing.
-
---------------------------------------------------====================
-v2.4-PROD: DRAGGABLE NOTEPAD & DEV PANEL UPGRADE (ACTIVE RUNTIME)
---------------------------------------------------------------------------------
-- Deployed fully draggable/floating Mouse & Touch Remarks notepad modal.
-- Integrated premium Developer Staging Panel at the top of the browser.
-- Deployed interactive E2E PWA simulated upgrade loop with success progress bar.
-- Added version history ledger directly in current folder.
-
---------------------------------------------------====================
-v2.5-PROD: MOBILE SYNC & SECURE PERSISTENCE DEPLOYMENT
---------------------------------------------------------------------------------
-- Activated fully draggable/floating Mouse & Touch Remarks notepad modal.
-- Fixed relative service worker path scope for complete offline PWA reliability.
-- Optimized atmospheric climate satellite data sync routines.
-- Deployed dynamic update toast confirmation dialog box for Google compliance.
---------------------------------------------------====================
-
---------------------------------------------------
-v2.5-PROD — DEPLOYED 2026-05-20 14:25:29
---------------------------------------------------
-• Version auto-bumped from previous release
-• Service Worker cache updated to: trc-pro-upgrade-v2.5-PROD
-• All tactical systems: OPERATIONAL
-• Toast updater: ACTIVE — users will see update prompt on next app open
-
---------------------------------------------------
-v2.6-PROD — DEPLOYED 2026-05-20 14:26:05
---------------------------------------------------
-• Version auto-bumped from previous release
-• Service Worker cache updated to: trc-pro-upgrade-v2.6-PROD
-• All tactical systems: OPERATIONAL
-• Toast updater: ACTIVE — users will see update prompt on next app open
-
---------------------------------------------------
-v2.7-PROD — DEPLOYED 2026-05-20 14:26:31
---------------------------------------------------
-• Version auto-bumped from previous release
-• Service Worker cache updated to: trc-pro-upgrade-v2.7-PROD
-• All tactical systems: OPERATIONAL
-• Toast updater: ACTIVE — users will see update prompt on next app open
-
---------------------------------------------------
-v2.8-PROD — DEPLOYED 2026-05-20 14:27:07
---------------------------------------------------
-• Version auto-bumped from previous release
-• Service Worker cache updated to: trc-pro-upgrade-v2.8-PROD
-• All tactical systems: OPERATIONAL
-• Toast updater: ACTIVE — users will see update prompt on next app open
-
---------------------------------------------------
-v2.9-PROD — DEPLOYED 2026-05-20 14:27:41
---------------------------------------------------
-• Version auto-bumped from previous release
-• Service Worker cache updated to: trc-pro-upgrade-v2.9-PROD
-• All tactical systems: OPERATIONAL
-• Toast updater: ACTIVE — users will see update prompt on next app open
-
---------------------------------------------------
-v2.10-PROD — DEPLOYED 2026-05-20 14:29:54
---------------------------------------------------
-• Version auto-bumped from previous release
-• Service Worker cache updated to: trc-pro-upgrade-v2.10-PROD
-• All tactical systems: OPERATIONAL
-• Toast updater: ACTIVE — users will see update prompt on next app open
-
---------------------------------------------------
-v2.11-PROD — DEPLOYED 2026-05-20 14:31:05
---------------------------------------------------
-• Version auto-bumped from previous release
-• Service Worker cache updated to: trc-pro-upgrade-v2.11-PROD
-• All tactical systems: OPERATIONAL
-• Toast updater: ACTIVE — users will see update prompt on next app open
-
---------------------------------------------------
-v2.12-PROD — DEPLOYED 2026-05-20 14:31:12
---------------------------------------------------
-• Version auto-bumped from previous release
-• Service Worker cache updated to: trc-pro-upgrade-v2.12-PROD
-• All tactical systems: OPERATIONAL
-• Toast updater: ACTIVE — users will see update prompt on next app open
-
---------------------------------------------------
-v2.13-PROD — DEPLOYED 2026-05-20 14:32:30
---------------------------------------------------
-• Version auto-bumped from previous release
-• Service Worker cache updated to: trc-pro-upgrade-v2.13-PROD
-• All tactical systems: OPERATIONAL
-• Toast updater: ACTIVE — users will see update prompt on next app open
-
---------------------------------------------------
-v2.14-PROD — DEPLOYED 2026-05-20 14:32:41
---------------------------------------------------
-• Version auto-bumped from previous release
-• Service Worker cache updated to: trc-pro-upgrade-v2.14-PROD
-• All tactical systems: OPERATIONAL
-• Toast updater: ACTIVE — users will see update prompt on next app open
-
---------------------------------------------------
-v2.14.1-PROD — DEPLOYED 2026-05-20 15:37:06
---------------------------------------------------
-• Version auto-bumped from previous release
-• Service Worker cache updated to: trc-pro-upgrade-v2.14.1-PROD
-• All tactical systems: OPERATIONAL
-• Toast updater: ACTIVE — users will see update prompt on next app open
-
---------------------------------------------------
-v2.14.2-PROD — DEPLOYED 2026-05-20 15:46:52
---------------------------------------------------
-• Version auto-bumped from previous release
-• Service Worker cache updated to: trc-pro-upgrade-v2.14.2-PROD
-• All tactical systems: OPERATIONAL
-• Toast updater: ACTIVE — users will see update prompt on next app open
-
---------------------------------------------------
-v2.14.3-PROD — DEPLOYED 2026-05-21 15:22:32
---------------------------------------------------
-• Version auto-bumped from previous release
-• Service Worker cache updated to: trc-pro-upgrade-v2.14.3-PROD
-• All tactical systems: OPERATIONAL
-• Toast updater: ACTIVE — users will see update prompt on next app open
-
---------------------------------------------------
-v2.14.4-PROD — DEPLOYED 2026-05-21 15:43:03
---------------------------------------------------
-• Version auto-bumped from previous release
-• Service Worker cache updated to: trc-pro-upgrade-v2.14.4-PROD
-• All tactical systems: OPERATIONAL
-• Toast updater: ACTIVE — users will see update prompt on next app open
-
---------------------------------------------------
-v2.14.5-PROD — DEPLOYED 2026-05-21 15:53:49
---------------------------------------------------
-• Version auto-bumped from previous release
-• Service Worker cache updated to: trc-pro-upgrade-v2.14.5-PROD
-• All tactical systems: OPERATIONAL
-• Toast updater: ACTIVE — users will see update prompt on next app open
-
+============================================================
 v2.14.7-PROD - DEPLOYED 2026-05-21 16:52:16
---------------------------------------------------
 * Version auto-bumped from v2.14.6-PROD
 * Service Worker cache updated to: trc-pro-upgrade-v2.14.7-PROD
+* All tactical systems: OPERATIONAL
+* Toast updater: ACTIVE - users will see update prompt on next app open
+
+============================================================
+v2.14.8-PROD - DEPLOYED 2026-05-21 17:36:29
+* Version auto-bumped from v2.14.7-PROD
+* Service Worker cache updated to: trc-pro-upgrade-v2.14.8-PROD
+* All tactical systems: OPERATIONAL
+* Toast updater: ACTIVE - users will see update prompt on next app open
+
+============================================================
+v2.14.9-PROD - DEPLOYED 2026-05-21 17:48:38
+* Version auto-bumped from v2.14.8-PROD
+* Service Worker cache updated to: trc-pro-upgrade-v2.14.9-PROD
+* All tactical systems: OPERATIONAL
+* Toast updater: ACTIVE - users will see update prompt on next app open
+
+============================================================
+v2.14.10-PROD - DEPLOYED 2026-05-21 17:53:43
+* Version auto-bumped from v2.14.9-PROD
+* Service Worker cache updated to: trc-pro-upgrade-v2.14.10-PROD
+* All tactical systems: OPERATIONAL
+* Toast updater: ACTIVE - users will see update prompt on next app open
+
+============================================================
+v2.14.11-PROD - DEPLOYED 2026-05-21 17:54:50
+* Version auto-bumped from v2.14.10-PROD
+* Service Worker cache updated to: trc-pro-upgrade-v2.14.11-PROD
 * All tactical systems: OPERATIONAL
 * Toast updater: ACTIVE - users will see update prompt on next app open

@@ -95,9 +95,9 @@ def apply_version_bump(source_dir, new_version):
                      f"register('./sw.js?v={new_version}')", idx)
 
         # Update the DRAFT SNAPSHOT button label in the banner
-        idx = re.sub(r'📸 DRAFT SNAPSHOT V[\d.]+', f'📸 DRAFT SNAPSHOT {new_version}', idx)
-        idx = re.sub(r"btn\.innerText = '📸 DRAFT SNAPSHOT V[\d.]+'",
-                     f"btn.innerText = '📸 DRAFT SNAPSHOT {new_version}'", idx)
+        idx = re.sub(r'📸 DRAFT SNAPSHOT v[\d.]+-PROD', f'📸 DRAFT SNAPSHOT {new_version}', idx, flags=re.IGNORECASE)
+        idx = re.sub(r"btn\.innerText = '📸 DRAFT SNAPSHOT v[\d.]+-PROD'",
+                     f"btn.innerText = '📸 DRAFT SNAPSHOT {new_version}'", idx, flags=re.IGNORECASE)
 
         with open(index_path, 'w', encoding='utf-8') as f:
             f.write(idx)
@@ -109,7 +109,6 @@ def apply_version_bump(source_dir, new_version):
     entry = f"""
 {'='*60}
 {new_version} — DEPLOYED {timestamp}
-{'='*60}
 • Version auto-bumped from previous release
 • Service Worker cache updated to: trc-pro-upgrade-{new_version}
 • All tactical systems: OPERATIONAL
