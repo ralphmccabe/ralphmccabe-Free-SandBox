@@ -110,108 +110,7 @@
 
 <body class="bg-gray-800 text-gray-100 min-h-screen font-sans selection:bg-neon-green selection:text-black overflow-x-hidden">
 
-    <!-- LOCAL_TESTING_BANNER_START -->
-    <div id="local-testing-banner" style="background: repeating-linear-gradient(45deg, #7f1d1d, #7f1d1d 10px, #991b1b 10px, #991b1b 20px); border-bottom: 2px solid #ef4444; color: white; text-align: center; font-family: monospace; font-size: 10px; font-weight: bold; padding: 6px; letter-spacing: 0.05em; z-index: 99999; position: relative; display: flex; align-items: center; justify-content: center; gap: 15px; flex-wrap: wrap;">
-        <span>⚠️ LOCAL TESTING ENVIRONMENT (PORT 8445) - DO NOT PUSH TO PRODUCTION ⚠️</span>
-        <button id="snapshot-btn" onclick="takeSnapshotBackground()" style="background: #10b981; border: 1px solid #34d399; color: black; font-size: 8px; font-weight: 900; padding: 2px 8px; border-radius: 3px; cursor: pointer; text-transform: uppercase; font-family: monospace; transition: all 0.2s;">📸 DRAFT SNAPSHOT v2.14.11-PROD</button>
-        <button id="stage-prod-btn" onclick="stageToProduction()" style="background: #3b82f6; border: 1px solid #60a5fa; color: white; font-size: 8px; font-weight: 900; padding: 2px 8px; border-radius: 3px; cursor: pointer; text-transform: uppercase; font-family: monospace; transition: all 0.2s; white-space: nowrap;">🚀 STAGE TO "READY TO BE PUSHED"</button>
-    </div>
-    <script>
-        // ONE-TIME EMERGENCY CACHE BREAKER REMOVED
-
-        function takeSnapshotBackground() {
-            const btn = document.getElementById('snapshot-btn');
-            btn.innerText = '⚙️ BUMPING VERSION...';
-            btn.style.background = '#4b5563';
-            btn.style.borderColor = '#9ca3af';
-            btn.disabled = true;
-
-            fetch('/api/take-snapshot', { method: 'POST' })
-            .then(res => res.json())
-            .then(data => {
-                btn.disabled = false;
-                if (data.status === 'success') {
-                    const ver = data.version || 'NEW';
-                    btn.innerText = `✅ DRAFTED ${ver}!`;
-                    btn.style.background = '#10b981';
-                    btn.style.borderColor = '#34d399';
-                    btn.style.color = 'black';
-                    // Update button label to show the new version
-                    setTimeout(() => {
-                        btn.innerText = `📸 DRAFT SNAPSHOT ${ver}`;
-                        btn.style.background = '#10b981';
-                        btn.style.borderColor = '#34d399';
-                        btn.style.color = 'black';
-                    }, 3000);
-                } else {
-                    alert('Draft Error: ' + data.message);
-                    btn.innerText = '❌ DRAFT FAILED';
-                    btn.style.background = '#dc2626';
-                    btn.style.borderColor = '#f87171';
-                    btn.style.color = 'white';
-                    setTimeout(() => {
-                        btn.innerText = '📸 DRAFT SNAPSHOT';
-                        btn.style.background = '#10b981';
-                        btn.style.borderColor = '#34d399';
-                        btn.style.color = 'black';
-                    }, 3000);
-                }
-            })
-            .catch(() => {
-                btn.disabled = false;
-                alert('⚠️ Network Error — Is the Python server running from free-trc-sandbox?');
-                btn.innerText = '📸 DRAFT SNAPSHOT';
-                btn.style.background = '#10b981';
-                btn.style.borderColor = '#34d399';
-                btn.style.color = 'black';
-            });
-        }
-
-        function stageToProduction() {
-            const btn = document.getElementById('stage-prod-btn');
-            const originalText = btn.innerText;
-            btn.innerText = '⚙️ COMPILING...';
-            btn.style.background = '#4b5563';
-            btn.disabled = true;
-
-            fetch('/api/push-production', { method: 'POST' })
-            .then(res => res.json())
-            .then(data => {
-                btn.disabled = false;
-                if (data.status === 'success') {
-                    btn.innerText = '✅ STAGED! CHECK "READY TO BE PUSHED" FOLDER';
-                    btn.style.background = '#10b981';
-                    btn.style.borderColor = '#34d399';
-                    btn.style.color = 'black';
-                    setTimeout(() => {
-                        btn.innerText = originalText;
-                        btn.style.background = '#3b82f6';
-                        btn.style.borderColor = '#60a5fa';
-                        btn.style.color = 'white';
-                    }, 4000);
-                } else {
-                    alert('Stage Error: ' + data.message);
-                    btn.innerText = '❌ STAGE FAILED';
-                    btn.style.background = '#dc2626';
-                    setTimeout(() => {
-                        btn.innerText = originalText;
-                        btn.style.background = '#3b82f6';
-                        btn.style.borderColor = '#60a5fa';
-                        btn.style.color = 'white';
-                    }, 3000);
-                }
-            })
-            .catch(() => {
-                btn.disabled = false;
-                alert('⚠️ Network Error — Is the Python server running from free-trc-sandbox?');
-                btn.innerText = originalText;
-                btn.style.background = '#3b82f6';
-                btn.style.borderColor = '#60a5fa';
-                btn.style.color = 'white';
-            });
-        }
-    </script>
-    <!-- LOCAL_TESTING_BANNER_END -->
+    
 
     <div id="mainLayout" class="flex flex-col lg:flex-row h-screen lg:overflow-hidden">
         
@@ -1775,7 +1674,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js?v=v2.14.11-PROD').then(reg => {
+                navigator.serviceWorker.register('./sw.js?v=v2.14.12-PROD').then(reg => {
                     console.log('[SW] PWA Service Worker Registered');
                     
                     // Robust check helper to handle slow thread sync
@@ -1936,6 +1835,7 @@
     </script>
 </body>
 </html>
+
 
 
 

@@ -1,5 +1,5 @@
-/* TRC-PRO-VERSION - v2.14.11-PROD */
-const CACHE_NAME = 'trc-pro-upgrade-v2.14.11-PROD';
+/* TRC-PRO-VERSION - v2.14.12-PROD */
+const CACHE_NAME = 'trc-pro-upgrade-v2.14.12-PROD';
 const ASSETS = [
     './',
     './index.html?v=6.1',
@@ -53,6 +53,7 @@ self.addEventListener('fetch', event => {
         })
     );
 });
+
 
 
 

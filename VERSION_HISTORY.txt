@@ -44,3 +44,10 @@ v2.14.11-PROD - DEPLOYED 2026-05-21 17:54:50
 * Service Worker cache updated to: trc-pro-upgrade-v2.14.11-PROD
 * All tactical systems: OPERATIONAL
 * Toast updater: ACTIVE - users will see update prompt on next app open
+
+============================================================
+v2.14.12-PROD - DEPLOYED 2026-05-21 18:11:41
+* Version auto-bumped from v2.14.11-PROD
+* Service Worker cache updated to: trc-pro-upgrade-v2.14.12-PROD
+* All tactical systems: OPERATIONAL
+* Toast updater: ACTIVE - users will see update prompt on next app open

@@ -75,7 +75,8 @@ $TargetArchiveDir = Join-Path $ArchiveParent $ArchiveFolderName
 $Exclusions = @(
     ".git", "twa-build", "android.keystore", "app-release-bundle.aab", 
     "app-release-signed.apk", "app-release-signed.apk.idsig", 
-    "app-release-unsigned-aligned.apk", "cert.pfx", "cert.pem", "key.pem", "node_modules"
+    "app-release-unsigned-aligned.apk", "cert.pfx", "cert.pem", "key.pem", "node_modules",
+    "run_secure_server.py", "release_update.ps1", "take_snapshot.ps1"
 )
 
 function Copy-FilteredDir ($src, $dest) {
@@ -101,6 +102,15 @@ Write-Host "[*] Copying files to Ready to be pushed folder..." -ForegroundColor 
 if (!(Test-Path $ProdStagingDir)) { New-Item -ItemType Directory -Path $ProdStagingDir | Out-Null }
 Remove-Item -Path "$ProdStagingDir\*" -Recurse -Force -ErrorAction SilentlyContinue
 Copy-FilteredDir $SourceDir $ProdStagingDir
+
+# 7. STRIP TESTING BANNER FROM PRODUCTION
+$ProdIndexPath = Join-Path $ProdStagingDir "index.html"
+if (Test-Path $ProdIndexPath) {
+    $ProdContent = Get-Content $ProdIndexPath -Raw
+    $ProdContent = [regex]::Replace($ProdContent, "(?s)<!-- LOCAL_TESTING_BANNER_START -->.*?<!-- LOCAL_TESTING_BANNER_END -->", "")
+    Set-Content -Path $ProdIndexPath -Value $ProdContent
+    Write-Host "[*] Stripped local testing banner from production index.html" -ForegroundColor Cyan
+}
 
 Write-Host "SUCCESS: Auto-Update & Staging Complete." -ForegroundColor Green
 Write-Host "New Version: $NewVersion" -ForegroundColor Green
