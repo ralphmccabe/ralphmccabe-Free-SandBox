@@ -2672,14 +2672,26 @@ function initializeTacticalDashboard2() {
         // Close all other maximized panels first to ensure cleanliness
         document.querySelectorAll('.dash-panel.is-maximized').forEach(el => {
             el.classList.remove('is-maximized');
-            const i = el.querySelector('.maximize-btn i');
-            if(i) i.setAttribute('data-lucide', 'maximize-2');
+            const icon = el.querySelector('.maximize-btn [data-lucide]');
+            if(icon) {
+                const newI = document.createElement('i');
+                newI.setAttribute('data-lucide', 'maximize-2');
+                newI.className = icon.getAttribute('class').replace(/lucide(-[a-z0-9]+)?/g, '').trim();
+                if(!newI.className) newI.className = 'w-3.5 h-3.5';
+                icon.replaceWith(newI);
+            }
         });
 
         if (!isMax) {
             panel.classList.add('is-maximized');
-            const icon = panel.querySelector('.maximize-btn i');
-            if(icon) icon.setAttribute('data-lucide', 'minimize-2');
+            const icon = panel.querySelector('.maximize-btn [data-lucide]');
+            if(icon) {
+                const newI = document.createElement('i');
+                newI.setAttribute('data-lucide', 'minimize-2');
+                newI.className = icon.getAttribute('class').replace(/lucide(-[a-z0-9]+)?/g, '').trim();
+                if(!newI.className) newI.className = 'w-3.5 h-3.5';
+                icon.replaceWith(newI);
+            }
 
             // === TRIGGER SPECIFIC PANEL LOGIC ON OPEN ===
             if (panelId === 'panel-dope-select') {
@@ -5091,7 +5103,7 @@ function initializeTacticalDashboard2() {
             dragHeader.addEventListener('touchstart', startDrag, { passive: true });
         }
 
-        remarksSaveBtn.addEventListener('click', () => {
+        remarksSaveBtn.addEventListener('click', async () => {
             const text = remarksInput.value.trim();
             if (!text) return;
             const title = remarksTitleInput.value.trim().toUpperCase() || 'SECURE NOTE';
@@ -5175,10 +5187,15 @@ function initializeTacticalDashboard2() {
 
             const base64Image = canvas.toDataURL('image/jpeg', 0.9);
             
-            saveIntelSnapshot('REMARKS', base64Image, { 
+            await saveIntelSnapshot('REMARKS', base64Image, { 
                 remarksTitle: title, 
                 remarksText: text 
             });
+            
+            // Auto-load to Active Viewer
+            if (vaultCache.length > 0) {
+                selectVaultItem(vaultCache[0]);
+            }
             
             remarksInput.value = '';
             if (remarksTitleInput) remarksTitleInput.value = '';
