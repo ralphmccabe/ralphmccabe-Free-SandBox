@@ -1,5 +1,5 @@
-/* TRC-PRO-VERSION - v2.14.14-PROD */
-const CACHE_NAME = 'trc-pro-upgrade-v2.14.14-PROD';
+/* TRC-PRO-VERSION - v2.14.15-PROD */
+const CACHE_NAME = 'trc-pro-upgrade-v2.14.15-PROD';
 const ASSETS = [
     './',
     './index.html?v=6.1',
@@ -13,15 +13,17 @@ const ASSETS = [
     './tailwind-prod.css',
     './lucide.min.js?v=1.5',
     './html2canvas.min.js?v=1.5',
-    './idb_helper.js?v=1.5',
-    'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap'
+    './idb_helper.js?v=1.5'
 ];
 
 self.addEventListener('install', event => {
     event.waitUntil(
         caches.open(CACHE_NAME).then(cache => {
             console.log('[SW] Caching New Version:', CACHE_NAME);
-            return cache.addAll(ASSETS);
+            return cache.addAll(ASSETS).catch(err => {
+                console.error('[SW] Cache addAll failed:', err);
+                // Continue installing even if a specific asset fails
+            });
         })
     );
 });
@@ -46,10 +48,40 @@ self.addEventListener('activate', event => {
     self.clients.claim();
 });
 
+// Dynamic Offline Caching Strategy
 self.addEventListener('fetch', event => {
+    // Only cache GET requests
+    if (event.request.method !== 'GET') return;
+
     event.respondWith(
-        caches.match(event.request, { ignoreSearch: true }).then(response => {
-            return response || fetch(event.request);
+        caches.match(event.request, { ignoreSearch: true }).then(cachedResponse => {
+            if (cachedResponse) {
+                // If it's in cache, return it immediately, but fetch a new one in the background if it's the main page
+                return cachedResponse;
+            }
+
+            // If not in cache, fetch from network and dynamically add it to the cache!
+            return fetch(event.request).then(networkResponse => {
+                // Check if we received a valid response
+                if (!networkResponse || networkResponse.status !== 200 || networkResponse.type === 'error') {
+                    return networkResponse;
+                }
+
+                // Clone the response because it's a stream
+                const responseToCache = networkResponse.clone();
+                caches.open(CACHE_NAME).then(cache => {
+                    // Do not cache chrome-extension:// or other weird schemes
+                    if (event.request.url.startsWith('http')) {
+                        cache.put(event.request, responseToCache);
+                    }
+                });
+
+                return networkResponse;
+            }).catch(error => {
+                console.error('[SW] Fetch failed; returning offline fallback if available.', error);
+                // Return offline fallback here if needed
+                throw error;
+            });
         })
     );
 });

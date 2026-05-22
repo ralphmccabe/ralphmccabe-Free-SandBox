@@ -3665,21 +3665,39 @@ function initializeTacticalDashboard2() {
     let currentHudPitch = 0;
     let deviceOrientationActive = false;
 
+    let absoluteFired = false;
     function handleOrientation(e) {
-        deviceOrientationActive = true; // Hard-latch active mode the moment data flows
+        if (e.type === 'deviceorientationabsolute') {
+            absoluteFired = true;
+        } else if (e.type === 'deviceorientation' && absoluteFired) {
+            // Ignore relative events if we are getting absolute ones
+            return;
+        }
+
+        deviceOrientationActive = true; 
         
-        // e.webkitCompassHeading is iOS specific absolute heading. alpha is absolute on Android if AbsoluteOrientationSensor is used.
         let heading = e.webkitCompassHeading;
-        if (heading === undefined || heading === null) heading = e.alpha; // Fallback
+        if (heading === undefined || heading === null) {
+            heading = 360 - e.alpha; // Android alpha CCW compensation
+        }
+        if (heading === null || heading === undefined || isNaN(heading)) heading = 0;
         
-        if (heading === null || heading === undefined) heading = 0;
+        // Adjust for device screen orientation (landscape vs portrait)
+        let screenAngle = 0;
+        if (window.screen && window.screen.orientation) {
+            screenAngle = window.screen.orientation.angle || 0;
+        } else if (typeof window.orientation !== "undefined") {
+            screenAngle = window.orientation || 0;
+        }
         
-        // Pitch is beta (front-to-back tilt)
+        heading = (heading + screenAngle) % 360;
+        if (heading < 0) heading += 360;
+        
         let pitch = e.beta;
         if (pitch === null || pitch === undefined) pitch = 0;
 
         currentHudHeading = heading;
-        currentHudPitch = pitch - 90; // Adjust for phone held in portrait
+        currentHudPitch = pitch - 90;
     }
 
     function updateTacticalHUD() {
@@ -3745,6 +3763,7 @@ function initializeTacticalDashboard2() {
 
     function initTacticalHUD() {
         if (window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientationabsolute', handleOrientation, true);
             window.addEventListener('deviceorientation', handleOrientation, true);
             setTimeout(() => {
                 if (currentHudHeading === 0 && currentHudPitch === -90) {
@@ -3761,6 +3780,7 @@ function initializeTacticalDashboard2() {
 
     function stopTacticalHUD() {
         if (hudAnimationId) cancelAnimationFrame(hudAnimationId);
+        window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
         window.removeEventListener('deviceorientation', handleOrientation, true);
     }
     // --- END TACTICAL HUD SENSOR LOGIC ---
