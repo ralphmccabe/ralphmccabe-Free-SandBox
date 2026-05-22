@@ -55,45 +55,44 @@ function initializeTacticalDashboard1() {
 
 
     // Generate Distance Table Rows and collect their Input IDs
-    distances.forEach(dist => {
+    distances.forEach((dist) => {
         const clicksId = `clicks-${dist}`;
-        const udlrId = `udlr-${dist}`;
         const distInputId = `dist-${dist}`;
+        const udlrId = `udlr-${dist}`;
 
-        // Register these for syncing/saving
         inputs.push(clicksId, udlrId, distInputId);
-
-        // 1. Original Table Row
+        
+        // 1. Desktop Table Row
         if (tableBody) {
             const row = document.createElement('div');
-            row.className = 'grid grid-cols-4 border-b border-black flex-1 items-center text-center';
+            row.className = 'grid grid-cols-5 border-b border-black flex-1 items-center text-center';
             row.innerHTML = `
-                <div class="border-r border-black h-full flex items-center justify-center font-handwriting text-blue-800 min-w-0 px-0.5">
-                    <span id="display-${clicksId}" class="truncate w-full text-center"></span>
+                <div class="border-r border-black h-full py-1 flex items-center justify-center font-handwriting text-blue-800 min-w-0 px-0.5 overflow-hidden">
+                    <span id="display-${clicksId}" class="whitespace-nowrap leading-none w-full text-center"></span>
                 </div>
-                <div class="col-span-2 border-r border-black h-full flex items-center justify-center bg-gray-50/30 min-w-0 px-0.5">
-                    <span id="display-${distInputId}" class="text-sm font-bold truncate w-full text-center">${dist}</span>
+                <div class="col-span-2 border-r border-black h-full py-1 flex items-center justify-center bg-gray-50/30 min-w-0 px-0.5 overflow-hidden">
+                    <span id="display-${distInputId}" class="text-sm font-bold whitespace-nowrap leading-none w-full text-center">${dist}</span>
                 </div>
-                <div class="h-full flex items-center justify-center font-handwriting text-blue-800 min-w-0 px-0.5">
-                    <span id="display-${udlrId}" class="truncate w-full text-center"></span>
+                <div class="col-span-2 h-full py-1 flex items-center justify-center font-handwriting text-blue-800 min-w-0 px-0.5 overflow-hidden">
+                    <span id="display-${udlrId}" class="whitespace-nowrap leading-none w-full text-center"></span>
                 </div>
             `;
             tableBody.appendChild(row);
         }
 
-        // 2. NEW: Mobile Table Row
+        // 2. Mobile Table Row
         if (mobileTableBody) {
             const row = document.createElement('div');
-            row.className = 'grid grid-cols-4 border-b border-black flex items-center text-center border-l-0 border-r-0'; // Mobile styling adjustments
+            row.className = 'grid grid-cols-5 border-b border-black flex-1 items-center text-center border-l-0 border-r-0';
             row.innerHTML = `
-                <div class="border-r border-black h-full py-1 flex items-center justify-center font-handwriting text-blue-800 min-w-0 px-0.5">
-                    <span id="mobile-display-${clicksId}" class="truncate w-full text-center"></span>
+                <div class="border-r border-black h-full py-1 flex items-center justify-center font-handwriting text-blue-800 min-w-0 px-0.5 overflow-hidden">
+                    <span id="mobile-display-${clicksId}" class="whitespace-nowrap leading-none w-full text-center"></span>
                 </div>
-                <div class="col-span-2 border-r border-black h-full py-1 flex items-center justify-center bg-gray-50/30 min-w-0 px-0.5">
-                    <span id="mobile-display-${distInputId}" class="text-[10px] font-bold truncate w-full text-center">${dist}</span>
+                <div class="col-span-2 border-r border-black h-full py-1 flex items-center justify-center bg-gray-50/30 min-w-0 px-0.5 overflow-hidden">
+                    <span id="mobile-display-${distInputId}" class="text-[10px] font-bold whitespace-nowrap leading-none w-full text-center">${dist}</span>
                 </div>
-                <div class="h-full py-1 flex items-center justify-center font-handwriting text-blue-800 min-w-0 px-0.5">
-                    <span id="mobile-display-${udlrId}" class="truncate w-full text-center"></span>
+                <div class="col-span-2 h-full py-1 flex items-center justify-center font-handwriting text-blue-800 min-w-0 px-0.5 overflow-hidden">
+                    <span id="mobile-display-${udlrId}" class="whitespace-nowrap leading-none w-full text-center"></span>
                 </div>
             `;
             mobileTableBody.appendChild(row);
@@ -876,6 +875,12 @@ function initializeTacticalDashboard1() {
             return;
         }
 
+        const dopeCount = Object.keys(existingProfiles).filter(k => !existingProfiles[k].isReconScenario).length;
+        if (dopeCount >= 20) {
+            alert("LIBRARY FULL: DOPE CACHE CAPACITY REACHED (20/20). PLEASE DELETE OLD CARDS FIRST.");
+            return;
+        }
+
         const container = document.getElementById('card-container');
         const previewPanel = document.getElementById('previewPanel');
 
@@ -977,7 +982,12 @@ function initializeTacticalDashboard1() {
                 container.style.transform = originalTransform;
                 window.scrollTo(0, originalScrollY);
                 console.error("Capture failure:", err);
-                alert("Record save failed. Please check log.");
+                
+                if (err && err.name === 'QuotaExceededError' || err.toString().includes('exceeded the quota')) {
+                    alert("CRITICAL: Browser memory is 100% full! You must delete old Dope Cards or Recon Maps from the library before you can save this one.");
+                } else {
+                    alert("Record save failed. Please check log.");
+                }
             });
         }, 500); // Increased to 500ms for absolute stability
     };
@@ -2297,7 +2307,13 @@ function initializeTacticalDashboard2() {
             const lowerName = name.trim().toLowerCase();
             const nameExists = Object.keys(existingProfiles).some(k => k.trim().toLowerCase() === lowerName);
             if (nameExists) {
-                alert("NAME ALREADY EXIST");
+                alert("SCENARIO NAME ALREADY EXISTS");
+                return;
+            }
+
+            const reconCount = Object.keys(existingProfiles).filter(k => !!existingProfiles[k].isReconScenario).length;
+            if (reconCount >= 20) {
+                alert("LIBRARY FULL: RECON MAP CAPACITY REACHED (20/20). PLEASE DELETE OLD MAPS FIRST.");
                 return;
             }
 
@@ -2414,7 +2430,11 @@ function initializeTacticalDashboard2() {
                     if (window.lucide) window.lucide.createIcons();
 
                     console.error("Recon capture failure:", err);
-                    alert("Recon save failed. Please check log.");
+                    if (err && err.name === 'QuotaExceededError' || err.toString().includes('exceeded the quota')) {
+                        alert("CRITICAL: Browser memory is 100% full! You must delete old Dope Cards or Recon Maps from the library before you can save this one.");
+                    } else {
+                        alert("Recon save failed. Please check log.");
+                    }
                 });
             }, 500);
         });
@@ -2845,10 +2865,30 @@ function initializeTacticalDashboard2() {
                 </div>
                 
                 <div class="absolute inset-0 bg-emerald-500/10 opacity-0 group-hover:opacity-100 pointer-events-none border-2 border-transparent group-hover:border-emerald-500/50 rounded transition-all"></div>
+                
+                <!-- Send to Vault Checkbox -->
+                <div class="absolute top-1 left-1 z-30 bg-black/60 p-0.5 rounded">
+                    <input type="checkbox" class="dope-vault-checkbox w-3.5 h-3.5 cursor-pointer" data-profile-name="${name}" title="Mark for Vault">
+                </div>
+                
+                <!-- Delete Button -->
+                <button class="absolute top-1 right-1 z-30 bg-red-950/80 text-red-400 p-1 rounded border border-red-900/50 hover:bg-red-600 hover:text-white transition-colors opacity-0 group-hover:opacity-100" onclick="event.stopPropagation(); window.deleteRangeProfile('${name.replace(/'/g, "\\'")}')" title="Delete Profile">
+                    <i data-lucide="trash-2" class="w-3 h-3"></i>
+                </button>
             `;
             
-            // Handle Selection ONLY
+            // Handle Selection ONLY (ignore checkbox clicks)
             card.addEventListener('click', (e) => {
+                if (e.target.closest('.dope-vault-checkbox')) {
+                    // Update button visibility
+                    const anyChecked = document.querySelectorAll('.dope-vault-checkbox:checked').length > 0;
+                    const btn = document.getElementById('dope-to-vault-btn');
+                    if (btn) {
+                        if (anyChecked) btn.classList.remove('hidden');
+                        else btn.classList.add('hidden');
+                    }
+                    return;
+                }
                 e.stopPropagation();
                 selectDopeCardForDashboard(name, p);
             });
@@ -2856,6 +2896,10 @@ function initializeTacticalDashboard2() {
             container.appendChild(card);
         });
         if(window.lucide) lucide.createIcons();
+        
+        // Ensure button starts hidden
+        const btn = document.getElementById('dope-to-vault-btn');
+        if (btn) btn.classList.add('hidden');
     }
 
     function selectDopeCardForDashboard(name, data) {
@@ -2937,10 +2981,30 @@ function initializeTacticalDashboard2() {
                 </div>
                 
                 <div class="absolute inset-0 bg-emerald-500/10 opacity-0 group-hover:opacity-100 pointer-events-none border-2 border-transparent group-hover:border-emerald-500/50 rounded transition-all"></div>
+                
+                <!-- Send to Vault Checkbox -->
+                <div class="absolute top-1 left-1 z-30 bg-black/60 p-0.5 rounded">
+                    <input type="checkbox" class="sat-vault-checkbox w-3.5 h-3.5 cursor-pointer" data-profile-name="${name}" title="Mark for Vault">
+                </div>
+                
+                <!-- Delete Button -->
+                <button class="absolute top-1 right-1 z-30 bg-red-950/80 text-red-400 p-1 rounded border border-red-900/50 hover:bg-red-600 hover:text-white transition-colors opacity-0 group-hover:opacity-100" onclick="event.stopPropagation(); window.deleteRangeProfile('${name.replace(/'/g, "\\'")}')" title="Delete Profile">
+                    <i data-lucide="trash-2" class="w-3 h-3"></i>
+                </button>
             `;
             
-            // Bind selection handler ONLY
+            // Bind selection handler ONLY (ignore checkbox clicks)
             card.addEventListener('click', (e) => {
+                if (e.target.closest('.sat-vault-checkbox')) {
+                    // Update button visibility
+                    const anyChecked = document.querySelectorAll('.sat-vault-checkbox:checked').length > 0;
+                    const btn = document.getElementById('sat-to-vault-btn');
+                    if (btn) {
+                        if (anyChecked) btn.classList.remove('hidden');
+                        else btn.classList.add('hidden');
+                    }
+                    return;
+                }
                 e.stopPropagation();
                 selectSatArchiveForDashboard(name, p);
             });
@@ -2948,6 +3012,10 @@ function initializeTacticalDashboard2() {
             container.appendChild(card);
         });
         if (window.lucide) lucide.createIcons();
+        
+        // Ensure button starts hidden
+        const btn = document.getElementById('sat-to-vault-btn');
+        if (btn) btn.classList.add('hidden');
     }
 
     function selectSatArchiveForDashboard(name, data) {
@@ -4528,6 +4596,208 @@ function initializeTacticalDashboard2() {
         });
     }
 
+    const vaultChatsBtn = document.getElementById('vault-chats-btn');
+    if (vaultChatsBtn) {
+        vaultChatsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const checkedBoxes = document.querySelectorAll('.vault-export-checkbox:checked');
+            if (checkedBoxes.length === 0) {
+                alert('Please select at least one snapshot to send to chats.');
+                return;
+            }
+
+            const selectedIds = Array.from(checkedBoxes).map(cb => cb.dataset.vaultId);
+            const itemsToSend = vaultCache.filter(item => selectedIds.includes(item.id.toString()));
+
+            itemsToSend.forEach((item, index) => {
+                setTimeout(() => {
+                    const base64Image = item.image;
+                    
+                    // Send to network
+                    commsChannel.send({
+                        type: 'broadcast',
+                        event: 'chat',
+                        payload: { data: TacticalCrypto.encrypt({ message: "INCOMING IMAGE INTEL", image: base64Image, user: commsUser }) }
+                    });
+                    
+                    // Render locally
+                    renderChatMessage(commsUser, "INCOMING IMAGE INTEL", true, base64Image);
+                }, index * 500); // Stagger sending
+            });
+            
+            // Uncheck boxes after sending
+            checkedBoxes.forEach(cb => cb.checked = false);
+            window.pushTacLog(`SENT ${itemsToSend.length} IMAGES TO COMM CHANNEL`, "SUCCESS");
+        });
+    }
+
+    // --- VAULT TO CACHE LOGIC ---
+    const vaultToDopeBtn = document.getElementById('vault-to-dope-btn');
+    if (vaultToDopeBtn) {
+        vaultToDopeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const checkedBoxes = document.querySelectorAll('.vault-export-checkbox:checked');
+            if (checkedBoxes.length === 0) {
+                alert('Please select at least one snapshot to send to Dope Cache.');
+                return;
+            }
+
+            const selectedIds = Array.from(checkedBoxes).map(cb => cb.dataset.vaultId);
+            const itemsToSend = vaultCache.filter(item => selectedIds.includes(item.id.toString()));
+            const ps = getProfiles();
+            
+            const currentDopeCount = Object.keys(ps).filter(k => !ps[k].isReconScenario).length;
+            if (currentDopeCount + itemsToSend.length > 20) {
+                alert(`LIBRARY FULL: DOPE CACHE HAS CAPACITY FOR ${20 - currentDopeCount} MORE CARDS. PLEASE DELETE OLD CARDS FIRST.`);
+                return;
+            }
+            
+            let sortedCount = 0;
+            itemsToSend.forEach(item => {
+                const defaultName = item.label || 'IMPORTED_DOPE_' + Date.now();
+                const name = prompt("Enter a name for this DOPE card:", defaultName);
+                if (name) {
+                    ps[name] = {
+                        snapshot: item.image,
+                        isReconScenario: false,
+                        timestamp: item.timestamp || Date.now(),
+                        caliber: 'IMPORTED IMG',
+                        date: new Date().toLocaleDateString()
+                    };
+                    sortedCount++;
+                }
+            });
+            
+            if (sortedCount > 0) {
+                saveProfiles(ps);
+                if (window.refreshDopeCacheGrid) window.refreshDopeCacheGrid();
+                window.pushTacLog(`SORTED ${sortedCount} IMAGES TO DOPE CACHE`, "SUCCESS");
+            }
+            
+            // Uncheck boxes
+            checkedBoxes.forEach(cb => cb.checked = false);
+        });
+    }
+
+    const vaultToSatBtn = document.getElementById('vault-to-sat-btn');
+    if (vaultToSatBtn) {
+        vaultToSatBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const checkedBoxes = document.querySelectorAll('.vault-export-checkbox:checked');
+            if (checkedBoxes.length === 0) {
+                alert('Please select at least one snapshot to send to Sat Archive.');
+                return;
+            }
+
+            const selectedIds = Array.from(checkedBoxes).map(cb => cb.dataset.vaultId);
+            const itemsToSend = vaultCache.filter(item => selectedIds.includes(item.id.toString()));
+            const ps = getProfiles();
+            
+            const reconCount = Object.keys(ps).filter(k => !!ps[k].isReconScenario).length;
+            if (reconCount + itemsToSend.length > 20) {
+                alert(`LIBRARY FULL: RECON MAP CACHE HAS CAPACITY FOR ${20 - reconCount} MORE MAPS. PLEASE DELETE OLD MAPS FIRST.`);
+                return;
+            }
+            
+            let sortedCount = 0;
+            itemsToSend.forEach(item => {
+                const defaultName = item.label || 'IMPORTED_RECON_' + Date.now();
+                const name = prompt("Enter a name for this Recon Map:", defaultName);
+                if (name) {
+                    ps[name] = {
+                        snapshot: item.image,
+                        bgImage: item.image, // set both to be safe
+                        isReconScenario: true,
+                        timestamp: item.timestamp || Date.now()
+                    };
+                    sortedCount++;
+                }
+            });
+            
+            if (sortedCount > 0) {
+                saveProfiles(ps);
+                if (window.refreshSatArchiveGrid) window.refreshSatArchiveGrid();
+                window.pushTacLog(`SORTED ${sortedCount} IMAGES TO SAT ARCHIVE`, "SUCCESS");
+            }
+            
+            // Uncheck boxes
+            checkedBoxes.forEach(cb => cb.checked = false);
+        });
+    }
+
+    // --- CACHE TO VAULT LOGIC ---
+    const dopeToVaultBtn = document.getElementById('dope-to-vault-btn');
+    if (dopeToVaultBtn) {
+        dopeToVaultBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const checkedBoxes = document.querySelectorAll('.dope-vault-checkbox:checked');
+            if (checkedBoxes.length === 0) return;
+
+            const profiles = window.getProfiles ? window.getProfiles() : {};
+            let sentCount = 0;
+            let errCount = 0;
+
+            checkedBoxes.forEach(cb => {
+                const name = cb.dataset.profileName;
+                const p = profiles[name];
+                if (p && p.snapshot) {
+                    saveIntelSnapshot('DOPE_CARD', p.snapshot, name);
+                    sentCount++;
+                } else {
+                    errCount++;
+                }
+                cb.checked = false; // uncheck
+            });
+
+            if (errCount > 0) {
+                alert(`Warning: ${errCount} DOPE card(s) could not be sent to Vault because they do not have a snapshot image attached.`);
+            }
+            if (sentCount > 0) {
+                window.pushTacLog(`TRANSFERRED ${sentCount} DOPE CARDS TO SECURE VAULT`, "SUCCESS");
+            }
+            
+            // Re-hide button
+            dopeToVaultBtn.classList.add('hidden');
+        });
+    }
+
+    const satToVaultBtn = document.getElementById('sat-to-vault-btn');
+    if (satToVaultBtn) {
+        satToVaultBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const checkedBoxes = document.querySelectorAll('.sat-vault-checkbox:checked');
+            if (checkedBoxes.length === 0) return;
+
+            const profiles = window.getProfiles ? window.getProfiles() : {};
+            let sentCount = 0;
+            let errCount = 0;
+
+            checkedBoxes.forEach(cb => {
+                const name = cb.dataset.profileName;
+                const p = profiles[name];
+                const mapSrc = p ? (p.snapshot || p.bgImage) : null;
+                
+                if (mapSrc) {
+                    saveIntelSnapshot('RECON_MAP', mapSrc, name);
+                    sentCount++;
+                } else {
+                    errCount++;
+                }
+                cb.checked = false; // uncheck
+            });
+
+            if (errCount > 0) {
+                alert(`Warning: ${errCount} Recon Map(s) could not be sent to Vault because they do not have a snapshot or background image.`);
+            }
+            if (sentCount > 0) {
+                window.pushTacLog(`TRANSFERRED ${sentCount} MAPS TO SECURE VAULT`, "SUCCESS");
+            }
+            
+            // Re-hide button
+            satToVaultBtn.classList.add('hidden');
+        });
+    }
+
     if (vaultImportBtn && vaultImportInput) {
         vaultImportBtn.addEventListener('click', (e) => {
             e.stopPropagation();
@@ -4572,7 +4842,10 @@ function initializeTacticalDashboard2() {
                         vaultCache.sort((a, b) => b.timestamp - a.timestamp);
                         
                         // Enforce cache limit
-                        if(vaultCache.length > 50) vaultCache = vaultCache.slice(0, 50);
+                        if(vaultCache.length > 50) {
+                            vaultCache = vaultCache.slice(0, 50);
+                            window.pushTacLog("VAULT CAPACITY (50) REACHED: OLDEST ITEMS OVERWRITTEN", "WARNING");
+                        }
                         
                         localStorage.setItem('TRC_INTEL_VAULT', JSON.stringify(vaultCache));
                         refreshVaultGrid();
