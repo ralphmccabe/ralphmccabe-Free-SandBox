@@ -1325,7 +1325,7 @@
                 <div class="w-full h-full bg-black relative flex items-center justify-center group overflow-hidden" id="surveillance-container">
                     
                     <!-- The Real Video Stream Target -->
-                    <video id="surveillance-stream" autoplay playsinline webkit-playsinline muted class="w-full h-full object-cover hidden"></video>
+                    <video id="surveillance-stream" autoplay playsinline webkit-playsinline muted class="w-full h-full object-cover hidden z-0"></video>
                     
                     <!-- Fallback / Placeholder -->
                     <div id="surveillance-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-center z-0">
@@ -1338,7 +1338,7 @@
                     </div>
                     
                     <!-- HUD Overlay (Shows up when streaming is live) -->
-                    <div id="surveillance-hud" class="absolute inset-0 pointer-events-none hidden border border-emerald-500/20 shadow-[inset_0_0_50px_rgba(16,185,129,0.1)]">
+                    <div id="surveillance-hud" class="absolute inset-0 pointer-events-none hidden border border-emerald-500/20 shadow-[inset_0_0_50px_rgba(16,185,129,0.1)]" style="z-index: 50;">
                         
                         <!-- Top: Compass Tape -->
                         <div class="absolute top-24 left-1/2 -translate-x-1/2 w-[60%] h-6 bg-black/40 border border-emerald-500/30 rounded overflow-hidden flex items-center justify-center backdrop-blur-sm">
@@ -1674,7 +1674,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js?v=v2.14.12-PROD').then(reg => {
+                navigator.serviceWorker.register('./sw.js?v=v2.14.14-PROD').then(reg => {
                     console.log('[SW] PWA Service Worker Registered');
                     
                     // Robust check helper to handle slow thread sync
@@ -1835,6 +1835,8 @@
     </script>
 </body>
 </html>
+
+
 
 
 
