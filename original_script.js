@@ -3727,7 +3727,7 @@ function initializeTacticalDashboard2() {
                                 const index = vaultCache.findIndex(x => x.id === item.id);
                                 if (index !== -1) {
                                     vaultCache[index].distance = foundVal;
-                                    localStorage.setItem('TRC_INTEL_VAULT', JSON.stringify(vaultCache));
+                                    if(window.TRC_IDB) TRC_IDB.set('intelVault', vaultCache[index].id.toString(), vaultCache[index]);
                                 }
                             } else {
                                 // Fallback to existing Smart Label Extractor if OCR failed
@@ -3765,7 +3765,7 @@ function initializeTacticalDashboard2() {
                         const idx = vaultCache.findIndex(x => x.id === item.id);
                         if (idx !== -1) {
                             vaultCache[idx].distance = cleanVal;
-                            localStorage.setItem('TRC_INTEL_VAULT', JSON.stringify(vaultCache));
+                            if(window.TRC_IDB) TRC_IDB.set('intelVault', vaultCache[idx].id.toString(), vaultCache[idx]);
                             console.log("VECTOR CACHE UPDATED MANUALLY:", cleanVal);
                         }
                     }
@@ -4932,7 +4932,11 @@ function initializeTacticalDashboard2() {
                             window.pushTacLog("VAULT CAPACITY (50) REACHED: OLDEST ITEMS OVERWRITTEN", "WARNING");
                         }
                         
-                        localStorage.setItem('TRC_INTEL_VAULT', JSON.stringify(vaultCache));
+                        if(window.TRC_IDB) {
+                            vaultCache.forEach(item => {
+                                TRC_IDB.set('intelVault', item.id.toString(), item);
+                            });
+                        }
                         refreshVaultGrid();
                         window.pushTacLog(`IMPORTED ${importCount} IMAGES INTO VAULT CACHE`, "SUCCESS");
                         

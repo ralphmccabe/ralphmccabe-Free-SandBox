@@ -17,7 +17,7 @@ def print(*args, **kwargs):
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 
 # PORT CONFIG — matches Edge://flags setting on PC and Mobile
-PORT = 8445
+PORT = 8446
 
 # ============================================================
 # VERSION BUMP UTILITY
@@ -99,6 +99,10 @@ def apply_version_bump(source_dir, new_version):
         idx = re.sub(r"btn\.innerText = '📸 DRAFT SNAPSHOT v[\d.]+-PROD'",
                      f"btn.innerText = '📸 DRAFT SNAPSHOT {new_version}'", idx, flags=re.IGNORECASE)
 
+        # Update the API Version Check variable
+        idx = re.sub(r"window\.APP_VERSION = 'v[\d.]+-PROD';",
+                     f"window.APP_VERSION = '{new_version}';", idx)
+
         with open(index_path, 'w', encoding='utf-8') as f:
             f.write(idx)
         print(f"[+] index.html script versions bumped")
@@ -120,7 +124,22 @@ def apply_version_bump(source_dir, new_version):
 
 class TacticalRequestHandler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
-        if self.path == '/api/push-production':
+        if self.path == '/api/check-version':
+            try:
+                current_dir = os.getcwd()
+                current_version = read_current_version(current_dir)
+                
+                self.send_response(200)
+                self.send_header('Content-type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                msg = f'{{"status": "success", "latest_version": "{current_version}"}}'
+                self.wfile.write(msg.encode('utf-8'))
+            except Exception as e:
+                self.send_response(500)
+                self.end_headers()
+                
+        elif self.path == '/api/push-production':
             try:
                 current_dir = os.getcwd()
                 
@@ -210,7 +229,7 @@ class TacticalRequestHandler(http.server.SimpleHTTPRequestHandler):
                 # 1. Read current version and compute the NEW bumped version
                 current_version = read_current_version(source_dir)
                 new_version = bump_version(current_version)
-                print(f"\n[~] DRAFT: Bumping {current_version} → {new_version}")
+                print(f"\n[~] DRAFT: Bumping {current_version} -> {new_version}")
 
                 # 2. Apply version bump to sw.js, index.html, VERSION_HISTORY.txt
                 apply_version_bump(source_dir, new_version)

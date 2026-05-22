@@ -33,6 +33,7 @@
 
     <script src="html2canvas.min.js?v=1.5"></script>
     <script src="lucide.min.js?v=1.5"></script>
+    <script src="idb_helper.js?v=1.6"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 
@@ -1690,178 +1691,68 @@
 
     <script src="original_script.js"></script>
     
-    <!-- PWA SERVICE WORKER REGISTRATION & DYNAMIC UPDATE TOAST -->
+    <!-- PWA SERVICE WORKER REGISTRATION & API UPDATE CHECK -->
+
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js?v=v2.14.17-PROD').then(reg => {
-                    console.log('[SW] PWA Service Worker Registered');
-                    
-                    // Robust check helper to handle slow thread sync
-                    const checkForUpdate = (r) => {
-                        if (r.waiting && navigator.serviceWorker.controller) {
-                            showUpdateToast(r.waiting);
-                            return true;
-                        }
-                        return false;
-                    };
-                    
-                    // 1. Check if an update is already waiting
-                    if (checkForUpdate(reg)) return;
-                    
-                    // 2. Check if an update is installing
-                    if (reg.installing) {
-                        reg.installing.onstatechange = () => {
-                            if (reg.installing.state === 'installed' && navigator.serviceWorker.controller) checkForUpdate(reg);
-                        };
-                    }
-                    
-                    // 3. Listen for new updates
-                    reg.onupdatefound = () => {
-                        const installingWorker = reg.installing;
-                        if (installingWorker) {
-                            installingWorker.onstatechange = () => {
-                                if (installingWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    showUpdateToast(installingWorker);
-                                }
-                            };
-                        }
-                    };
-                });
-                // Controller change auto-reload removed to prevent forcing the user.
-                // The page will only reload when the user explicitly clicks the Reboot button on the Toast.
-            });
-            
-            // --- USER REQUESTED DEBUG TRIGGER ---
-            // Force the Update Toast to show on mobile for testing purposes
-            window.addEventListener('load', () => {
-                setTimeout(() => {
-                    if (typeof showUpdateToast === 'function') {
-                        showUpdateToast({ state: 'testing' });
-                    }
-                }, 1500);
-            });
-        }
-        
-        function showUpdateToast(worker) {
-            if (document.getElementById('twa-update-toast')) return;
-            
-            const toast = document.createElement('div');
-            toast.id = 'twa-update-toast';
-            // PINNED TO BOTTOM: Fixed positioning ensures it stays on screen on mobile
-            toast.style.cssText = 'position: fixed !important; top: 20px !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 999999 !important; width: 92% !important; max-width: 480px !important; box-sizing: border-box !important;';
-            
-            const renderToast = (versionTitle = 'TACTICAL UPDATE DETECTED', changelog = 'New PWA components ready to install. Please save all work.') => {
-                toast.innerHTML = `
-                    <div style="background-color: rgba(43, 15, 3, 0.98); border: 2px solid #f97316; border-radius: 8px; box-shadow: 0 0 30px rgba(249, 115, 22, 0.45); padding: 16px; color: #ffffff; font-family: monospace; display: flex; flex-direction: column; gap: 10px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
-                        <div class="flex items-center gap-2 border-b border-orange-500/30 pb-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-orange-500 animate-ping"></span>
-                            <span class="text-xs font-black uppercase text-orange-400 tracking-[0.2em]">${versionTitle}</span>
-                        </div>
-                        <div class="text-[9px] leading-relaxed uppercase font-bold text-orange-200" style="white-space: pre-line; max-height: 120px; overflow-y: auto;">
-                            ${changelog}
-                        </div>
-                        <div class="text-[8px] text-orange-400/80 font-bold uppercase tracking-wide border-t border-orange-500/10 pt-2">
-                            ⚠️ CAUTION: Save your current active card, libraries, and vaults before updating!
-                        </div>
-                        <div class="flex gap-2 justify-end mt-1">
-                            <button id="cancel-update-btn" class="bg-transparent border border-orange-500/50 hover:bg-orange-500/10 text-orange-300 text-[9px] font-black uppercase px-3 py-1.5 rounded transition-all">
-                                [ Cancel ]
-                            </button>
-                            <button id="confirm-update-btn" class="bg-orange-500 border border-orange-400 hover:bg-orange-600 text-black text-[9px] font-black uppercase px-3 py-1.5 rounded transition-all shadow-[0_0_10px_rgba(249,115,22,0.4)]">
-                                [ Yes, Update Now ]
-                            </button>
-                        </div>
-                    </div>
-                `;
-                
-                // Bind events in-memory using querySelector to prevent TypeError crashes
-                const cancelBtn = toast.querySelector('#cancel-update-btn');
-                const confirmBtn = toast.querySelector('#confirm-update-btn');
-                
-                if (cancelBtn) {
-                    cancelBtn.onclick = () => toast.remove();
-                }
-                
-                if (confirmBtn) {
-                    confirmBtn.onclick = () => {
-                        toast.innerHTML = `
-                            <div style="background-color: rgba(6, 78, 59, 0.98); border: 2px solid #10b981; border-radius: 8px; box-shadow: 0 0 30px rgba(16, 185, 129, 0.5); padding: 16px; color: #ffffff; font-family: monospace; display: flex; flex-direction: column; gap: 12px; pointer-events: auto; backdrop-filter: blur(8px);">
-                                <div class="flex items-center gap-2 border-b border-emerald-500/30 pb-2">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping"></span>
-                                    <span class="text-xs font-black uppercase text-emerald-400 tracking-[0.2em]">UPDATE SUCCESSFUL</span>
-                                </div>
-                                <div class="text-[9px] leading-relaxed uppercase font-bold text-emerald-200 flex flex-col gap-1">
-                                    <div>DEPLOY CODE: 200 (SUCCESS)</div>
-                                    <div>DATABASE SYNCHRONIZATION: OPERATIONAL</div>
-                                    <div class="text-emerald-400 font-bold mt-1">SYSTEM READY FOR REBOOT.</div>
-                                </div>
-                                <div class="w-full bg-emerald-950 h-1.5 rounded overflow-hidden mt-1">
-                                    <div id="pwa-progress-bar" class="bg-emerald-400 h-full rounded transition-all duration-1000" style="width: 0%;"></div>
-                                </div>
-                                <div class="flex justify-end mt-2">
-                                    <button id="reboot-now-btn" class="bg-emerald-500 border border-emerald-400 hover:bg-emerald-600 text-black text-[10px] font-black uppercase px-4 py-2 rounded transition-all shadow-[0_0_15px_rgba(16,185,129,0.5)]">
-                                        [ REBOOT SYSTEM NOW ]
-                                    </button>
-                                </div>
-                            </div>
-                        `;
-                        
-                        setTimeout(() => {
-                            const bar = toast.querySelector('#pwa-progress-bar');
-                            if (bar) bar.style.width = '100%';
-                        }, 50);
+        window.APP_VERSION = 'v2.14.20-PROD';
 
-                        // Tell service worker to skip waiting
-                        try { worker.postMessage({ type: 'SKIP_WAITING' }); } catch(e) { console.error("Worker msg failed", e); }
-                        
-                        // Wait for user to manually click reboot
-                        const rebootBtn = toast.querySelector('#reboot-now-btn');
-                        if (rebootBtn) {
-                            rebootBtn.onclick = () => {
-                                rebootBtn.innerText = 'REBOOTING...';
-                                window.location.reload(true);
-                            };
-                        }
-                    };
-                }
-            };
+        window.addEventListener('load', () => {
+            // Register SW silently for offline support
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js?v=' + window.APP_VERSION).catch(err => console.log('SW reg failed', err));
+            }
 
-            // Render loading status first
-            renderToast('CHECKING FOR DEPLOYMENT LOGS...', 'Connecting to staging server history...');
-            document.body.appendChild(toast);
-
-            // Fetch and parse the latest version info from VERSION_HISTORY.txt
+            // Check for new version using static VERSION_HISTORY.txt (Works on GitHub Pages!)
             fetch('./VERSION_HISTORY.txt?t=' + Date.now())
                 .then(res => {
-                    if (!res.ok) throw new Error();
+                    if (!res.ok) throw new Error('Network response was not ok');
                     return res.text();
                 })
                 .then(text => {
-                    const sections = text.split(/={10,}/);
-                    const validSections = sections.map(s => s.trim()).filter(s => s.length > 0);
-                    
-                    if (validSections.length > 0) {
-                        const latestBlock = validSections[validSections.length - 1];
-                        const lines = latestBlock.split('\n');
-                        const headerLine = lines[0].trim();
-                        
-                        let versionTitle = 'UPDATE AVAILABLE';
-                        const match = headerLine.match(/(v\d+\.\d+(?:\.\d+)?-PROD)/);
-                        if (match) {
-                            versionTitle = `NEW UPDATE: ${match[1]}`;
+                    const matches = text.match(/v\d+\.\d+(?:\.\d+)?-PROD/g);
+                    if (matches && matches.length > 0) {
+                        const latestVersion = matches[matches.length - 1];
+                        if (latestVersion !== window.APP_VERSION) {
+                            showUpdateModal(latestVersion);
                         }
-                        
-                        const changelogText = lines.slice(1).join('\n').trim();
-                        renderToast(versionTitle, changelogText);
-                    } else {
-                        renderToast('TACTICAL UPDATE DETECTED', 'New version files successfully cached. Ready to install.');
                     }
-                })
-                .catch(() => {
-                    renderToast('TACTICAL UPDATE DETECTED', 'New version files cached. Ready to install.');
-                });
+                }).catch(err => console.log('Update check failed:', err));
+        });
+
+        function showUpdateModal(newVersion) {
+            if (document.getElementById('twa-update-modal')) return;
+            const modal = document.createElement('div');
+            modal.id = 'twa-update-modal';
+            modal.style.cssText = 'position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 1000000; display: flex; align-items: center; justify-content: center; font-family: monospace; padding: 20px;';
+            
+            modal.innerHTML = `
+                <div style="background-color: #0f172a; border: 1px solid #3b82f6; border-radius: 12px; padding: 24px; max-width: 400px; width: 100%; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5);">
+                    <h2 style="font-size: 1.5rem; font-weight: bold; margin-bottom: 12px; color: #60a5fa; margin-top: 0;">Update Available</h2>
+                    <p style="font-size: 0.9rem; color: #cbd5e1; margin-bottom: 24px; line-height: 1.5;">
+                        Version ${newVersion} is ready to install.<br><br>
+                        By clicking <b>Accept & Update</b>, you agree to the latest Privacy Policy and End User License Agreement.
+                    </p>
+                    <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                        <button id="modal-remind-btn" style="background: transparent; border: 1px solid #475569; color: #94a3b8; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; text-transform: uppercase; font-family: monospace;">Remind Me Later</button>
+                        <button id="modal-update-btn" style="background: #3b82f6; border: none; color: white; padding: 10px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; text-transform: uppercase; font-family: monospace; box-shadow: 0 4px 6px -1px rgba(59, 130, 246, 0.5);">Accept & Update</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            
+            document.getElementById('modal-remind-btn').onclick = () => {
+                modal.remove();
+            };
+            
+            document.getElementById('modal-update-btn').onclick = () => {
+                document.getElementById('modal-update-btn').innerText = 'UPDATING...';
+                // Force reload to grab the new version from the server
+                window.location.reload(true);
+            };
         }
+
+
         // =========================================================================
         // CUSTOM PWA INSTALL PROMPT (TACTICAL TOAST)
         // =========================================================================
@@ -1909,7 +1800,7 @@
                 deferredPrompt.prompt();
                 // Wait for the user to respond to the prompt
                 const { outcome } = await deferredPrompt.userChoice;
-                console.log(\`User response to the install prompt: \${outcome}\`);
+                console.log(`User response to the install prompt: ${outcome}`);
                 // We've used the prompt, and can't use it again, throw it away
                 deferredPrompt = null;
             };

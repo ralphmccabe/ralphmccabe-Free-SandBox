@@ -5,7 +5,7 @@
  */
 
 const DB_NAME = 'TRC_PRO_UPGRADE_DB';
-const DB_VERSION = 3; // Incremented version to add drafts store
+const DB_VERSION = 4; // Incremented version to add intelVault store
 const STORES = {
     PROFILES: 'rangeCardProfiles',
     VAULT: 'intelVault', // NEW: Permanent storage for snapshots/remarks

@@ -36,37 +36,37 @@ v2.14.10-PROD - DEPLOYED 2026-05-21 17:53:43
 * Version auto-bumped from v2.14.9-PROD
 * Service Worker cache updated to: trc-pro-upgrade-v2.14.10-PROD
 * All tactical systems: OPERATIONAL
-* Toast updater: ACTIVE - users will see update prompt on next app open
+* Toast updater: ACTIVE - users will see update prompt on next app open
 
 ============================================================
 v2.14.11-PROD - DEPLOYED 2026-05-21 17:54:50
 * Version auto-bumped from v2.14.10-PROD
 * Service Worker cache updated to: trc-pro-upgrade-v2.14.11-PROD
 * All tactical systems: OPERATIONAL
-* Toast updater: ACTIVE - users will see update prompt on next app open
+* Toast updater: ACTIVE - users will see update prompt on next app open
 
 ============================================================
 v2.14.12-PROD - DEPLOYED 2026-05-21 18:11:41
 * Version auto-bumped from v2.14.11-PROD
 * Service Worker cache updated to: trc-pro-upgrade-v2.14.12-PROD
 * All tactical systems: OPERATIONAL
-* Toast updater: ACTIVE - users will see update prompt on next app open
+* Toast updater: ACTIVE - users will see update prompt on next app open
 
 ============================================================
 v2.14.13-PROD - DEPLOYED 2026-05-21 18:37:29
 * Version auto-bumped from v2.14.12-PROD
 * Service Worker cache updated to: trc-pro-upgrade-v2.14.13-PROD
 * All tactical systems: OPERATIONAL
-* Toast updater: ACTIVE - users will see update prompt on next app open
+* Toast updater: ACTIVE - users will see update prompt on next app open
 
 ============================================================
 v2.14.14-PROD - DEPLOYED 2026-05-21 18:57:37
 * Version auto-bumped from v2.14.13-PROD
 * Service Worker cache updated to: trc-pro-upgrade-v2.14.14-PROD
 * All tactical systems: OPERATIONAL
-* Toast updater: ACTIVE - users will see update prompt on next app open
-
-============================================================
+* Toast updater: ACTIVE - users will see update prompt on next app open
+
+============================================================
 * Toast updater: ACTIVE - users will see update prompt on next app open
 
 ============================================================
@@ -84,22 +84,28 @@ v2.14.16-PROD — DEPLOYED 2026-05-22 12:02:52
 • Toast updater: ACTIVE — users will see update prompt on next app open
 
 ============================================================
-v2.14.18-PROD — DEPLOYED 2026-05-22 12:30:22
+v2.14.17-PROD — DEPLOYED 2026-05-22 14:43:34
 • Version auto-bumped from previous release
-• Service Worker cache updated to: trc-pro-upgrade-v2.14.18-PROD
+• Service Worker cache updated to: trc-pro-upgrade-v2.14.17-PROD
 • All tactical systems: OPERATIONAL
 • Toast updater: ACTIVE — users will see update prompt on next app open
 
 ============================================================
-v2.14.19-PROD — DEPLOYED 2026-05-22 12:32:06
+v2.14.18-PROD � DEPLOYED 2026-05-22 18:10:00
+� Version auto-bumped from previous release
+� Service Worker cache updated to: trc-pro-upgrade-v2.14.18-PROD
+� Update Modal: ACTIVE
+
+============================================================
+v2.14.19-PROD — DEPLOYED 2026-05-22 18:33:23
 • Version auto-bumped from previous release
 • Service Worker cache updated to: trc-pro-upgrade-v2.14.19-PROD
 • All tactical systems: OPERATIONAL
 • Toast updater: ACTIVE — users will see update prompt on next app open
 
 ============================================================
-v2.14.17-PROD — DEPLOYED 2026-05-22 14:43:34
+v2.14.20-PROD — DEPLOYED 2026-05-22 18:51:25
 • Version auto-bumped from previous release
-• Service Worker cache updated to: trc-pro-upgrade-v2.14.17-PROD
+• Service Worker cache updated to: trc-pro-upgrade-v2.14.20-PROD
 • All tactical systems: OPERATIONAL
 • Toast updater: ACTIVE — users will see update prompt on next app open

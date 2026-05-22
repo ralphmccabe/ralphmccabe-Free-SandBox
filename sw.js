@@ -1,5 +1,5 @@
-/* TRC-PRO-VERSION - v2.14.17-PROD */
-const CACHE_NAME = 'trc-pro-upgrade-v2.14.17-PROD';
+/* TRC-PRO-VERSION - v2.14.20-PROD */
+const CACHE_NAME = 'trc-pro-upgrade-v2.14.20-PROD';
 const ASSETS = [
     './',
     './index.html?v=6.1',
@@ -50,6 +50,12 @@ self.addEventListener('activate', event => {
 
 // Dynamic Offline Caching Strategy
 self.addEventListener('fetch', event => {
+    // Bypass cache completely for version history to ensure live updates
+    if (event.request.url.includes('VERSION_HISTORY.txt')) {
+        event.respondWith(fetch(event.request));
+        return;
+    }
+    
     // Only cache GET requests
     if (event.request.method !== 'GET') return;
 
