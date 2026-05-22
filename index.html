@@ -505,7 +505,7 @@
                         <p class="text-[10px] font-extrabold text-black uppercase tracking-wider mb-2 text-center">🗺️ INTERACTIVE MISSION WORKSPACE</p>
                         <div id="mobile-recon-workspace-portal" class="w-full aspect-[4/3] border border-black overflow-hidden relative bg-gray-100">
                             <div class="absolute inset-0 border-2 border-black bg-gray-100 overflow-hidden w-full h-full" id="mobile-recon-map-workspace">
-                                <img id="mobile-recon-bg-image" class="absolute inset-0 w-full h-full object-cover pointer-events-none hidden" alt="Satellite background">
+                                <img id="mobile-recon-bg-image" class="absolute inset-0 w-full h-full object-contain pointer-events-none hidden" alt="Satellite background">
                                 <div id="mobile-recon-default-grid" class="absolute inset-0 bg-[linear-gradient(to_right,#ccc_1px,transparent_1px),linear-gradient(to_bottom,#ccc_1px,transparent_1px)] bg-[size:20px_20px] opacity-25 pointer-events-none"></div>
                                 <canvas id="mobile-recon-canvas" width="600" height="450" class="absolute inset-0 w-full h-full z-10 pointer-events-none"></canvas>
                             </div>
@@ -686,7 +686,7 @@
                         <!-- Interactive Map Workspace -->
                         <div class="flex-1 relative border-2 border-black bg-gray-100 overflow-hidden" id="recon-map-workspace">
                             <!-- Uploaded Background Image Layer -->
-                            <img id="recon-bg-image" class="absolute inset-0 w-full h-full object-cover pointer-events-none hidden" alt="Satellite background">
+                            <img id="recon-bg-image" class="absolute inset-0 w-full h-full object-contain pointer-events-none hidden" alt="Satellite background">
                             
                             <!-- Default Grid lines overlay when no background image -->
                             <div id="recon-default-grid" class="absolute inset-0 bg-[linear-gradient(to_right,#ccc_1px,transparent_1px),linear-gradient(to_bottom,#ccc_1px,transparent_1px)] bg-[size:20px_20px] opacity-25 pointer-events-none"></div>
@@ -869,6 +869,7 @@
                         </div>
                         <div id="previewActions" class="p-5 bg-black/80 border-t border-gray-800 flex gap-4 mt-auto">
                             <button id="loadSelectedBtn" class="flex-1 bg-neon-green text-black font-extrabold py-4 rounded-lg uppercase text-xs">Inject Data</button>
+                            <button id="injectReconBtn" class="flex-1 bg-indigo-500 text-black font-extrabold py-4 rounded-lg uppercase text-xs">Inject to Recon</button>
                             <button id="deleteSelectedBtn" class="px-8 bg-black border border-gray-800 text-gray-400 py-4 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
                         </div>
                     </div>
@@ -1693,7 +1694,7 @@
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('./sw.js?v=v2.14.16-PROD').then(reg => {
+                navigator.serviceWorker.register('./sw.js?v=v2.14.17-PROD').then(reg => {
                     console.log('[SW] PWA Service Worker Registered');
                     
                     // Robust check helper to handle slow thread sync
@@ -1730,6 +1731,16 @@
                 // Controller change auto-reload removed to prevent forcing the user.
                 // The page will only reload when the user explicitly clicks the Reboot button on the Toast.
             });
+            
+            // --- USER REQUESTED DEBUG TRIGGER ---
+            // Force the Update Toast to show on mobile for testing purposes
+            window.addEventListener('load', () => {
+                setTimeout(() => {
+                    if (typeof showUpdateToast === 'function') {
+                        showUpdateToast({ state: 'testing' });
+                    }
+                }, 1500);
+            });
         }
         
         function showUpdateToast(worker) {
@@ -1738,11 +1749,11 @@
             const toast = document.createElement('div');
             toast.id = 'twa-update-toast';
             // PINNED TO BOTTOM: Fixed positioning ensures it stays on screen on mobile
-            toast.style.cssText = 'position: fixed !important; top: 20px !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 999999 !important; width: 92% !important; max-width: 480px !important; box-sizing: border-box !important; pointer-events: none !important;';
+            toast.style.cssText = 'position: fixed !important; top: 20px !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 999999 !important; width: 92% !important; max-width: 480px !important; box-sizing: border-box !important;';
             
             const renderToast = (versionTitle = 'TACTICAL UPDATE DETECTED', changelog = 'New PWA components ready to install. Please save all work.') => {
                 toast.innerHTML = `
-                    <div style="background-color: rgba(43, 15, 3, 0.98); border: 2px solid #f97316; border-radius: 8px; box-shadow: 0 0 30px rgba(249, 115, 22, 0.45); padding: 16px; color: #ffffff; font-family: monospace; display: flex; flex-direction: column; gap: 10px; pointer-events: auto; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+                    <div style="background-color: rgba(43, 15, 3, 0.98); border: 2px solid #f97316; border-radius: 8px; box-shadow: 0 0 30px rgba(249, 115, 22, 0.45); padding: 16px; color: #ffffff; font-family: monospace; display: flex; flex-direction: column; gap: 10px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
                         <div class="flex items-center gap-2 border-b border-orange-500/30 pb-2">
                             <span class="w-2.5 h-2.5 rounded-full bg-orange-500 animate-ping"></span>
                             <span class="text-xs font-black uppercase text-orange-400 tracking-[0.2em]">${versionTitle}</span>
@@ -1851,6 +1862,58 @@
                     renderToast('TACTICAL UPDATE DETECTED', 'New version files cached. Ready to install.');
                 });
         }
+        // =========================================================================
+        // CUSTOM PWA INSTALL PROMPT (TACTICAL TOAST)
+        // =========================================================================
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Prevent Chrome 67 and earlier from automatically showing the prompt
+            e.preventDefault();
+            // Stash the event so it can be triggered later.
+            deferredPrompt = e;
+            
+            // If the install toast already exists, don't show it again
+            if (document.getElementById('twa-install-toast')) return;
+
+            const installToast = document.createElement('div');
+            installToast.id = 'twa-install-toast';
+            installToast.style.cssText = 'position: fixed !important; top: 20px !important; left: 50% !important; transform: translateX(-50%) !important; z-index: 999999 !important; width: 92% !important; max-width: 480px !important; box-sizing: border-box !important; pointer-events: none !important;';
+            
+            installToast.innerHTML = `
+                <div style="background-color: rgba(6, 78, 59, 0.98); border: 2px solid #10b981; border-radius: 8px; box-shadow: 0 0 30px rgba(16, 185, 129, 0.5); padding: 16px; color: #ffffff; font-family: monospace; display: flex; flex-direction: column; gap: 10px; pointer-events: auto; backdrop-filter: blur(8px);">
+                    <div class="flex items-center gap-2 border-b border-emerald-500/30 pb-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-xs font-black uppercase text-emerald-400 tracking-[0.2em]">INSTALL TACTICAL APP</span>
+                    </div>
+                    <div class="text-[11px] leading-relaxed text-gray-200" style="margin-top: 4px;">
+                        Add this application to your device home screen for fullscreen mobile access and offline capabilities.
+                    </div>
+                    <div class="flex gap-2 mt-2">
+                        <button id="cancel-install-btn" style="flex: 1; padding: 10px; background: rgba(0,0,0,0.4); border: 1px solid #064e3b; color: #9ca3af; border-radius: 4px; font-family: monospace; font-size: 11px; font-weight: bold; cursor: pointer; text-transform: uppercase;">Dismiss</button>
+                        <button id="confirm-install-btn" style="flex: 2; padding: 10px; background: #10b981; border: 1px solid #34d399; color: #000; border-radius: 4px; font-family: monospace; font-size: 11px; font-weight: 900; cursor: pointer; text-transform: uppercase;">Install App</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(installToast);
+            
+            const cancelBtn = installToast.querySelector('#cancel-install-btn');
+            const confirmBtn = installToast.querySelector('#confirm-install-btn');
+            
+            cancelBtn.onclick = () => installToast.remove();
+            
+            confirmBtn.onclick = async () => {
+                // Hide the custom toast
+                installToast.remove();
+                // Show the native browser install prompt
+                deferredPrompt.prompt();
+                // Wait for the user to respond to the prompt
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(\`User response to the install prompt: \${outcome}\`);
+                // We've used the prompt, and can't use it again, throw it away
+                deferredPrompt = null;
+            };
+        });
     </script>
 </body>
 </html>

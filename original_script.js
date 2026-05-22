@@ -65,16 +65,16 @@ function initializeTacticalDashboard1() {
         // 1. Desktop Table Row
         if (tableBody) {
             const row = document.createElement('div');
-            row.className = 'grid grid-cols-5 border-b border-black flex-1 items-center text-center';
+            row.className = 'grid grid-cols-5 border-b border-black flex-1 items-stretch text-center';
             row.innerHTML = `
                 <div class="border-r border-black h-full py-1 flex items-center justify-center font-handwriting text-blue-800 min-w-0 px-0.5 overflow-hidden">
-                    <span id="display-${clicksId}" class="whitespace-nowrap leading-none w-full text-center"></span>
+                    <span id="display-${clicksId}" class="break-words leading-none w-full text-center" style="word-break: break-word;"></span>
                 </div>
                 <div class="col-span-2 border-r border-black h-full py-1 flex items-center justify-center bg-gray-50/30 min-w-0 px-0.5 overflow-hidden">
-                    <span id="display-${distInputId}" class="text-sm font-bold whitespace-nowrap leading-none w-full text-center">${dist}</span>
+                    <span id="display-${distInputId}" class="text-sm font-bold break-words leading-none w-full text-center" style="word-break: break-word;">${dist}</span>
                 </div>
                 <div class="col-span-2 h-full py-1 flex items-center justify-center font-handwriting text-blue-800 min-w-0 px-0.5 overflow-hidden">
-                    <span id="display-${udlrId}" class="whitespace-nowrap leading-none w-full text-center"></span>
+                    <span id="display-${udlrId}" class="break-words leading-none w-full text-center" style="word-break: break-word;"></span>
                 </div>
             `;
             tableBody.appendChild(row);
@@ -83,16 +83,16 @@ function initializeTacticalDashboard1() {
         // 2. Mobile Table Row
         if (mobileTableBody) {
             const row = document.createElement('div');
-            row.className = 'grid grid-cols-5 border-b border-black flex-1 items-center text-center border-l-0 border-r-0';
+            row.className = 'grid grid-cols-5 border-b border-black flex-1 items-stretch text-center border-l-0 border-r-0';
             row.innerHTML = `
                 <div class="border-r border-black h-full py-1 flex items-center justify-center font-handwriting text-blue-800 min-w-0 px-0.5 overflow-hidden">
-                    <span id="mobile-display-${clicksId}" class="whitespace-nowrap leading-none w-full text-center"></span>
+                    <span id="mobile-display-${clicksId}" class="break-words leading-none w-full text-center" style="word-break: break-word;"></span>
                 </div>
                 <div class="col-span-2 border-r border-black h-full py-1 flex items-center justify-center bg-gray-50/30 min-w-0 px-0.5 overflow-hidden">
-                    <span id="mobile-display-${distInputId}" class="text-[10px] font-bold whitespace-nowrap leading-none w-full text-center">${dist}</span>
+                    <span id="mobile-display-${distInputId}" class="text-[10px] font-bold break-words leading-none w-full text-center" style="word-break: break-word;">${dist}</span>
                 </div>
                 <div class="col-span-2 h-full py-1 flex items-center justify-center font-handwriting text-blue-800 min-w-0 px-0.5 overflow-hidden">
-                    <span id="mobile-display-${udlrId}" class="whitespace-nowrap leading-none w-full text-center"></span>
+                    <span id="mobile-display-${udlrId}" class="break-words leading-none w-full text-center" style="word-break: break-word;"></span>
                 </div>
             `;
             mobileTableBody.appendChild(row);
@@ -689,6 +689,71 @@ function initializeTacticalDashboard1() {
         // Actions
         document.getElementById('loadSelectedBtn').onclick = () => {
             loadProfile(name);
+            window.closeLibrary();
+        };
+        document.getElementById('injectReconBtn').onclick = () => {
+            const ps = getProfiles();
+            const data = ps[name];
+            if (!data) return;
+
+            const toggleBtn = document.getElementById('toggleReconMapperBtn');
+            const isCurrentlyActive = toggleBtn && toggleBtn.textContent.includes('BACK TO RANGE CARD');
+            if (!isCurrentlyActive && toggleBtn) {
+                toggleBtn.click();
+            }
+
+            const rScenarioInput = document.getElementById('recon-scenario-name');
+            const rReportInput = document.getElementById('recon-report');
+            if (rScenarioInput) { rScenarioInput.value = data.name || ''; rScenarioInput.dispatchEvent(new Event('input')); }
+            if (rReportInput) { rReportInput.value = data.report || ''; rReportInput.dispatchEvent(new Event('input')); }
+
+            const rBgImage = document.getElementById('recon-bg-image');
+            const mBgImage = document.getElementById('mobile-recon-bg-image');
+            const rDefaultGrid = document.getElementById('recon-default-grid');
+            const mDefaultGrid = document.getElementById('mobile-recon-default-grid');
+
+            if (rBgImage) {
+                const mapSrc = data.snapshot || data.bgImage || data.image;
+                if (mapSrc) {
+                    rBgImage.src = mapSrc;
+                    rBgImage.classList.remove('hidden');
+                    if (rDefaultGrid) rDefaultGrid.classList.add('hidden');
+                    if (mBgImage) { mBgImage.src = mapSrc; mBgImage.classList.remove('hidden'); }
+                    if (mDefaultGrid) mDefaultGrid.classList.add('hidden');
+                } else {
+                    rBgImage.classList.add('hidden'); rBgImage.src = '';
+                    if (rDefaultGrid) rDefaultGrid.classList.remove('hidden');
+                    if (mBgImage) { mBgImage.classList.add('hidden'); mBgImage.src = ''; }
+                    if (mDefaultGrid) mDefaultGrid.classList.remove('hidden');
+                }
+            }
+
+            document.querySelectorAll('.recon-marker').forEach(m => m.remove());
+            if (data.markers && Array.isArray(data.markers)) {
+                data.markers.forEach(m => {
+                    if (typeof window.createMarker === 'function') {
+                        window.createMarker(m.x, m.y, m.emoji, m.note || '');
+                    }
+                });
+            }
+
+            const rCanvas = document.getElementById('recon-canvas');
+            const mCanvas = document.getElementById('mobile-recon-canvas');
+            if (rCanvas) {
+                const rCtx = rCanvas.getContext('2d');
+                rCtx.clearRect(0, 0, rCanvas.width, rCanvas.height);
+                if (mCanvas) mCanvas.getContext('2d').clearRect(0, 0, mCanvas.width, mCanvas.height);
+                
+                if (data.drawing) {
+                    const img = new Image();
+                    img.onload = () => {
+                        rCtx.drawImage(img, 0, 0);
+                        if (mCanvas) mCanvas.getContext('2d').drawImage(img, 0, 0);
+                    };
+                    img.src = data.drawing;
+                }
+            }
+
             window.closeLibrary();
         };
         document.getElementById('deleteSelectedBtn').onclick = () => {
@@ -4654,16 +4719,25 @@ function initializeTacticalDashboard2() {
             
             let sortedCount = 0;
             itemsToSend.forEach(item => {
-                const defaultName = item.label || 'IMPORTED_DOPE_' + Date.now();
+                const defaultName = item.originalName || item.label || 'IMPORTED_DOPE_' + Date.now();
                 const name = prompt("Enter a name for this DOPE card:", defaultName);
                 if (name) {
-                    ps[name] = {
-                        snapshot: item.image,
-                        isReconScenario: false,
-                        timestamp: item.timestamp || Date.now(),
-                        caliber: 'IMPORTED IMG',
-                        date: new Date().toLocaleDateString()
-                    };
+                    if (item.originalName) {
+                        // RESTORE FULL ORIGINAL FORM DATA FROM VAULT METADATA
+                        ps[name] = Object.assign({}, item, {
+                            snapshot: item.image,
+                            timestamp: item.timestamp || Date.now()
+                        });
+                    } else {
+                        // FALLBACK FOR EXTERNAL IMAGES IMPORTED INTO VAULT
+                        ps[name] = {
+                            snapshot: item.image,
+                            isReconScenario: false,
+                            timestamp: item.timestamp || Date.now(),
+                            caliber: 'IMPORTED IMG',
+                            date: new Date().toLocaleDateString()
+                        };
+                    }
                     sortedCount++;
                 }
             });
@@ -4701,15 +4775,23 @@ function initializeTacticalDashboard2() {
             
             let sortedCount = 0;
             itemsToSend.forEach(item => {
-                const defaultName = item.label || 'IMPORTED_RECON_' + Date.now();
+                const defaultName = item.originalName || item.label || 'IMPORTED_RECON_' + Date.now();
                 const name = prompt("Enter a name for this Recon Map:", defaultName);
                 if (name) {
-                    ps[name] = {
-                        snapshot: item.image,
-                        bgImage: item.image, // set both to be safe
-                        isReconScenario: true,
-                        timestamp: item.timestamp || Date.now()
-                    };
+                    if (item.originalName) {
+                        ps[name] = Object.assign({}, item, {
+                            snapshot: item.image,
+                            // Preserve original item.bgImage (clean map) instead of overwriting with the flattened snapshot
+                            timestamp: item.timestamp || Date.now()
+                        });
+                    } else {
+                        ps[name] = {
+                            snapshot: item.image,
+                            bgImage: item.image, // Fallback: use snapshot as background
+                            isReconScenario: true,
+                            timestamp: item.timestamp || Date.now()
+                        };
+                    }
                     sortedCount++;
                 }
             });
@@ -4741,7 +4823,9 @@ function initializeTacticalDashboard2() {
                 const name = cb.dataset.profileName;
                 const p = profiles[name];
                 if (p && p.snapshot) {
-                    saveIntelSnapshot('DOPE_CARD', p.snapshot, name);
+                    // Clone profile and ensure name is attached so we don't lose the label
+                    const profileMetadata = Object.assign({}, p, { originalName: name });
+                    saveIntelSnapshot('DOPE_CARD', p.snapshot, profileMetadata);
                     sentCount++;
                 } else {
                     errCount++;
@@ -4778,7 +4862,8 @@ function initializeTacticalDashboard2() {
                 const mapSrc = p ? (p.snapshot || p.bgImage) : null;
                 
                 if (mapSrc) {
-                    saveIntelSnapshot('RECON_MAP', mapSrc, name);
+                    const profileMetadata = Object.assign({}, p, { originalName: name });
+                    saveIntelSnapshot('RECON_MAP', mapSrc, profileMetadata);
                     sentCount++;
                 } else {
                     errCount++;
