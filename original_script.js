@@ -3282,7 +3282,8 @@ function initializeTacticalDashboard2() {
             // 2. Load World Imagery Tile Layer (Satellite)
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
                 maxZoom: 19,
-                attribution: 'Tiles &copy; Esri'
+                attribution: 'Tiles &copy; Esri',
+                crossOrigin: true
             }).addTo(orbitalMap);
 
             // Push Zoom control to a custom location so it doesn't mess with our headers
@@ -5287,7 +5288,9 @@ function initializeTacticalDashboard2() {
                     zoomControl: false,
                     attributionControl: false
                 }).setView([31.9686, -99.9018], 13);
-                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}').addTo(commsMapInstance);
+                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                    crossOrigin: true
+                }).addTo(commsMapInstance);
             }
         }
         

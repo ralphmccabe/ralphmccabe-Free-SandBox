@@ -1708,7 +1708,7 @@
     <!-- PWA SERVICE WORKER REGISTRATION & API UPDATE CHECK -->
 
     <script>
-        window.APP_VERSION = 'v2.14.26-PROD';
+        window.APP_VERSION = 'v2.14.29-PROD';
 
         window.addEventListener('load', () => {
             // Register SW silently for offline support
@@ -1757,6 +1757,8 @@
             
             document.getElementById('modal-remind-btn').onclick = () => {
                 modal.remove();
+                // Check again in 10 SECONDS for testing (10,000 ms)
+                setTimeout(checkForUpdates, 10000);
             };
             
             document.getElementById('modal-update-btn').onclick = () => {
@@ -1865,6 +1867,9 @@
     </script>
 </body>
 </html>
+
+
+
 
 
 
