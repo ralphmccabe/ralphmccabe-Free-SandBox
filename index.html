@@ -1708,7 +1708,7 @@
     <!-- PWA SERVICE WORKER REGISTRATION & API UPDATE CHECK -->
 
     <script>
-        window.APP_VERSION = 'v2.14.22-PROD';
+        window.APP_VERSION = 'v2.14.26-PROD';
 
         window.addEventListener('load', () => {
             // Register SW silently for offline support
@@ -1773,10 +1773,27 @@
 
                 if (navigator.serviceWorker) {
                     navigator.serviceWorker.getRegistration().then(reg => {
-                        if (reg && reg.waiting) {
-                            reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                        if (reg) {
+                            if (reg.waiting) {
+                                reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                            } else {
+                                // Force the browser to fetch the new sw.js
+                                reg.update().then(() => {
+                                    if (reg.waiting) {
+                                        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                                    } else if (reg.installing) {
+                                        reg.installing.addEventListener('statechange', (e) => {
+                                            if (e.target.state === 'installed' && reg.waiting) {
+                                                reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                                            }
+                                        });
+                                    } else {
+                                        // Fallback reload if SW doesn't update
+                                        window.location.reload();
+                                    }
+                                }).catch(() => window.location.reload());
+                            }
                         } else {
-                            // If no waiting SW, just reload
                             window.location.reload();
                         }
                     });
@@ -1848,6 +1865,10 @@
     </script>
 </body>
 </html>
+
+
+
+
 
 
 
