@@ -1,10 +1,10 @@
-/* TRC-PRO-VERSION - v2.14.21-PROD */
-const CACHE_NAME = 'trc-pro-upgrade-v2.14.21-PROD';
+/* TRC-PRO-VERSION - v2.14.22-PROD */
+const CACHE_NAME = 'trc-pro-upgrade-v2.14.22-PROD';
 const ASSETS = [
     './',
     './index.html?v=6.1',
     './style.css?v=1.7',
-    './original_script.js?v=6.1',
+    './original_script.min.js?v=2.0',
     './manifest.json',
     './icon-512.png',
     './icon-192.png',
@@ -91,6 +91,7 @@ self.addEventListener('fetch', event => {
         })
     );
 });
+
 
 
 
