@@ -5588,13 +5588,21 @@ function initializeTacticalDashboard2() {
     }
 
     // === PERSISTENCE SHIELD: MISSION RECOVERY PROTOCOL ===
+    const shieldInputs = [
+        'unit-name', 'call-sign', 'location-name', 'mgrs-coords', 'profile-date',
+        'rifle-notes', 'wind-notes', 'scope-notes', 'shooting-angle', 'direction-notes', 'lrf-notes', 'compass-range',
+        'compass-range-2', 'box-count-input', 'sidebar-bal-input-alt', 'sidebar-bal-input-temp', 'sidebar-bal-input-baro',
+        'caliber', 'zero', 'barrel', 'bullet', 'load', 'powder', 'primer', 'col', 'rings',
+        'velocity', 'g1', 'weather', 'targetSize', 'groupSize', 'header-notes', 'shooter-name',
+        'elevation', 'hold-data', 'final-dope'
+    ];
     let autoSaveTimeout;
     function triggerAutoSave() {
         clearTimeout(autoSaveTimeout);
         autoSaveTimeout = setTimeout(async () => {
             if (!window.TRC_IDB) return;
             const state = {};
-            inputs.forEach(id => {
+            shieldInputs.forEach(id => {
                 const el = document.getElementById(id);
                 if (el) state[id] = el.value;
             });
@@ -5608,7 +5616,7 @@ function initializeTacticalDashboard2() {
     }
 
     // Bind auto-save to all inputs
-    inputs.forEach(id => {
+    shieldInputs.forEach(id => {
         const el = document.getElementById(id);
         if (el) el.addEventListener('input', triggerAutoSave);
     });
@@ -5619,7 +5627,7 @@ function initializeTacticalDashboard2() {
         const recovery = await window.TRC_IDB.get('drafts', '___DRAFT_RECOVERY___');
         if (recovery && recovery.data) {
             const data = recovery.data;
-            inputs.forEach(id => {
+            shieldInputs.forEach(id => {
                 const el = document.getElementById(id);
                 if (el && data[id] !== undefined) {
                     el.value = data[id];

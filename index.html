@@ -21,22 +21,27 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Range Card PRO">
 
-    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- TAILWIND CSS -->
+    <link rel="stylesheet" href="tailwind-prod.css?v=1.0">
     
     <!-- LEAFLET MAP LIBS (NO KEY REQ) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
 
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css?v=116">
 
-    <script src="html2canvas.min.js?v=1.5"></script>
-    <script src="lucide.min.js?v=1.5"></script>
+    <script src="html2canvas.min.js?v=1.5" defer></script>
+    <script src="lucide.min.js?v=1.5" defer></script>
+    <script defer>
+        window.addEventListener('load', () => {
+            if(window.lucide) lucide.createIcons();
+        });
+    </script>
     <script src="idb_helper.js?v=1.6"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" defer></script>
     <style>
         :root { --accent-color: #22c55e; --accent-rgb: 34, 197, 94; --neon-green: #4ade80; }
         
@@ -1689,12 +1694,12 @@
         </div>
     </div>
 
-    <script src="original_script.js"></script>
+    <script src="original_script.min.js?v=2.0"></script>
     
     <!-- PWA SERVICE WORKER REGISTRATION & API UPDATE CHECK -->
 
     <script>
-        window.APP_VERSION = 'v2.14.20-PROD';
+        window.APP_VERSION = 'v2.14.21-PROD';
 
         window.addEventListener('load', () => {
             // Register SW silently for offline support
