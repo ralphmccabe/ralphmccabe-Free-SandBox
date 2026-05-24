@@ -49,7 +49,7 @@ def read_current_version(source_dir):
     if os.path.exists(sw_path):
         with open(sw_path, 'r', encoding='utf-8') as f:
             content = f.read()
-        match = re.search(r'TRC-PRO-VERSION - ([\w.-]+)', content)
+        match = re.search(r'TRC-VERSION - ([\w.-]+)', content)
         if match:
             return match.group(1)
     return "v2.4"
@@ -66,10 +66,10 @@ def apply_version_bump(source_dir, new_version):
     if os.path.exists(sw_path):
         with open(sw_path, 'r', encoding='utf-8') as f:
             sw = f.read()
-        sw = re.sub(r'/\* TRC-PRO-VERSION - [\w.-]+ \*/',
-                    f'/* TRC-PRO-VERSION - {new_version} */', sw)
-        sw = re.sub(r"const CACHE_NAME = 'trc-pro-upgrade-[\w.-]+'",
-                    f"const CACHE_NAME = 'trc-pro-upgrade-{new_version}'", sw)
+        sw = re.sub(r'/\* TRC-VERSION - [\w.-]+ \*/',
+                    f'/* TRC-VERSION - {new_version} */', sw)
+        sw = re.sub(r"const CACHE_NAME = 'trc-[\w.-]+'",
+                    f"const CACHE_NAME = 'trc-{new_version}'", sw)
         with open(sw_path, 'w', encoding='utf-8') as f:
             f.write(sw)
         print(f"[+] sw.js bumped to {new_version}")
