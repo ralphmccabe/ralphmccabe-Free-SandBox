@@ -104,7 +104,7 @@
         .input-field { width: 100%; background: rgba(0, 0, 0, 0.3); border: 1px solid #4b5563; border-radius: 4px; padding: 0.5rem; font-size: 12px; color: white; transition: all 0.2s; }
         .input-field:focus { outline: none; border-color: var(--neon-green); background: rgba(0, 0, 0, 0.5); box-shadow: 0 0 10px rgba(34, 197, 94, 0.2); }
 
-        #card-container span[id^="display-"] { display: inline-block; transform: translateY(-3px); line-height: normal; }
+        #card-container span[id^="display-"] { word-break: break-all; overflow-wrap: anywhere; }
         /* Global Placeholder Enhancement: Disambiguate placeholders from dynamic text to enhance data entry clarity */
         input::placeholder {
             color: #64748b !important; /* slate-500 */
@@ -152,22 +152,22 @@
                     <div class="grid grid-cols-2 gap-4 px-2">
                         <button id="openAmmoLibraryBtn" aria-label="Open Ammo Library" class="col-span-1 aspect-square rounded-full bg-emerald-950/20 border border-emerald-900 text-emerald-400 uppercase flex flex-col items-center justify-center text-center p-3 hover:bg-emerald-900/40 hover:scale-[1.03] transition-all gap-1 shadow-[0_4px_15px_rgba(0,0,0,0.2)]">
                             <i data-lucide="database" class="w-6 h-6 mb-0.5"></i>
-                            <span class="text-[9px] font-extrabold leading-tight tracking-wider">AMMO<br/>LIBRARY</span>
+                            <span class="text-[9px] font-extrabold leading-normal tracking-wider">AMMO<br/>LIBRARY</span>
                         </button>
 
                         <button id="toggleReconMapperBtn" class="col-span-1 aspect-square rounded-full bg-indigo-950/40 border border-indigo-500 text-indigo-400 uppercase flex flex-col items-center justify-center text-center p-3 hover:bg-indigo-900/40 hover:scale-[1.03] transition-all gap-1 shadow-[0_4px_15px_rgba(0,0,0,0.2)]">
                             <i data-lucide="map" class="w-6 h-6 mb-0.5"></i>
-                            <span class="text-[9px] font-extrabold leading-tight tracking-wider">TACTICAL<br/>MAPPER</span>
+                            <span class="text-[9px] font-extrabold leading-normal tracking-wider">TACTICAL<br/>MAPPER</span>
                         </button>
 
                         <button id="launchDualHudBtn" class="col-span-1 aspect-square rounded-full bg-orange-600/20 border-2 border-orange-500 text-orange-400 uppercase flex flex-col items-center justify-center text-center p-3 hover:bg-orange-600/40 hover:scale-[1.03] transition-all gap-1 shadow-[0_0_15px_rgba(249,115,22,0.15)] animate-pulse-slow">
                             <i data-lucide="layout-dashboard" class="w-6 h-6 mb-0.5"></i>
-                            <span class="text-[9px] font-extrabold leading-tight tracking-wider">DUAL-VIEW<br/>HUD</span>
+                            <span class="text-[9px] font-extrabold leading-normal tracking-wider">DUAL-VIEW<br/>HUD</span>
                         </button>
 
                         <button id="launchToolsDashboardBtn" class="col-span-1 aspect-square rounded-full bg-emerald-600/20 border-2 border-emerald-500 text-emerald-400 uppercase flex flex-col items-center justify-center text-center p-3 hover:bg-emerald-600/40 hover:scale-[1.03] transition-all gap-1 shadow-[0_0_15px_rgba(16,185,129,0.15)] animate-pulse-slow">
                             <i data-lucide="terminal" class="w-6 h-6 mb-0.5"></i>
-                            <span class="text-[9px] font-extrabold leading-tight tracking-wider">TOOLS<br/>DASHBOARD</span>
+                            <span class="text-[9px] font-extrabold leading-normal tracking-wider">TOOLS<br/>DASHBOARD</span>
                         </button>
                     </div>
                 </div>
@@ -454,7 +454,7 @@
                             <button class="emoji-btn p-2 rounded hover:bg-gray-800 text-lg transition-colors border border-transparent hover:border-neon-green" data-emoji="Ⓢ" title="South">Ⓢ</button>
                             <button class="emoji-btn p-2 rounded hover:bg-gray-800 text-lg transition-colors border border-transparent hover:border-neon-green" data-emoji="Ⓦ" title="West">Ⓦ</button>
                             <button class="emoji-btn p-2 rounded hover:bg-gray-800 text-lg transition-colors border border-transparent hover:border-neon-green" data-emoji="🚲" title="Bike">🚲</button>
-                            <button class="emoji-btn p-2 rounded hover:bg-gray-800 text-lg transition-colors border border-transparent hover:border-neon-green" data-emoji="🗼" title="Tall Cone">🗼</button>
+                            <button class="emoji-btn p-2 rounded hover:bg-gray-800 text-lg transition-colors border border-transparent hover:border-neon-green" data-emoji="🪖" title="Infantry/Hostiles">🪖</button>
                             <button class="emoji-btn p-2 rounded hover:bg-gray-800 text-lg transition-colors border border-transparent hover:border-neon-green" data-emoji="📏" title="Ruler">📏</button>
                         </div>
 
@@ -612,26 +612,26 @@
 
                     <div class="flex gap-4 h-[40%] text-black">
                         <div class="w-1/2 grid grid-cols-[1.4fr_0.8fr_0.8fr] gap-x-2 gap-y-1 text-[11px] font-bold content-start text-black">
-                            <div class="flex flex-col min-w-0"><span>Timestamp</span><div class="flex gap-1 min-w-0"><span id="display-date" class="text-blue-800 font-normal truncate"></span><span>@</span><span id="display-time" class="text-blue-800 font-normal truncate"></span></div></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Zero Range</span><span id="display-zero" class="text-blue-800 font-normal truncate"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Caliber</span><span id="display-caliber" class="text-blue-800 font-normal truncate"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Bullet</span><span id="display-bullet" class="text-blue-800 font-normal truncate"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Barrel</span><span id="display-barrel" class="text-blue-800 font-normal truncate"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Powder</span><span id="display-powder" class="text-blue-800 font-normal truncate"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Load (gr)</span><span id="display-load" class="text-blue-800 font-normal truncate"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">C.O.L</span><span id="display-col" class="text-blue-800 font-normal truncate"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Primer</span><span id="display-primer" class="text-blue-800 font-normal truncate"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Velocity</span><span id="display-velocity" class="text-blue-800 font-normal truncate"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Target</span><span id="display-targetSize" class="text-blue-800 font-normal truncate"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">G-1 BC</span><span id="display-g1" class="text-blue-800 font-normal truncate"></span></div>
-                            <div class="flex flex-col col-span-2 min-w-0"><span class="text-[8px] text-gray-600">Environment</span><span id="display-weather" class="text-blue-800 font-normal truncate"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Rings</span><span id="display-rings" class="text-blue-800 font-normal truncate"></span></div>
-                            <div class="flex flex-col col-span-2 min-w-0"><span class="text-[8px] text-gray-600">Group</span><span id="display-groupSize" class="text-blue-800 font-normal truncate"></span></div>
+                            <div class="flex flex-col min-w-0"><span>Timestamp</span><div class="flex gap-1 min-w-0"><span id="display-date" class="text-blue-800 font-normal leading-normal"></span><span>@</span><span id="display-time" class="text-blue-800 font-normal leading-normal"></span></div></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Zero Range</span><span id="display-zero" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Caliber</span><span id="display-caliber" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Bullet</span><span id="display-bullet" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Barrel</span><span id="display-barrel" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Powder</span><span id="display-powder" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Load (gr)</span><span id="display-load" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">C.O.L</span><span id="display-col" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Primer</span><span id="display-primer" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Velocity</span><span id="display-velocity" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Target</span><span id="display-targetSize" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">G-1 BC</span><span id="display-g1" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col col-span-2 min-w-0"><span class="text-[8px] text-gray-600">Environment</span><span id="display-weather" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Rings</span><span id="display-rings" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col col-span-2 min-w-0"><span class="text-[8px] text-gray-600">Group</span><span id="display-groupSize" class="text-blue-800 font-normal leading-normal"></span></div>
                             <div class="flex flex-col border border-neon-green/30 bg-neon-green/5 px-1 rounded-sm justify-center min-w-0"><span class="text-[8px] font-black text-green-800">BOX RDS</span><span id="display-box-count-input" class="text-green-900 font-black text-center text-[12px] truncate"></span></div>
                             <div class="col-span-3 mt-2 grid grid-cols-2 gap-2 bg-gray-50 p-2 pb-3 border border-black rounded-sm">
-                                <div class="flex justify-between text-black min-w-0"><span>ELEV:</span> <span id="display-elevation" class="text-blue-800 font-bold truncate text-right"></span></div>
-                                <div class="flex justify-between text-black min-w-0"><span>HOLD:</span> <span id="display-hold-data" class="text-blue-800 font-bold truncate text-right"></span></div>
-                                <div class="col-span-2 flex justify-between items-center bg-black text-white px-2 py-2 mt-2 min-w-0 rounded-sm"><span class="text-[10px] font-bold text-neon-green shrink-0">FINAL DOPE:</span><span id="display-final-dope" class="text-sm font-bold text-right ml-2 leading-tight"></span></div>
+                                <div class="flex justify-between text-black min-w-0"><span>ELEV:</span> <span id="display-elevation" class="text-blue-800 font-bold leading-normal text-right"></span></div>
+                                <div class="flex justify-between text-black min-w-0"><span>HOLD:</span> <span id="display-hold-data" class="text-blue-800 font-bold leading-normal text-right"></span></div>
+                                <div class="col-span-2 flex justify-between items-center bg-black text-white px-2 py-2 mt-2 min-w-0 rounded-sm"><span class="text-[10px] font-bold text-neon-green shrink-0">FINAL DOPE:</span><span id="display-final-dope" class="text-sm font-bold text-right ml-2 leading-normal"></span></div>
                             </div>
                         </div>
                         <div class="w-1/4 flex flex-col gap-2">
@@ -1066,7 +1066,7 @@
                             <!-- NEW: COND & ELEV -->
                             <div class="bg-black/50 border border-gray-800/50 p-2 rounded flex flex-col items-center justify-center relative overflow-hidden">
                                 <span class="text-[6px] text-sky-500 font-black absolute top-1 left-1 uppercase">CONDITIONS</span>
-                                <span class="text-[10px] font-extrabold text-sky-300 uppercase leading-tight text-center break-words px-1" id="wx-cond">-- --</span>
+                                <span class="text-[10px] font-extrabold text-sky-300 uppercase leading-normal text-center break-words px-1" id="wx-cond">-- --</span>
                             </div>
                             <div class="bg-black/50 border border-gray-800/50 p-2 rounded flex flex-col items-center justify-center relative overflow-hidden">
                                 <span class="text-[6px] text-yellow-600 font-black absolute top-1 left-1 uppercase">FIELD ELEV</span>
@@ -1699,7 +1699,7 @@
         </div>
     </div>
 
-    <script src="original_script.min.js?v=2.0"></script>
+    <script src="original_script.min.js?v=2.2"></script>
     <script>
         // Set header version display
         window.addEventListener('DOMContentLoaded', () => {
@@ -1709,10 +1709,26 @@
         });
     </script>
     
+    
+    <!-- CUSTOM SAVE PROFILE MODAL -->
+    <div id="save-profile-modal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-[1000000] flex items-center justify-center p-4 font-mono">
+        <div class="bg-slate-900 border border-blue-500 rounded-xl p-6 max-w-sm w-full shadow-2xl">
+            <h2 class="text-xl font-bold mb-3 text-blue-400 mt-0 uppercase tracking-wider">Save Tactical Record</h2>
+            <p class="text-sm text-slate-300 mb-4 leading-relaxed">
+                Enter profile name to save current session to your secure vault:
+            </p>
+            <input type="text" id="save-profile-input" class="w-full bg-black border border-slate-600 rounded p-3 text-white focus:outline-none focus:border-blue-500 mb-6 uppercase" placeholder="PROFILE NAME..." maxlength="30" autocomplete="off">
+            <div class="flex justify-end gap-3">
+                <button id="save-profile-cancel" class="bg-transparent border border-slate-600 text-slate-400 px-4 py-2 rounded font-bold uppercase hover:text-white transition-colors">Cancel</button>
+                <button id="save-profile-confirm" class="bg-blue-600 border-none text-white px-4 py-2 rounded font-bold uppercase shadow-[0_4px_6px_-1px_rgba(59,130,246,0.5)] hover:bg-blue-500 transition-colors">Save To Vault</button>
+            </div>
+        </div>
+    </div>
+
     <!-- PWA SERVICE WORKER REGISTRATION & API UPDATE CHECK -->
 
     <script>
-        window.APP_VERSION = 'v3.0.6';
+        window.APP_VERSION = 'v2.4.1';
         if(document.getElementById('header-version-display')) {
             document.getElementById('header-version-display').innerText = window.APP_VERSION;
         }
@@ -1881,6 +1897,10 @@
     </script>
 </body>
 </html>
+
+
+
+
 
 
 

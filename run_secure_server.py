@@ -24,7 +24,7 @@ PORT = 8446
 # ============================================================
 def bump_version(version_str):
     """Bumps vX.Y.Z-SUFFIX to vX.Y.(Z+1)-SUFFIX to keep main numbers low."""
-    # First try to match a 3-digit version like v2.4.1-PROD
+    # First try to match a 3-digit version like v2.4.1
     match3 = re.match(r'v(\d+)\.(\d+)\.(\d+)(.*)', version_str)
     if match3:
         major = int(match3.group(1))
@@ -33,7 +33,7 @@ def bump_version(version_str):
         suffix = match3.group(4)
         return f'v{major}.{minor}.{patch + 1}{suffix}'
     
-    # If it's a 2-digit version like v2.4-PROD, convert it to v2.4.1-PROD
+    # If it's a 2-digit version like v2.4, convert it to v2.4.1
     match2 = re.match(r'v(\d+)\.(\d+)(.*)', version_str)
     if match2:
         major = int(match2.group(1))
@@ -52,7 +52,7 @@ def read_current_version(source_dir):
         match = re.search(r'TRC-PRO-VERSION - ([\w.-]+)', content)
         if match:
             return match.group(1)
-    return "v2.4-PROD"
+    return "v2.4"
 
 def apply_version_bump(source_dir, new_version):
     """
@@ -95,12 +95,12 @@ def apply_version_bump(source_dir, new_version):
                      f"register('./sw.js?v={new_version}')", idx)
 
         # Update the DRAFT SNAPSHOT button label in the banner
-        idx = re.sub(r'📸 DRAFT SNAPSHOT v[\d.]+-PROD', f'📸 DRAFT SNAPSHOT {new_version}', idx, flags=re.IGNORECASE)
-        idx = re.sub(r"btn\.innerText = '📸 DRAFT SNAPSHOT v[\d.]+-PROD'",
+        idx = re.sub(r'📸 DRAFT SNAPSHOT v[\d.]+', f'📸 DRAFT SNAPSHOT {new_version}', idx, flags=re.IGNORECASE)
+        idx = re.sub(r"btn\.innerText = '📸 DRAFT SNAPSHOT v[\d.]+'",
                      f"btn.innerText = '📸 DRAFT SNAPSHOT {new_version}'", idx, flags=re.IGNORECASE)
 
         # Update the API Version Check variable
-        idx = re.sub(r"window\.APP_VERSION = 'v[\d.]+-PROD';",
+        idx = re.sub(r"window\.APP_VERSION = 'v[\d.]+';",
                      f"window.APP_VERSION = '{new_version}';", idx)
 
         with open(index_path, 'w', encoding='utf-8') as f:
@@ -124,6 +124,18 @@ def apply_version_bump(source_dir, new_version):
 
 class TacticalRequestHandler(http.server.SimpleHTTPRequestHandler):
     def do_POST(self):
+        # --- SECURITY LOCKDOWN ---
+        # Require secure token for administrative actions
+        admin_endpoints = ['/api/production_stage', '/api/take-snapshot']
+        if any(self.path.startswith(ep) for ep in admin_endpoints):
+            auth_header = self.headers.get('Authorization')
+            if not auth_header or auth_header != 'Bearer PFtEpubjGS_qHkB-vFTkjdRbRZfqpdpUdCIXtCDin8A':
+                self.send_response(403)
+                self.end_headers()
+                self.wfile.write(b'{"status": "error", "message": "Unauthorized: Invalid or missing security token"}')
+                print("\n[!] SECURITY ALERT: Blocked unauthorized access attempt to administrative endpoint!")
+                return
+
         if self.path == '/api/check-version':
             try:
                 current_dir = os.getcwd()
@@ -139,7 +151,7 @@ class TacticalRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_response(500)
                 self.end_headers()
                 
-        elif self.path == '/api/push-production':
+        elif self.path == '/api/production_stage':
             try:
                 current_dir = os.getcwd()
                 

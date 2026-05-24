@@ -1,4 +1,4 @@
-# TACTICAL RANGE CARD PRO - AUTO RELEASE & STAGING SCRIPT
+# TACTICAL RANGE CARD - AUTO RELEASE & STAGING SCRIPT
 # This script bumps the version, updates all files, creates an archive snapshot,
 # and stages the files to the "Ready to be pushed" folder automatically.
 
@@ -14,11 +14,11 @@ $PrettyDate = Get-Date -Format "yyyy-MM-dd HH:mm:ss"
 # 1. READ CURRENT VERSION FROM SW.JS
 $SwPath = Join-Path $SourceDir "sw.js"
 $SwContent = Get-Content $SwPath -Raw
-if ($SwContent -match "TRC-PRO-VERSION\s*-\s*v(\d+)\.(\d+)\.(\d+)-PROD") {
+if ($SwContent -match "TRC-VERSION\s*-\s*v(\d+)\.(\d+)\.(\d+)") {
     $Major = [int]$Matches[1]
     $Minor = [int]$Matches[2]
     $Patch = [int]$Matches[3]
-} elseif ($SwContent -match "TRC-PRO-VERSION\s*-\s*v(\d+)\.(\d+)-PROD") {
+} elseif ($SwContent -match "TRC-VERSION\s*-\s*v(\d+)\.(\d+)") {
     $Major = [int]$Matches[1]
     $Minor = [int]$Matches[2]
     $Patch = 0
@@ -27,12 +27,12 @@ if ($SwContent -match "TRC-PRO-VERSION\s*-\s*v(\d+)\.(\d+)\.(\d+)-PROD") {
     exit
 }
 
-$CurrentVersion = "v${Major}.${Minor}.${Patch}-PROD"
+$CurrentVersion = "v${Major}.${Minor}.${Patch}"
 $NewPatch = $Patch + 1
-$NewVersion = "v${Major}.${Minor}.${NewPatch}-PROD"
+$NewVersion = "v${Major}.${Minor}.${NewPatch}"
 
 Write-Host "========================================================" -ForegroundColor Green
-Write-Host "       TACTICAL RANGE CARD PRO - AUTO UPDATER" -ForegroundColor Green
+Write-Host "       TACTICAL RANGE CARD - AUTO UPDATER" -ForegroundColor Green
 Write-Host "========================================================" -ForegroundColor Green
 Write-Host "Current Version: $CurrentVersion"
 Write-Host "New Version:     $NewVersion"
@@ -40,16 +40,17 @@ Write-Host "--------------------------------------------------------"
 
 # 2. UPDATE SW.JS
 $SwContent = $SwContent -replace $CurrentVersion, $NewVersion
-$SwContent = $SwContent -replace "trc-pro-upgrade-$CurrentVersion", "trc-pro-upgrade-$NewVersion"
+$SwContent = $SwContent -replace "trc-v$CurrentVersion", "trc-v$NewVersion"
 Set-Content -Path $SwPath -Value $SwContent
 
 # 3. UPDATE INDEX.HTML
 $IndexPath = Join-Path $SourceDir "index.html"
 $IndexContent = Get-Content $IndexPath -Raw
 $IndexContent = $IndexContent -replace "\?v=$CurrentVersion", "?v=$NewVersion"
+$IndexContent = $IndexContent -replace "window\.APP_VERSION = '$CurrentVersion'", "window.APP_VERSION = '$NewVersion'"
 
-# Using a generic regex to catch the "DRAFT SNAPSHOT vX.X.X-PROD" without breaking on emoji
-$IndexContent = [regex]::Replace($IndexContent, "DRAFT SNAPSHOT v[\d.]+-PROD", "DRAFT SNAPSHOT $NewVersion")
+# Using a generic regex to catch the "DRAFT SNAPSHOT vX.X.X" without breaking on emoji
+$IndexContent = [regex]::Replace($IndexContent, "DRAFT SNAPSHOT v[\d.]+", "DRAFT SNAPSHOT $NewVersion")
 
 Set-Content -Path $IndexPath -Value $IndexContent
 
@@ -60,7 +61,7 @@ $HistoryEntry = @"
 ============================================================
 $NewVersion - DEPLOYED $PrettyDate
 * Version auto-bumped from $CurrentVersion
-* Service Worker cache updated to: trc-pro-upgrade-$NewVersion
+* Service Worker cache updated to: trc-v$NewVersion
 * All tactical systems: OPERATIONAL
 * Toast updater: ACTIVE - users will see update prompt on next app open
 "@
@@ -94,11 +95,18 @@ Write-Host "[*] Creating secure snapshot archive..." -ForegroundColor Cyan
 Copy-FilteredDir $SourceDir $TargetArchiveDir
 
 $RecipeFile = Join-Path $TargetArchiveDir "manifest-recipe.txt"
-$RecipeContent = "TACTICAL RANGE CARD PRO - ARCHIVE RECIPE`r`n=======================================`r`nVersion:      $NewVersion`r`nTimestamp:    $PrettyDate`r`nSource Path:  $SourceDir`r`n"
+$RecipeContent = "TACTICAL RANGE CARD - ARCHIVE RECIPE`r`n=======================================`r`nVersion:      $NewVersion`r`nTimestamp:    $PrettyDate`r`nSource Path:  $SourceDir`r`n"
 Set-Content -Path $RecipeFile -Value $RecipeContent
 
-# 6. STAGE TO "READY TO BE PUSHED"
-Write-Host "[*] Copying files to Ready to be pushed folder..." -ForegroundColor Cyan
+# 6. BACKUP OLD READY FOLDER AND STAGE TO "READY TO BE PUSHED"
+Write-Host "[*] Archiving old Ready to be pushed folder..." -ForegroundColor Cyan
+if (Test-Path $ProdStagingDir) {
+    $OldArchiveDir = Join-Path $ArchiveParent "Archived_Versions\Archive_$CurrentVersion_$DateStr"
+    if (!(Test-Path $OldArchiveDir)) { New-Item -ItemType Directory -Path $OldArchiveDir -Force | Out-Null }
+    Copy-Item -Path "$ProdStagingDir\*" -Destination $OldArchiveDir -Recurse -Force -ErrorAction SilentlyContinue
+}
+
+Write-Host "[*] Copying new files to Ready to be pushed folder..." -ForegroundColor Cyan
 if (!(Test-Path $ProdStagingDir)) { New-Item -ItemType Directory -Path $ProdStagingDir | Out-Null }
 Remove-Item -Path "$ProdStagingDir\*" -Recurse -Force -ErrorAction SilentlyContinue
 Copy-FilteredDir $SourceDir $ProdStagingDir
@@ -116,3 +124,5 @@ Write-Host "SUCCESS: Auto-Update & Staging Complete." -ForegroundColor Green
 Write-Host "New Version: $NewVersion" -ForegroundColor Green
 Write-Host "Ready to push from: $ProdStagingDir" -ForegroundColor Green
 Write-Host "========================================================" -ForegroundColor Green
+
+

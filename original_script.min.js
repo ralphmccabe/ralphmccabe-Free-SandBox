@@ -2923,10 +2923,10 @@ function initializeTacticalDashboard2() {
 
             card.innerHTML = `
                 ${imgHtml}
-                <div class="flex-1">
+                <div class="flex-1 min-w-0">
                     <h4 class="text-[10px] font-bold text-gray-200 truncate uppercase">${name}</h4>
                     <div class="flex justify-between mt-1">
-                        <span class="text-[8px] font-mono text-emerald-500">${p.caliber || 'UNSET'}</span>
+                        <span class="text-[8px] font-mono text-emerald-500">${p.caliber || '--'}</span>
                         <span class="text-[8px] font-mono text-gray-600">${p.date || '--'}</span>
                     </div>
                 </div>
@@ -3039,7 +3039,7 @@ function initializeTacticalDashboard2() {
 
             card.innerHTML = `
                 ${imgHtml}
-                <div class="flex-1">
+                <div class="flex-1 min-w-0">
                     <h4 class="text-[10px] font-bold text-emerald-100 truncate uppercase">${name}</h4>
                     <div class="flex justify-between mt-1">
                         <span class="text-[8px] font-mono text-gray-400 uppercase">RECON SITREP</span>
