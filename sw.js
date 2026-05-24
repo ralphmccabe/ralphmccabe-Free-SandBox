@@ -1,5 +1,5 @@
-/* TRC-PRO-VERSION - v2.14.29-PROD */
-const CACHE_NAME = 'trc-pro-upgrade-v2.14.29-PROD';
+/* TRC-VERSION - v3.0.4 */
+const CACHE_NAME = 'trc-v3.0.4';
 const ASSETS = [
     './',
     './index.html?v=6.1',
@@ -10,7 +10,7 @@ const ASSETS = [
     './icon-192.png',
     './splash-page.jpg',
     './Screenshot_13-2-2026_35249_.jpeg',
-    './tailwind-prod.css',
+    './tailwind.css',
     './lucide.min.js?v=1.5',
     './html2canvas.min.js?v=1.5',
     './idb_helper.js?v=1.5'
@@ -43,9 +43,10 @@ self.addEventListener('activate', event => {
                     return caches.delete(key);
                 })
             );
+        }).then(() => {
+            return self.clients.claim();
         })
     );
-    self.clients.claim();
 });
 
 // Dynamic Offline Caching Strategy
@@ -91,6 +92,11 @@ self.addEventListener('fetch', event => {
         })
     );
 });
+
+
+
+
+
 
 
 

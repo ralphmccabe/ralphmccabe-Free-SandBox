@@ -1,3 +1,4 @@
+let geoDistanceUnit = 'YDS';
 /* 
     TACTICAL RANGE CARD PRO - PRODUCTION CORE v2.1
     SECURITY: AES-256 ENCRYPTED COMMS
@@ -431,6 +432,7 @@ function initializeTacticalDashboard1() {
             // 3. Visual sync
             if (window.updateProfileList) window.updateProfileList();
             if (window.refreshSatArchiveGrid) window.refreshSatArchiveGrid();
+            if (window.refreshDopeCacheGrid) window.refreshDopeCacheGrid();
 
             // Reset preview states if deleted item was being viewed
             const prevName = document.getElementById('previewName');
@@ -2792,7 +2794,7 @@ function initializeTacticalDashboard2() {
                 document.getElementById('geo-toolkit-bar')?.classList.remove('hidden');
                 document.getElementById('geo-ruler-footer')?.classList.remove('hidden');
                 document.getElementById('live-sat-map-container')?.classList.remove('pointer-events-none');
-                setTimeout(() => { if(orbitalMap) orbitalMap.invalidateSize(); }, 200);
+                setTimeout(() => { if(orbitalMap) orbitalMap.invalidateSize(); }, 600);
             } else if (panelId === 'panel-vault') {
                 document.getElementById('vault-selector-grid').classList.remove('hidden');
                 document.getElementById('vault-selector-grid').classList.add('flex');
@@ -2811,7 +2813,7 @@ function initializeTacticalDashboard2() {
                 document.getElementById('geo-toolkit-bar')?.classList.add('hidden');
                 document.getElementById('geo-ruler-footer')?.classList.add('hidden');
                 document.getElementById('live-sat-map-container')?.classList.add('pointer-events-none');
-                setTimeout(() => { if(orbitalMap) orbitalMap.invalidateSize(); }, 200);
+                setTimeout(() => { if(orbitalMap) orbitalMap.invalidateSize(); }, 600);
             } else if (panelId === 'panel-vault') {
                 document.getElementById('vault-selector-grid').classList.add('hidden');
                 document.getElementById('vault-selector-grid').classList.remove('flex');
@@ -2988,7 +2990,7 @@ function initializeTacticalDashboard2() {
                     CAL: ${data.caliber || '---'}
                 </div>
                 <!-- Non-Destructive Unload Actuator -->
-                <button class="absolute top-1 right-1 bg-red-950/90 text-red-300 border border-red-600/50 p-1 rounded z-30 hover:bg-red-600 hover:text-white transition-all shadow-lg" onclick="event.stopPropagation(); window.unloadDashboardCard(1)" title="Unload Card">
+                <button class="absolute top-1 right-1 bg-red-950/90 text-red-300 border border-red-600/50 p-1 rounded z-10 hover:bg-red-600 hover:text-white transition-all shadow-lg" onclick="event.stopPropagation(); window.unloadDashboardCard(1)" title="Unload Card">
                     <i data-lucide="trash-2" class="w-2.5 h-2.5"></i>
                 </button>
             </div>
@@ -3104,7 +3106,7 @@ function initializeTacticalDashboard2() {
                 </div>
 
                 <!-- Non-Destructive Unload Actuator -->
-                <button class="absolute top-1 right-1 bg-red-950/90 text-red-300 border border-red-600/50 p-1 rounded z-30 hover:bg-red-600 hover:text-white transition-all shadow-[0_0_10px_rgba(0,0,0,0.8)]" onclick="event.stopPropagation(); window.unloadDashboardCard(2)" title="Unload Map">
+                <button class="absolute top-1 right-1 bg-red-950/90 text-red-300 border border-red-600/50 p-1 rounded z-10 hover:bg-red-600 hover:text-white transition-all shadow-[0_0_10px_rgba(0,0,0,0.8)]" onclick="event.stopPropagation(); window.unloadDashboardCard(2)" title="Unload Map">
                     <i data-lucide="trash-2" class="w-2.5 h-2.5"></i>
                 </button>
             </div>
@@ -3279,6 +3281,12 @@ function initializeTacticalDashboard2() {
                 preferCanvas: true 
             }).setView([39.8283, -98.5795], 4); 
 
+            // Prevent grey map issue when resizing the container
+            const resizeObserver = new ResizeObserver(() => {
+                if (orbitalMap) orbitalMap.invalidateSize();
+            });
+            resizeObserver.observe(container);
+
             // 2. Load World Imagery Tile Layer (Satellite)
             L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
                 maxZoom: 19,
@@ -3294,6 +3302,11 @@ function initializeTacticalDashboard2() {
 
             // Auto-Trigger initial GPS sync to find where the user currently is!
             syncMapToGps();
+            
+            // Force re-renders to fix grey tile bugs on mobile layout shifts
+            setTimeout(() => { if (orbitalMap) orbitalMap.invalidateSize(); }, 500);
+            setTimeout(() => { if (orbitalMap) orbitalMap.invalidateSize(); }, 1500);
+            setTimeout(() => { if (orbitalMap) orbitalMap.invalidateSize(); }, 3000);
         } else {
             // If it exists, just force an invalidation to correct size after maximizing
             orbitalMap.invalidateSize();
@@ -3354,8 +3367,11 @@ function initializeTacticalDashboard2() {
         }
     }
 
-    function drawMapLine() {
+    window.drawMapLine = function() {
         if (!orbitalMap || mapMarkers.length < 2) return;
+
+        if (mapPolyline) orbitalMap.removeLayer(mapPolyline);
+        if (mapLabelMarker) orbitalMap.removeLayer(mapLabelMarker);
 
         const latlng1 = mapMarkers[0].getLatLng();
         const latlng2 = mapMarkers[1].getLatLng();
@@ -3374,25 +3390,26 @@ function initializeTacticalDashboard2() {
         
         // Spherical Earth Math
         const distanceMeters = latlng1.distanceTo(latlng2);
-        const distanceYards = distanceMeters * 1.09361;
-        const formattedYards = distanceYards.toFixed(1);
-
-        const labelHtml = `<div style="color:#ff1493; font-family:'JetBrains Mono', monospace; font-weight:900; font-size:12px; text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; white-space:nowrap;">${formattedYards} YDS</div>`;
+        let displayDistance;
+        if (geoDistanceUnit === 'YDS') {
+            displayDistance = (distanceMeters * 1.09361).toFixed(1);
+        } else {
+            displayDistance = distanceMeters.toFixed(1);
+        }
+        const labelHtml = `<div style="color:#ff1493; font-family:'JetBrains Mono', monospace; font-weight:900; font-size:12px; text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; white-space:nowrap;">${displayDistance} ${geoDistanceUnit}</div>`;
         const customIcon = L.divIcon({
             html: labelHtml,
-            className: 'map-distance-label',
-            iconSize: [60, 20],
-            iconAnchor: [30, 10]
+            className: 'geo-midpoint-label',
+            iconSize: null,
+            iconAnchor: [30, -10]
         });
 
-        if(mapLabelMarker) orbitalMap.removeLayer(mapLabelMarker);
         mapLabelMarker = L.marker([midLat, midLng], { icon: customIcon }).addTo(orbitalMap);
 
-        // Update Master Footer Counter
-        document.getElementById('live-map-dist').textContent = formattedYards;
+        document.getElementById('live-map-dist').textContent = displayDistance;
+        if(document.getElementById('live-map-unit')) document.getElementById('live-map-unit').textContent = geoDistanceUnit;
         
-        // BROADCAST LOG TO TAC-COMMS
-        window.pushTacLog(`ORBITAL VECTOR SECURED: ${formattedYards} YARDS.`, "LOCK");
+        window.pushTacLog(`ORBITAL VECTOR SECURED:  .`, "LOCK");
         
         // === PERSIST TO MINIMIZED PANEL VIEW ===
         const minimized = document.getElementById('geo-minimized-view');
@@ -4800,6 +4817,7 @@ function initializeTacticalDashboard2() {
             if (sortedCount > 0) {
                 saveProfiles(ps);
                 if (window.refreshSatArchiveGrid) window.refreshSatArchiveGrid();
+            if (window.refreshDopeCacheGrid) window.refreshDopeCacheGrid();
                 window.pushTacLog(`SORTED ${sortedCount} IMAGES TO SAT ARCHIVE`, "SUCCESS");
             }
             
@@ -5654,3 +5672,18 @@ if (document.readyState === 'loading') {
 } else {
     initializeTacticalDashboard2();
 }
+
+
+document.getElementById('geo-unit-toggle-btn')?.addEventListener('click', (e) => { e.stopPropagation(); geoDistanceUnit = geoDistanceUnit === 'YDS' ? 'M' : 'YDS'; document.getElementById('geo-unit-label').textContent = geoDistanceUnit; if(document.getElementById('live-map-unit')) document.getElementById('live-map-unit').textContent = geoDistanceUnit; if (typeof drawMapLine === 'function') drawMapLine(); });
+
+
+
+
+
+
+
+
+
+
+
+

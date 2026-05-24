@@ -10,19 +10,19 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="dns-prefetch" href="https://cdn.tailwindcss.com">
     
-    <title>Tactical Range Card PRO</title>
+    <title>Tactical Range Card</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon-192.png">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <meta name="description" content="Tactical Range Card PRO: Ultimate tactical utility suite.">
+    <meta name="description" content="Tactical Range Card: Ultimate tactical utility suite.">
     <meta name="theme-color" content="#22c55e">
     <!-- Apple Mobile Web App Capabilities -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Range Card PRO">
+    <meta name="apple-mobile-web-app-title" content="Range Card">
 
     <!-- TAILWIND CSS -->
-    <link rel="stylesheet" href="tailwind-prod.css?v=1.0">
+    <link rel="stylesheet" href="tailwind.css?v=1.0">
     
     <!-- LEAFLET MAP LIBS (NO KEY REQ) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -125,8 +125,7 @@
             <div class="p-6 border-b border-gray-700 bg-gray-900 z-30 shrink-0">
                 <h1 class="text-2xl font-bold tracking-tighter text-neon-green uppercase flex items-center gap-2 relative">
                     <i data-lucide="crosshair" class="w-6 h-6 text-neon-green"></i>
-                    <span>Tactical Range Card <span class="text-orange-500 font-bold text-xs lowercase italic">/ PRO</span></span>
-                    <span id="header-version-display" class="text-[10px] text-gray-500 font-mono self-end mb-1 ml-1 lowercase text-blue-400 border border-blue-900 px-1 rounded bg-blue-950/30"></span>
+                    <span>Tactical Range Card <span id="header-version-display" class="text-white font-bold text-xs lowercase italic bg-white/10 px-2 rounded border border-white/30 ml-2"></span></span>
                 </h1>
             </div>
 
@@ -588,9 +587,9 @@
 
                 <div class="mt-20 pt-8 border-t border-gray-700 text-center pb-8">
                     <p class="text-[10px] text-gray-300 font-handwriting">&copy; 2026 Ralph Mccabe. All Rights Reserved.</p>
-                    <div class="mt-4 flex justify-center gap-6 text-[9px] font-bold text-gray-500 uppercase tracking-widest cursor-default">
-                        <span>Privacy Policy</span>
-                        <span>Terms of Engagement</span>
+                    <div class="mt-4 flex justify-center gap-6 text-[9px] font-bold text-gray-500 uppercase tracking-widest">
+                        <a href="https://ralphmccabe.github.io/Tactical-Range-Cards/privacy.html" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-400 transition-colors cursor-pointer">Privacy Policy</a>
+                        <a href="https://ralphmccabe.github.io/Tactical-Range-Cards/terms.html" target="_blank" rel="noopener noreferrer" class="hover:text-emerald-400 transition-colors cursor-pointer">Terms of Engagement</a>
                     </div>
                 </div>
             </div>
@@ -602,7 +601,7 @@
                     
                     <div class="flex justify-between items-end mb-6 border-b-2 border-black pb-2 text-black">
                         <div class="flex items-center gap-8">
-                            <div class="flex flex-col"><h2 class="text-4xl font-extrabold uppercase leading-none text-black">Reload Data</h2><p class="text-[10px] text-orange-500 font-bold italic">PRO VERSION UPGRADE</p></div>
+                            <div class="flex flex-col"><h2 class="text-4xl font-extrabold uppercase leading-none text-black">Reload Data</h2><p class="text-[10px] text-orange-500 font-bold italic">TACTICAL SYSTEM UPGRADE</p></div>
                             <div class="text-xl font-bold text-black">NOTES : <span id="display-header-notes" class="font-handwriting text-blue-800"></span></div>
                         </div>
                         <div class="flex flex-col items-end pb-1 text-black"><span class="text-[10px] font-bold uppercase tracking-widest">Shooter / Company</span><span id="display-shooter-name" class="font-handwriting text-blue-800 font-bold text-xl leading-none text-right"></span></div>
@@ -626,10 +625,10 @@
                             <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Rings</span><span id="display-rings" class="text-blue-800 font-normal truncate"></span></div>
                             <div class="flex flex-col col-span-2 min-w-0"><span class="text-[8px] text-gray-600">Group</span><span id="display-groupSize" class="text-blue-800 font-normal truncate"></span></div>
                             <div class="flex flex-col border border-neon-green/30 bg-neon-green/5 px-1 rounded-sm justify-center min-w-0"><span class="text-[8px] font-black text-green-800">BOX RDS</span><span id="display-box-count-input" class="text-green-900 font-black text-center text-[12px] truncate"></span></div>
-                            <div class="col-span-3 mt-2 grid grid-cols-2 gap-4 bg-gray-50 p-2 border border-black rounded-sm">
+                            <div class="col-span-3 mt-2 grid grid-cols-2 gap-2 bg-gray-50 p-2 pb-3 border border-black rounded-sm">
                                 <div class="flex justify-between text-black min-w-0"><span>ELEV:</span> <span id="display-elevation" class="text-blue-800 font-bold truncate text-right"></span></div>
                                 <div class="flex justify-between text-black min-w-0"><span>HOLD:</span> <span id="display-hold-data" class="text-blue-800 font-bold truncate text-right"></span></div>
-                                <div class="col-span-2 flex justify-between items-center bg-black text-white px-2 py-1 mt-1 min-w-0"><span class="text-[10px] font-bold text-neon-green shrink-0">FINAL DOPE:</span><span id="display-final-dope" class="text-lg font-bold truncate text-right ml-2"></span></div>
+                                <div class="col-span-2 flex justify-between items-center bg-black text-white px-2 py-2 mt-2 min-w-0 rounded-sm"><span class="text-[10px] font-bold text-neon-green shrink-0">FINAL DOPE:</span><span id="display-final-dope" class="text-sm font-bold text-right ml-2 leading-tight"></span></div>
                             </div>
                         </div>
                         <div class="w-1/4 flex flex-col gap-2">
@@ -1131,15 +1130,14 @@
                                              <button id="bal-sync-map" class="text-[5px] bg-blue-950 border border-blue-800 text-blue-400 px-1 rounded font-black hover:bg-blue-600 hover:text-white">SYNC</button>
                                          </div>
                                          <div class="flex items-baseline gap-1 mt-0.5">
-                                             <input type="text" inputmode="decimal" maxlength="25" id="bal-input-range" placeholder="577" class="bg-transparent text-white text-xl font-black font-mono outline-none w-full leading-none">
+                                             <input type="text" inputmode="decimal" maxlength="25" id="bal-input-range" placeholder="1000" class="bg-transparent text-white text-base font-black font-mono outline-none w-full min-w-0 flex-1 leading-none p-0">
                                              <span class="text-[7px] text-blue-400 font-black uppercase shrink-0">YDS</span>
                                          </div>
                                      </div>
                                      <div class="w-[1px] bg-gray-800/50 self-stretch my-1"></div>
-                                     <div class="w-20 flex flex-col">
-                                         <span class="text-[6px] text-blue-400 font-black uppercase">01B: SHOT DIR</span>
+                                     <div class="w-12 flex flex-col"><span class="text-[6px] text-blue-400 font-black uppercase">01B: SHOT DIR</span>
                                          <div class="flex items-baseline gap-1 mt-0.5">
-                                             <input type="text" inputmode="decimal" maxlength="25" id="bal-input-shot-dir" placeholder="0" class="bg-transparent text-blue-300 text-lg font-black font-mono outline-none w-full leading-none">
+                                             <input type="text" inputmode="decimal" maxlength="25" id="bal-input-shot-dir" placeholder="0" class="bg-transparent text-blue-300 text-base font-black font-mono outline-none w-full min-w-0 flex-1 leading-none p-0">
                                              <span class="text-[7px] text-gray-600 font-black uppercase shrink-0">DEG</span>
                                          </div>
                                      </div>
@@ -1434,7 +1432,7 @@
                         </div>
 
                         <!-- Full List Selector Container (Hidden until explicitly triggered or maximized) -->
-                        <div id="dope-cache-selector-grid" class="hidden flex-col bg-gray-950 absolute inset-0 z-20 overflow-y-auto p-4">
+                        <div id="dope-cache-selector-grid" class="hidden flex-col bg-gray-950 absolute inset-0 z-[100] overflow-y-auto p-4">
                             <div class="flex justify-between items-center border-b border-gray-800 pb-3 mb-3 shrink-0">
                                 <div class="flex items-center gap-2">
                                     <i data-lucide="database" class="w-4 h-4 text-emerald-500"></i>
@@ -1468,7 +1466,7 @@
                         </div>
 
                         <!-- Full List Selector Container -->
-                        <div id="sat-archive-selector-grid" class="hidden flex-col bg-gray-950 absolute inset-0 z-20 overflow-y-auto p-4">
+                        <div id="sat-archive-selector-grid" class="hidden flex-col bg-gray-950 absolute inset-0 z-[100] overflow-y-auto p-4">
                             <div class="flex justify-between items-center border-b border-gray-800 pb-3 mb-3 shrink-0">
                                 <div class="flex items-center gap-2">
                                     <i data-lucide="satellite" class="w-4 h-4 text-emerald-500"></i>
@@ -1511,6 +1509,9 @@
                                     <button id="geo-snapshot-btn" class="bg-yellow-950/80 border border-yellow-700 text-yellow-500 text-[8px] px-2 py-1 rounded font-black uppercase flex items-center gap-1 hover:bg-yellow-600 hover:text-black transition-all shadow-[0_0_10px_rgba(234,179,8,0.2)] ml-1">
                                         <i data-lucide="camera" class="w-3 h-3"></i> CAPTURE
                                     </button>
+                                    <button id="geo-unit-toggle-btn" class="bg-blue-950/80 border border-blue-700 text-blue-400 text-[8px] px-2 py-1 rounded font-black uppercase flex items-center gap-1 hover:bg-blue-600 hover:text-white transition-all shadow-[0_0_10px_rgba(59,130,246,0.2)] ml-1">
+                                        <i data-lucide="ruler" class="w-3 h-3"></i> <span id="geo-unit-label">YDS</span>
+                                    </button>
                                 </div>
                                 
                                 <div class="flex items-center gap-2 text-[9px] font-black text-emerald-400 uppercase tracking-widest font-mono bg-black/50 px-2 py-1 border border-gray-800 rounded hidden md:flex shrink-0 ml-2">
@@ -1526,7 +1527,7 @@
                             <!-- Live Readout Footer (Style Hardened for Mobile Visibility) -->
                             <div id="geo-ruler-footer" class="hidden bg-emerald-950/90 border-t border-emerald-500/50 flex items-center justify-center text-emerald-300 font-mono font-black text-xs shrink-0" style="height: 32px; z-index: 1000; letter-spacing: 0.2em;">
                                 <i data-lucide="ruler" class="w-3.5 h-3.5 mr-2"></i>
-                                DISTANCE: <span id="live-map-dist" class="text-white mx-2">--.--</span> YDS
+                                DISTANCE: <span id="live-map-dist" class="text-white mx-2">--.--</span> <span id="live-map-unit">YDS</span>
                             </div>
                         </div>
                     </div>
@@ -1548,7 +1549,7 @@
                         </div>
 
                         <!-- Vault Grid Selector Container -->
-                        <div id="vault-selector-grid" class="hidden flex-col bg-gray-950 absolute inset-0 z-20 overflow-y-auto p-4">
+                        <div id="vault-selector-grid" class="hidden flex-col bg-gray-950 absolute inset-0 z-[100] overflow-y-auto p-4">
                             <div class="flex items-center justify-between mb-4 border-b border-gray-800 pb-2 flex-wrap gap-2">
                                 <div class="flex items-center gap-2">
                                     <i data-lucide="archive" class="w-4 h-4 text-emerald-500"></i>
@@ -1708,22 +1709,19 @@
     <!-- PWA SERVICE WORKER REGISTRATION & API UPDATE CHECK -->
 
     <script>
-        window.APP_VERSION = 'v2.14.29-PROD';
+        window.APP_VERSION = 'v3.0.4';
+        if(document.getElementById('header-version-display')) {
+            document.getElementById('header-version-display').innerText = window.APP_VERSION;
+        }
 
-        window.addEventListener('load', () => {
-            // Register SW silently for offline support
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('./sw.js?v=' + window.APP_VERSION).catch(err => console.log('SW reg failed', err));
-            }
-
-            // Check for new version using static VERSION_HISTORY.txt (Works on GitHub Pages!)
+        window.checkForUpdates = function() {
             fetch('./VERSION_HISTORY.txt?t=' + Date.now())
                 .then(res => {
                     if (!res.ok) throw new Error('Network response was not ok');
                     return res.text();
                 })
                 .then(text => {
-                    const matches = text.match(/v\d+\.\d+(?:\.\d+)?-PROD/g);
+                    const matches = text.match(/v\d+\.\d+(?:\.\d+)?/g);
                     if (matches && matches.length > 0) {
                         const latestVersion = matches[matches.length - 1];
                         if (latestVersion !== window.APP_VERSION) {
@@ -1731,6 +1729,16 @@
                         }
                     }
                 }).catch(err => console.log('Update check failed:', err));
+        };
+
+        window.addEventListener('load', () => {
+            // Register SW silently for offline support
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('./sw.js?v=' + window.APP_VERSION).catch(err => console.log('SW reg failed', err));
+            }
+
+            // Initial check on load
+            window.checkForUpdates();
         });
 
         function showUpdateModal(newVersion) {
@@ -1757,58 +1765,61 @@
             
             document.getElementById('modal-remind-btn').onclick = () => {
                 modal.remove();
-                // Check again in 10 SECONDS for testing (10,000 ms)
-                setTimeout(checkForUpdates, 10000);
+                // Check again in 10 MINUTES (600,000 ms)
+                setTimeout(() => {
+                    if (typeof window.checkForUpdates === 'function') {
+                        window.checkForUpdates();
+                    } else {
+                        window.location.reload(); // Fallback if no specific check logic exposed
+                    }
+                }, 600000);
             };
             
             document.getElementById('modal-update-btn').onclick = () => {
                 const btn = document.getElementById('modal-update-btn');
-                if (btn.innerText === 'UPDATING...') return; // Prevent multiple clicks
+                if (btn.innerText === 'UPDATING...') return;
                 btn.innerText = 'UPDATING...';
-                
-                let refreshing = false;
-                navigator.serviceWorker.addEventListener('controllerchange', () => {
-                    if (refreshing) return;
-                    refreshing = true;
-                    window.location.reload();
-                });
 
+                const logBox = document.createElement('div');
+                logBox.style = 'margin-top: 15px; background: #000; border: 1px solid #333; border-radius: 4px; padding: 10px; font-family: monospace; font-size: 10px; color: #10b981; text-align: left; height: 80px; overflow-y: auto;';
+                document.getElementById('modal-update-btn').parentElement.parentElement.appendChild(logBox);
+                
+                const log = (msg) => {
+                    const entry = document.createElement('div');
+                    entry.innerText = '[+] ' + msg;
+                    logBox.appendChild(entry);
+                    logBox.scrollTop = logBox.scrollHeight;
+                };
+
+                log('Connecting to secure update server...');
+                setTimeout(() => log('Purging old version files...'), 400);
+                setTimeout(() => log('Injecting new Tactical system files...'), 900);
+
+                let reloadTriggered = false;
+                const forceReload = () => {
+                    if (!reloadTriggered) {
+                        reloadTriggered = true;
+                        log('Update successful. Rebooting system...');
+                        setTimeout(() => window.location.reload(), 800);
+                    }
+                };
+                setTimeout(forceReload, 2500);
+
+                navigator.serviceWorker.addEventListener('controllerchange', forceReload);
                 if (navigator.serviceWorker) {
                     navigator.serviceWorker.getRegistration().then(reg => {
-                        if (reg) {
-                            if (reg.waiting) {
-                                reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-                            } else {
-                                // Force the browser to fetch the new sw.js
-                                reg.update().then(() => {
-                                    if (reg.waiting) {
-                                        reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-                                    } else if (reg.installing) {
-                                        reg.installing.addEventListener('statechange', (e) => {
-                                            if (e.target.state === 'installed' && reg.waiting) {
-                                                reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-                                            }
-                                        });
-                                    } else {
-                                        // Fallback reload if SW doesn't update
-                                        window.location.reload();
-                                    }
-                                }).catch(() => window.location.reload());
-                            }
+                        if (reg && reg.waiting) {
+                            reg.waiting.postMessage({ type: 'SKIP_WAITING' });
+                        } else if (reg && reg.active) {
+                            reg.active.postMessage({ type: 'SKIP_WAITING' });
                         } else {
-                            window.location.reload();
+                            forceReload();
                         }
                     });
+                } else {
+                    forceReload();
                 }
-                
-                // Fallback in case controllerchange doesn't fire
-                setTimeout(() => {
-                    if (!refreshing) {
-                        refreshing = true;
-                        window.location.reload();
-                    }
-                }, 1500);
-            };
+        };
         }
 
 
@@ -1867,6 +1878,27 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
