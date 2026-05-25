@@ -301,3 +301,10 @@ v3.0.16 - DEPLOYED 2026-05-24 19:45:17
 * Service Worker cache updated to: trc-vv3.0.16
 * All tactical systems: OPERATIONAL
 * Toast updater: ACTIVE - users will see update prompt on next app open
+
+============================================================
+v3.0.17 - DEPLOYED 2026-05-24 20:12:31
+* Version auto-bumped from v3.0.16
+* Service Worker cache updated to: trc-vv3.0.17
+* All tactical systems: OPERATIONAL
+* Toast updater: ACTIVE - users will see update prompt on next app open

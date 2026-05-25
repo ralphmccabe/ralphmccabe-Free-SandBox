@@ -26,7 +26,7 @@
     
     <!-- LEAFLET MAP LIBS (NO KEY REQ) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js" defer></script>
 
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
@@ -39,7 +39,7 @@
             if(window.lucide) lucide.createIcons();
         });
     </script>
-    <script src="idb_helper.js?v=1.6"></script>
+    <script src="idb_helper.js?v=1.6" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" defer></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js" defer></script>
     <style>
@@ -1715,7 +1715,7 @@
         </div>
     </div>
 
-    <script src="original_script.min.js?v=2.3"></script>
+    <script src="original_script.min.js?v=2.3" defer></script>
     <script>
         // Set header version display
         window.addEventListener('DOMContentLoaded', () => {
@@ -1744,7 +1744,7 @@
     <!-- PWA SERVICE WORKER REGISTRATION & API UPDATE CHECK -->
 
     <script>
-        window.APP_VERSION = 'v3.0.16';
+        window.APP_VERSION = 'v3.0.17';
         if(document.getElementById('header-version-display')) {
             document.getElementById('header-version-display').innerText = window.APP_VERSION;
         }
@@ -1774,6 +1774,9 @@
 
             // Initial check on load
             window.checkForUpdates();
+            
+            // Check in the background every 10 minutes while playing
+            setInterval(window.checkForUpdates, 600000);
         });
 
         function showUpdateModal(newVersion) {
@@ -1826,35 +1829,43 @@
                     logBox.scrollTop = logBox.scrollHeight;
                 };
 
-                log('Connecting to secure update server...');
-                setTimeout(() => log('Purging old version files...'), 400);
-                setTimeout(() => log('Injecting new Tactical system files...'), 900);
+                const doUpdate = async () => {
+                    log('Connecting to secure update server...');
+                    setTimeout(() => log('Purging old version files...'), 400);
 
-                let reloadTriggered = false;
-                const forceReload = () => {
-                    if (!reloadTriggered) {
-                        reloadTriggered = true;
-                        log('Update successful. Rebooting system...');
-                        setTimeout(() => window.location.reload(), 800);
-                    }
-                };
-                setTimeout(forceReload, 2500);
-
-                navigator.serviceWorker.addEventListener('controllerchange', forceReload);
-                if (navigator.serviceWorker) {
-                    navigator.serviceWorker.getRegistration().then(reg => {
-                        if (reg && reg.waiting) {
-                            reg.waiting.postMessage({ type: 'SKIP_WAITING' });
-                        } else if (reg && reg.active) {
-                            reg.active.postMessage({ type: 'SKIP_WAITING' });
-                        } else {
-                            forceReload();
+                    // 1. Wipe all local caches
+                    if ('caches' in window) {
+                        try {
+                            const cacheNames = await caches.keys();
+                            await Promise.all(cacheNames.map(name => caches.delete(name)));
+                            log('Cache purged successfully.');
+                        } catch (e) {
+                            log('Cache purge warning.');
                         }
-                    });
-                } else {
-                    forceReload();
-                }
-        };
+                    }
+
+                    // 2. Unregister Service Workers
+                    if ('serviceWorker' in navigator) {
+                        try {
+                            const registrations = await navigator.serviceWorker.getRegistrations();
+                            for (let reg of registrations) {
+                                await reg.unregister();
+                            }
+                            log('Tactical systems injected.');
+                        } catch (e) {
+                            log('SW unregister warning.');
+                        }
+                    }
+
+                    // 3. Hard reload from server
+                    setTimeout(() => {
+                        log('Update successful. Rebooting system...');
+                        setTimeout(() => window.location.reload(true), 800);
+                    }, 1500);
+                };
+                
+                doUpdate();
+            };
         }
 
 
@@ -1913,6 +1924,7 @@
     </script>
 </body>
 </html>
+
 
 
 
