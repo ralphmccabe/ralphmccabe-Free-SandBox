@@ -1812,15 +1812,20 @@ function initializeTacticalDashboard2() {
         keys.forEach(key => {
             const p = profiles[key];
             const card = document.createElement('div');
-            card.className = "bg-gray-900 border border-gray-800 p-4 rounded-xl flex flex-col justify-between hover:border-emerald-500/50 transition-all shadow-md relative";
+            card.className = "bg-gray-900 border border-gray-800 p-4 rounded-xl flex flex-col justify-between hover:border-emerald-500/50 transition-all shadow-md relative group overflow-hidden";
             card.innerHTML = `
-                <div class="space-y-2 text-left">
+                <!-- Send to Vault Checkbox -->
+                <div class="absolute top-1 left-1 z-30 bg-black/60 p-0.5 rounded">
+                    <input type="checkbox" class="ammo-vault-checkbox w-3.5 h-3.5 cursor-pointer" data-profile-name="${key}" title="Mark for Vault">
+                </div>
+                
+                <div class="space-y-2 text-left mt-2">
                     <div class="flex justify-between items-start border-b border-gray-800 pb-2 mb-2">
-                        <div>
+                        <div class="pl-4">
                             <h4 class="text-white font-bold uppercase text-sm tracking-wide truncate max-w-[150px]">${key}</h4>
                             <span class="text-[9px] text-emerald-400 font-mono uppercase">${p.caliber || 'General'}</span>
                         </div>
-                        <button class="delete-ammo-btn text-red-500 hover:text-red-400 p-1 bg-black/40 hover:bg-red-950/20 rounded transition-colors" data-name="${key}">
+                        <button class="delete-ammo-btn text-red-500 hover:text-red-400 p-1 bg-black/40 hover:bg-red-950/20 rounded transition-colors z-30" data-name="${key}">
                             <i data-lucide="trash-2" class="w-4 h-4"></i>
                         </button>
                     </div>
@@ -1834,21 +1839,44 @@ function initializeTacticalDashboard2() {
                     </div>
                 </div>
                 
-                <div class="mt-4 pt-3 border-t border-gray-800 flex items-center justify-between gap-4">
+                <div class="mt-4 pt-3 border-t border-gray-800 flex items-center justify-start gap-4">
                     <!-- Adjustment Counter -->
                     <div class="flex items-center gap-1.5 bg-black/40 p-1 rounded border border-gray-800">
-                        <button class="adjust-ammo-btn bg-gray-800 text-white font-bold text-xs w-6 h-6 rounded flex items-center justify-center hover:bg-gray-700 active:bg-gray-600 transition-colors" data-name="${key}" data-amount="-1">-1</button>
+                        <button class="adjust-ammo-btn bg-gray-800 text-white font-bold text-xs w-6 h-6 rounded flex items-center justify-center hover:bg-gray-700 active:bg-gray-600 transition-colors z-30" data-name="${key}" data-amount="-1">-1</button>
                         <span class="text-white font-black text-xs px-2 min-w-[32px] text-center">${p.count || '0'} rds</span>
-                        <button class="adjust-ammo-btn bg-gray-800 text-white font-bold text-xs w-6 h-6 rounded flex items-center justify-center hover:bg-gray-700 active:bg-gray-600 transition-colors" data-name="${key}" data-amount="1">+1</button>
+                        <button class="adjust-ammo-btn bg-gray-800 text-white font-bold text-xs w-6 h-6 rounded flex items-center justify-center hover:bg-gray-700 active:bg-gray-600 transition-colors z-30" data-name="${key}" data-amount="1">+1</button>
                     </div>
-                    
-                    <button class="load-ammo-btn bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 text-[10px] uppercase font-bold py-1.5 px-3 rounded hover:bg-emerald-600/40 transition-colors" data-name="${key}">
-                        Load to Card
-                    </button>
                 </div>
             `;
+            
+            // Checkbox logic
+            card.addEventListener('click', (e) => {
+                if (e.target.closest('.ammo-vault-checkbox')) {
+                    const checkedBoxes = document.querySelectorAll('.ammo-vault-checkbox:checked');
+                    
+                    const vaultBtn = document.getElementById('ammo-to-vault-btn');
+                    if (vaultBtn) {
+                        if (checkedBoxes.length > 0) vaultBtn.classList.remove('hidden');
+                        else vaultBtn.classList.add('hidden');
+                    }
+                    
+                    const reworkBtn = document.getElementById('rework-ammo-btn');
+                    if (reworkBtn) {
+                        if (checkedBoxes.length === 1) reworkBtn.classList.remove('hidden');
+                        else reworkBtn.classList.add('hidden');
+                    }
+                }
+            });
+
             ammoLibraryList.appendChild(card);
         });
+        
+        // Ensure buttons start hidden
+        const vaultBtn = document.getElementById('ammo-to-vault-btn');
+        if (vaultBtn) vaultBtn.classList.add('hidden');
+        
+        const reworkBtn = document.getElementById('rework-ammo-btn');
+        if (reworkBtn) reworkBtn.classList.add('hidden');
 
         // Add event listeners inside list
         document.querySelectorAll('.delete-ammo-btn').forEach(btn => {
@@ -3301,7 +3329,7 @@ function initializeTacticalDashboard2() {
             orbitalMap.on('click', handleMapClick);
 
             // Auto-Trigger initial GPS sync to find where the user currently is!
-            syncMapToGps();
+            // syncMapToGps(); // Disabled on page load to comply with Lighthouse Best Practices
             
             // Force re-renders to fix grey tile bugs on mobile layout shifts
             setTimeout(() => { if (orbitalMap) orbitalMap.invalidateSize(); }, 500);
@@ -4679,6 +4707,60 @@ function initializeTacticalDashboard2() {
         });
     }
 
+    const vaultToAmmoBtn = document.getElementById('vault-to-ammo-btn');
+    if (vaultToAmmoBtn) {
+        vaultToAmmoBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const checkedBoxes = document.querySelectorAll('.vault-export-checkbox:checked');
+            if (checkedBoxes.length === 0) {
+                alert('Please select at least one snapshot to send to Ammo Library.');
+                return;
+            }
+
+            const selectedIds = Array.from(checkedBoxes).map(cb => cb.dataset.vaultId);
+            const itemsToSend = vaultCache.filter(item => selectedIds.includes(item.id.toString()));
+            
+            let addedCount = 0;
+            const ammoProfiles = typeof getAmmoProfiles === 'function' ? getAmmoProfiles() : JSON.parse(localStorage.getItem('rangeCardAmmoProfiles') || '{}');
+
+            let debugInfo = [];
+            itemsToSend.forEach(item => {
+                if (item.isAmmo && item.originalName) {
+                    // Extract ammo data and save
+                    const newProfile = {
+                        caliber: item.caliber || '',
+                        bullet: item.bullet || '',
+                        powder: item.powder || '',
+                        primer: item.primer || '',
+                        col: item.col || '',
+                        velocity: item.velocity || '',
+                        count: item.count || '0'
+                    };
+                    ammoProfiles[item.originalName] = newProfile;
+                    addedCount++;
+                } else {
+                    debugInfo.push(`Label: ${item.label}, isAmmo: ${item.isAmmo}, origName: ${item.originalName}`);
+                    console.warn(`Snapshot "${item.label}" is not an Ammo Card.`);
+                }
+            });
+
+            if (addedCount > 0) {
+                if(typeof saveAmmoProfiles === 'function') saveAmmoProfiles(ammoProfiles);
+                else localStorage.setItem('rangeCardAmmoProfiles', JSON.stringify(ammoProfiles));
+                
+                if(typeof updateAmmoList === 'function') updateAmmoList();
+                
+                window.pushTacLog(`TRANSFERRED ${addedCount} CARDS TO AMMO LIBRARY`, "SUCCESS");
+                alert(`Successfully sent ${addedCount} Ammo Card(s) to the Ammo Library!`);
+            } else {
+                alert(`None of the selected items were valid Ammo Cards.\n[DEBUG] ${debugInfo.join(' | ')}`);
+            }
+
+            // Uncheck boxes
+            checkedBoxes.forEach(cb => cb.checked = false);
+        });
+    }
+
     const vaultChatsBtn = document.getElementById('vault-chats-btn');
     if (vaultChatsBtn) {
         vaultChatsBtn.addEventListener('click', (e) => {
@@ -4696,11 +4778,20 @@ function initializeTacticalDashboard2() {
                 setTimeout(() => {
                     const base64Image = item.image;
                     
-                    // Send to network
+                    // Send to network, including all metadata (but don't duplicate the image)
+                    const metadataObj = Object.assign({}, item);
+                    delete metadataObj.image;
+                    delete metadataObj.id;
+                    
                     commsChannel.send({
                         type: 'broadcast',
                         event: 'chat',
-                        payload: { data: TacticalCrypto.encrypt({ message: "INCOMING IMAGE INTEL", image: base64Image, user: commsUser }) }
+                        payload: { data: TacticalCrypto.encrypt({ 
+                            message: "INCOMING IMAGE INTEL", 
+                            image: base64Image, 
+                            user: commsUser,
+                            metadata: metadataObj
+                        }) }
                     });
                     
                     // Render locally
@@ -4823,6 +4914,117 @@ function initializeTacticalDashboard2() {
             
             // Uncheck boxes
             checkedBoxes.forEach(cb => cb.checked = false);
+        });
+    }
+
+    const clearAmmoFormBtn = document.getElementById('clearAmmoFormBtn');
+    if (clearAmmoFormBtn) {
+        clearAmmoFormBtn.onclick = () => {
+            const ammoInputs = {
+                name: document.getElementById('ammo-name'),
+                caliber: document.getElementById('ammo-caliber'),
+                bullet: document.getElementById('ammo-bullet'),
+                powder: document.getElementById('ammo-powder'),
+                primer: document.getElementById('ammo-primer'),
+                col: document.getElementById('ammo-col'),
+                velocity: document.getElementById('ammo-velocity'),
+                count: document.getElementById('ammo-count')
+            };
+            Object.values(ammoInputs).forEach(input => { if(input) input.value = ''; });
+        };
+    }
+
+    // --- REWORK AMMO BATCH LOGIC ---
+    const reworkAmmoBtn = document.getElementById('rework-ammo-btn');
+    if (reworkAmmoBtn) {
+        reworkAmmoBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const checkedBoxes = document.querySelectorAll('.ammo-vault-checkbox:checked');
+            if (checkedBoxes.length !== 1) return;
+
+            const name = checkedBoxes[0].dataset.profileName;
+            const profiles = typeof getAmmoProfiles === 'function' ? getAmmoProfiles() : JSON.parse(localStorage.getItem('rangeCardAmmoProfiles') || '{}');
+            const p = profiles[name];
+
+            if (p) {
+                const ammoForm = {
+                    name: document.getElementById('ammo-name'),
+                    caliber: document.getElementById('ammo-caliber'),
+                    bullet: document.getElementById('ammo-bullet'),
+                    powder: document.getElementById('ammo-powder'),
+                    primer: document.getElementById('ammo-primer'),
+                    col: document.getElementById('ammo-col'),
+                    velocity: document.getElementById('ammo-velocity'),
+                    count: document.getElementById('ammo-count')
+                };
+
+                if(ammoForm.name) ammoForm.name.value = name || '';
+                if(ammoForm.caliber) ammoForm.caliber.value = p.caliber || '';
+                if(ammoForm.bullet) ammoForm.bullet.value = p.bullet || '';
+                if(ammoForm.powder) ammoForm.powder.value = p.powder || '';
+                if(ammoForm.primer) ammoForm.primer.value = p.primer || '';
+                if(ammoForm.col) ammoForm.col.value = p.col || '';
+                if(ammoForm.velocity) ammoForm.velocity.value = p.velocity || '';
+                if(ammoForm.count) ammoForm.count.value = p.count || '0';
+
+                // Uncheck and hide buttons
+                checkedBoxes[0].checked = false;
+                reworkAmmoBtn.classList.add('hidden');
+                const vaultBtn = document.getElementById('ammo-to-vault-btn');
+                if (vaultBtn) vaultBtn.classList.add('hidden');
+
+                if(ammoForm.name) ammoForm.name.focus();
+            }
+        });
+    }
+
+    // --- AMMO TO VAULT LOGIC ---
+    const ammoToVaultBtn = document.getElementById('ammo-to-vault-btn');
+    if (ammoToVaultBtn) {
+        ammoToVaultBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const checkedBoxes = document.querySelectorAll('.ammo-vault-checkbox:checked');
+            if (checkedBoxes.length === 0) return;
+
+            const profiles = typeof getAmmoProfiles === 'function' ? getAmmoProfiles() : JSON.parse(localStorage.getItem('rangeCardAmmoProfiles') || '{}');
+            let sentCount = 0;
+
+            checkedBoxes.forEach((cb, i) => {
+                const name = cb.dataset.profileName;
+                const p = profiles[name];
+                if (p) {
+                    const ammoSvgBase64 = "data:image/svg+xml;base64," + btoa(`<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
+                        <rect width="300" height="300" fill="#052e16"/>
+                        <rect x="10" y="10" width="280" height="280" fill="none" stroke="#10b981" stroke-width="4"/>
+                        <text x="50%" y="40" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-size="22" font-weight="bold" fill="#34d399">${name.substring(0, 20)}</text>
+                        <line x1="20" y1="60" x2="280" y2="60" stroke="#10b981" stroke-width="2" />
+                        <text x="20" y="100" font-family="monospace" font-size="16" fill="#a7f3d0">B: ${p.bullet || '--'}</text>
+                        <text x="20" y="130" font-family="monospace" font-size="16" fill="#a7f3d0">P: ${p.powder || '--'}</text>
+                        <text x="20" y="160" font-family="monospace" font-size="16" fill="#a7f3d0">PR: ${p.primer || '--'}</text>
+                        <text x="20" y="190" font-family="monospace" font-size="16" fill="#a7f3d0">COL: ${p.col || '--'}</text>
+                        <text x="20" y="220" font-family="monospace" font-size="16" fill="#a7f3d0">V: ${p.velocity || '--'} FPS</text>
+                        <text x="20" y="250" font-family="monospace" font-size="16" fill="#a7f3d0">C: ${p.caliber || '--'}</text>
+                    </svg>`);
+
+                    const profileMetadata = Object.assign({}, p, { originalName: name, isAmmo: true });
+                    setTimeout(() => {
+                        saveIntelSnapshot('AMMO_CARD', ammoSvgBase64, profileMetadata);
+                    }, i * 50);
+                    sentCount++;
+                }
+            });
+
+            if (sentCount > 0) {
+                window.pushTacLog(`TRANSFERRED ${sentCount} AMMO FILES TO INTEL VAULT`, "SUCCESS");
+            }
+            
+            // Uncheck boxes and hide button
+            checkedBoxes.forEach(cb => cb.checked = false);
+            ammoToVaultBtn.classList.add('hidden');
+            
+            // Close ammo library modal if desired
+            const ammoModal = document.getElementById('ammoLibraryModal');
+            if (ammoModal) ammoModal.classList.add('hidden');
         });
     }
 
@@ -5066,7 +5268,7 @@ function initializeTacticalDashboard2() {
             if (dec) {
                 renderChatMessage(dec.user, dec.message, dec.user.id === commsUser.id, dec.image);
                 if (dec.image && dec.user.id !== commsUser.id) {
-                    saveIntelSnapshot(`RX_INTEL_${dec.user.callsign}`, dec.image);
+                    saveIntelSnapshot(`RX_INTEL_${dec.user.callsign}`, dec.image, dec.metadata || {});
                 }
             }
         });

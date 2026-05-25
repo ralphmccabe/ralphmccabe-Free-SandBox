@@ -47,7 +47,7 @@
         
         /* 100/100 ACCESSIBILITY: Forced High Contrast Overrides for Audit Robots */
         aside .text-gray-500, #libraryModal .text-gray-500 { color: #f9fafb !important; }
-        aside .text-blue-800, #libraryModal .text-blue-800 { color: #93c5fd !important; }
+        aside:not(:has(.bg-white)) .text-blue-800, #libraryModal .text-blue-800 { color: #93c5fd !important; }
         aside .text-gray-400, #libraryModal .text-gray-400 { color: #ffffff !important; }
         
         /* Card Legibility: High visibility for paper side */
@@ -132,20 +132,20 @@
             <div class="p-6 space-y-8 pb-32">
                 <div class="space-y-6">
                     <!-- FLAVOR CONTROLS ELEVATED TO MASTER VIEW -->
-                    <button id="colorCycleBtn" aria-label="Cycle theme color" class="w-full bg-blue-950/20 border border-blue-900 rounded-lg p-2 text-xs font-bold text-blue-400 uppercase flex items-center justify-center gap-2 hover:bg-blue-900/40 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] transition-all">
+                    <button id="colorCycleBtn" class="w-full bg-blue-950/20 border border-blue-900 rounded-lg p-2 text-xs font-bold text-blue-400 uppercase flex items-center justify-center gap-2 hover:bg-blue-900/40 shadow-[inset_0_1px_1px_rgba(255,255,255,0.05)] transition-all">
                         <i data-lucide="palette" class="w-4 h-4"></i> CHANGE FLAVOR
                     </button>
 
                     <h2 class="section-label">Data Management</h2>
                     
                     <div class="grid grid-cols-2 gap-2">
-                        <button id="openLibraryBtn" aria-label="Open Repository" class="bg-gray-800 border border-gray-600 rounded p-2 text-xs font-bold flex items-center justify-center gap-2 hover:bg-gray-700 transition-colors">
+                        <button id="openLibraryBtn" class="bg-gray-800 border border-gray-600 rounded p-2 text-xs font-bold flex items-center justify-center gap-2 hover:bg-gray-700 transition-colors">
                             <i data-lucide="library" class="w-4 h-4 text-neon-green"></i> TACTICAL-CARD LIBRARY
                         </button>
                         <button id="saveProfileBtnManual" aria-label="Save current session profile" class="bg-gray-800 border border-gray-600 rounded p-2 text-xs font-bold flex items-center justify-center gap-2 hover:bg-gray-700 transition-colors">
                             <i data-lucide="save" class="w-4 h-4 text-blue-400"></i> SAVE CURRENT
                         </button>
-                        <button id="clearFormBtn" aria-label="Clear all form inputs" class="col-span-2 bg-red-950/20 border border-red-900 rounded p-2 text-xs font-bold text-red-500 hover:bg-red-900/40 transition-colors">CLEAR ALL DATA</button>
+                        <button id="clearFormBtn" class="col-span-2 bg-red-950/20 border border-red-900 rounded p-2 text-xs font-bold text-red-500 hover:bg-red-900/40 transition-colors">CLEAR ALL DATA</button>
                     </div>
 
                     <!-- MODERNIZED 2x2 CIRCULAR DASHBOARD -->
@@ -483,7 +483,7 @@
                     </section>
                 </div>
 
-                <div class="pt-4"><button id="downloadBtn" aria-label="Export Image" class="w-full bg-neon-green text-white font-extrabold py-4 rounded-lg uppercase tracking-widest text-sm flex items-center justify-center gap-3 shadow-lg hover:bg-green-500 transition-all"><i data-lucide="download"></i> DOWNLOAD CARD IMAGE</button></div>
+                <div class="pt-4"><button id="downloadBtn" class="w-full bg-neon-green text-gray-900 font-extrabold py-4 rounded-lg uppercase tracking-widest text-sm flex items-center justify-center gap-3 shadow-lg hover:bg-green-500 transition-all"><i data-lucide="download"></i> DOWNLOAD CARD IMAGE</button></div>
 
                 <!-- Mobile Recon Stacked Preview/Form -->
                 <div id="mobile-recon-preview-complete" class="space-y-6 mt-8 border-t border-emerald-700 pt-8 pb-10 hidden">
@@ -895,9 +895,17 @@
                     <i data-lucide="database" class="w-5 h-5 text-emerald-400"></i>
                     <h2 class="text-lg font-bold uppercase text-white">AMMO LIBRARY & INVENTORY</h2>
                 </div>
-                <button id="closeAmmoLibraryBtn" aria-label="Close modal" class="p-2 bg-gray-800 rounded-lg group hover:bg-gray-700 transition-colors">
-                    <i data-lucide="x" class="w-5 h-5 text-white"></i>
-                </button>
+                <div class="flex items-center gap-3">
+                    <button id="rework-ammo-btn" class="hidden text-[10px] bg-amber-950/80 text-amber-300 px-3 py-1.5 rounded-lg border border-amber-700 hover:bg-amber-600 hover:text-white transition-colors flex items-center gap-2 font-bold uppercase tracking-wider">
+                        <i data-lucide="wrench" class="w-4 h-4"></i> REWORK BATCH
+                    </button>
+                    <button id="ammo-to-vault-btn" class="hidden text-[10px] bg-purple-950/80 text-purple-300 px-3 py-1.5 rounded-lg border border-purple-700 hover:bg-purple-600 hover:text-white transition-colors flex items-center gap-2 font-bold uppercase tracking-wider">
+                        <i data-lucide="archive" class="w-4 h-4"></i> INTEL VAULT
+                    </button>
+                    <button id="closeAmmoLibraryBtn" aria-label="Close modal" class="p-2 bg-gray-800 rounded-lg group hover:bg-gray-700 transition-colors">
+                        <i data-lucide="x" class="w-5 h-5 text-white"></i>
+                    </button>
+                </div>
             </div>
             
             <div class="flex-1 flex flex-col md:flex-row overflow-hidden">
@@ -940,9 +948,14 @@
                         </div>
                     </div>
                     
-                    <button id="saveAmmoProfileBtn" class="bg-emerald-600 text-white font-extrabold py-3 rounded-lg uppercase tracking-wider text-xs shadow-lg hover:bg-emerald-500 transition-all mt-4 flex items-center justify-center gap-2">
-                        <i data-lucide="check-square" class="w-4 h-4"></i> Save Ammo Batch
-                    </button>
+                    <div class="flex gap-2 mt-4">
+                        <button id="clearAmmoFormBtn" class="bg-red-900 text-white font-extrabold py-3 px-4 rounded-lg uppercase tracking-wider text-xs shadow-lg hover:bg-red-800 transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i> Clear
+                        </button>
+                        <button id="saveAmmoProfileBtn" class="flex-1 bg-emerald-600 text-white font-extrabold py-3 rounded-lg uppercase tracking-wider text-xs shadow-lg hover:bg-emerald-500 transition-all flex items-center justify-center gap-2">
+                            <i data-lucide="check-square" class="w-4 h-4"></i> Save Ammo Batch
+                        </button>
+                    </div>
                 </div>
                 
                 <!-- Saved Ammunition Ledger List (Right) -->
@@ -1558,13 +1571,16 @@
                                     <i data-lucide="archive" class="w-4 h-4 text-emerald-500"></i>
                                     <h3 class="text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em]">SNAPSHOT DATABASE</h3>
                                 </div>
-                                <div class="flex items-center gap-2">
+                                <div class="flex flex-wrap items-center gap-2 gap-y-2">
                                     <input type="file" id="vault-import-input" class="hidden" accept="image/png, image/jpeg" multiple>
                                     <button id="vault-import-btn" class="text-[8px] bg-blue-950/80 text-blue-300 px-2 py-1 rounded border border-blue-700 hover:bg-blue-600 hover:text-white transition-colors flex items-center gap-1 font-bold">
                                         <i data-lucide="download" class="w-3 h-3"></i> IMPORT
                                     </button>
                                     <button id="vault-export-btn" class="text-[8px] bg-emerald-950/80 text-emerald-300 px-2 py-1 rounded border border-emerald-700 hover:bg-emerald-600 hover:text-white transition-colors flex items-center gap-1 font-bold">
                                         <i data-lucide="upload" class="w-3 h-3"></i> EXPORT
+                                    </button>
+                                    <button id="vault-to-ammo-btn" class="text-[8px] bg-amber-950/80 text-amber-300 px-2 py-1 rounded border border-amber-700 hover:bg-amber-600 hover:text-white transition-colors flex items-center gap-1 font-bold">
+                                        <i data-lucide="database" class="w-3 h-3"></i> AMMO LIB
                                     </button>
                                     <button id="vault-to-dope-btn" class="text-[8px] bg-slate-950/80 text-slate-300 px-2 py-1 rounded border border-slate-700 hover:bg-slate-600 hover:text-white transition-colors flex items-center gap-1 font-bold">
                                         <i data-lucide="clipboard-list" class="w-3 h-3"></i> DOPECARD
@@ -1699,7 +1715,7 @@
         </div>
     </div>
 
-    <script src="original_script.min.js?v=2.2"></script>
+    <script src="original_script.min.js?v=2.3"></script>
     <script>
         // Set header version display
         window.addEventListener('DOMContentLoaded', () => {
@@ -1728,7 +1744,7 @@
     <!-- PWA SERVICE WORKER REGISTRATION & API UPDATE CHECK -->
 
     <script>
-        window.APP_VERSION = 'v3.0.13';
+        window.APP_VERSION = 'v3.0.16';
         if(document.getElementById('header-version-display')) {
             document.getElementById('header-version-display').innerText = window.APP_VERSION;
         }
@@ -1897,6 +1913,10 @@
     </script>
 </body>
 </html>
+
+
+
+
 
 
 
