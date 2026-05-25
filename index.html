@@ -47,11 +47,11 @@
         
         /* 100/100 ACCESSIBILITY: Forced High Contrast Overrides for Audit Robots */
         aside .text-gray-500, #libraryModal .text-gray-500 { color: #f9fafb !important; }
-        aside:not(:has(.bg-white)) .text-blue-950, #libraryModal .text-blue-950 { color: #93c5fd !important; }
+        aside:not(:has(.bg-white)) .text-blue-800, #libraryModal .text-blue-800 { color: #93c5fd !important; }
         aside .text-gray-400, #libraryModal .text-gray-400 { color: #ffffff !important; }
         
         /* Card Legibility: High visibility for paper side */
-        #card-container .text-blue-950 { color: #1e3a8a !important; font-weight: 700; }
+        #card-container .text-blue-800 { color: #1e3a8a !important; font-weight: 700; }
         #card-container .text-gray-400 { color: #4b5563 !important; }
         #card-container .text-gray-600 { color: #374151 !important; }
         
@@ -82,7 +82,7 @@
         /* Dynamic download button styling added by Antigravity */
         #downloadBtn {
             background-color: var(--accent-color) !important;
-            color: var(--tab-text-color, #111827) !important;
+            color: var(--tab-text-color, #ffffff) !important;
             transition: opacity 0.2s ease-in-out;
         }
         #downloadBtn:hover {
@@ -178,59 +178,59 @@
                 <section class="space-y-4">
                     <h2 class="section-label">Session Info</h2>
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="col-span-2"><label for="header-notes" class="sr-only">Notes</label><input aria-label="Header Notes" type="text" id="header-notes" class="input-field" placeholder="Header Notes" maxlength="20"></div>
-                        <div class="col-span-2"><label for="shooter-name" class="sr-only">Shooter</label><input aria-label="Shooter Name / Company" type="text" id="shooter-name" class="input-field" placeholder="Shooter Name / Company" maxlength="20"></div>
-                        <div class="col-span-1"><label for="date" class="sr-only">Date</label><input aria-label="date" type="date" id="date" class="input-field"></div>
-                        <div class="col-span-1"><label for="time" class="sr-only">Time</label><input aria-label="time" type="time" id="time" class="input-field"></div>
+                        <div class="col-span-2"><label for="header-notes" class="sr-only">Notes</label><input type="text" id="header-notes" class="input-field" placeholder="Header Notes" maxlength="20"></div>
+                        <div class="col-span-2"><label for="shooter-name" class="sr-only">Shooter</label><input type="text" id="shooter-name" class="input-field" placeholder="Shooter Name / Company" maxlength="20"></div>
+                        <div class="col-span-1"><label for="date" class="sr-only">Date</label><input type="date" id="date" class="input-field"></div>
+                        <div class="col-span-1"><label for="time" class="sr-only">Time</label><input type="time" id="time" class="input-field"></div>
                     </div>
 
                     <h2 class="section-label">Reload Data</h2>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <div class="col-span-1"><input aria-label="Caliber" type="text" id="caliber" class="input-field" placeholder="Caliber" maxlength="20"></div>
-                        <div class="col-span-1"><input aria-label="Zero Range" type="text" id="zero" class="input-field" placeholder="Zero Range" maxlength="20"></div>
-                        <div class="col-span-1"><label for="sidebar-bal-input-alt" class="sr-only">Alt (ft)</label><input aria-label="Alt (ft)" type="text" inputmode="decimal" id="sidebar-bal-input-alt" class="input-field" placeholder="Alt (ft)"></div>
-                        <div class="col-span-1"><label for="sidebar-bal-input-temp" class="sr-only">Temp (°F)</label><input aria-label="Temp (°F)" type="text" inputmode="decimal" id="sidebar-bal-input-temp" class="input-field" placeholder="Temp (°F)"></div>
-                        <div class="col-span-1"><label for="sidebar-bal-input-baro" class="sr-only">Baro (inHg)</label><input aria-label="Baro (inHg)" type="text" inputmode="decimal" id="sidebar-bal-input-baro" class="input-field" placeholder="Baro (inHg)"></div>
+                        <div class="col-span-1"><input type="text" id="caliber" class="input-field" placeholder="Caliber" maxlength="20"></div>
+                        <div class="col-span-1"><input type="text" id="zero" class="input-field" placeholder="Zero Range" maxlength="20"></div>
+                        <div class="col-span-1"><label for="sidebar-bal-input-alt" class="sr-only">Alt (ft)</label><input type="text" inputmode="decimal" id="sidebar-bal-input-alt" class="input-field" placeholder="Alt (ft)"></div>
+                        <div class="col-span-1"><label for="sidebar-bal-input-temp" class="sr-only">Temp (°F)</label><input type="text" inputmode="decimal" id="sidebar-bal-input-temp" class="input-field" placeholder="Temp (°F)"></div>
+                        <div class="col-span-1"><label for="sidebar-bal-input-baro" class="sr-only">Baro (inHg)</label><input type="text" inputmode="decimal" id="sidebar-bal-input-baro" class="input-field" placeholder="Baro (inHg)"></div>
                         <div class="col-span-2 md:col-span-3 bg-black/40 border border-gray-700 rounded p-1 flex justify-between px-2 text-[10px] text-gray-400 mt-1">
                             <span>Computed Density Altitude (DA):</span>
                             <span id="bal-display-da" class="text-neon-green font-bold tracking-widest">-- ft</span>
                         </div>
-                        <div class="col-span-1"><input aria-label="Barrel" type="text" id="barrel" class="input-field" placeholder="Barrel" maxlength="20"></div>
-                        <div class="col-span-1"><input aria-label="Bullet" type="text" id="bullet" class="input-field" placeholder="Bullet" maxlength="20"></div>
-                        <div class="col-span-1"><input aria-label="Load (gr)" type="text" id="load" class="input-field" placeholder="Load (gr)" maxlength="20"></div>
-                        <div class="col-span-1"><input aria-label="Powder" type="text" id="powder" class="input-field" placeholder="Powder" maxlength="20"></div>
-                        <div class="col-span-1"><input aria-label="Primer" type="text" id="primer" class="input-field" placeholder="Primer" maxlength="20"></div>
-                        <div class="col-span-1"><input aria-label="C.O.L" type="text" id="col" class="input-field" placeholder="C.O.L" maxlength="20"></div>
-                        <div class="col-span-1"><input aria-label="Rings" type="text" id="rings" class="input-field" placeholder="Rings" maxlength="20"></div>
-                        <div class="col-span-1"><input aria-label="Velocity" type="text" id="velocity" class="input-field" placeholder="Velocity" maxlength="20"></div>
-                        <div class="col-span-1"><input aria-label="G-1 / BC" type="text" id="g1" class="input-field" placeholder="G-1 / BC" maxlength="20"></div>
-                        <div class="col-span-1"><input aria-label="Environment" type="text" id="weather" class="input-field" placeholder="Environment" maxlength="20"></div>
-                        <div class="col-span-1"><input aria-label="Target Size" type="text" id="targetSize" class="input-field" placeholder="Target Size" maxlength="20"></div>
-                        <div class="col-span-1"><input aria-label="Group Size" type="text" id="groupSize" class="input-field" placeholder="Group Size" maxlength="20"></div>
-                        <div class="col-span-2"><input aria-label="BOX COUNT (RDS)" type="text" id="box-count-input" class="input-field text-neon-green border-neon-green/40 font-bold tracking-wide" placeholder="BOX COUNT (RDS)" maxlength="20"></div>
+                        <div class="col-span-1"><input type="text" id="barrel" class="input-field" placeholder="Barrel" maxlength="20"></div>
+                        <div class="col-span-1"><input type="text" id="bullet" class="input-field" placeholder="Bullet" maxlength="20"></div>
+                        <div class="col-span-1"><input type="text" id="load" class="input-field" placeholder="Load (gr)" maxlength="20"></div>
+                        <div class="col-span-1"><input type="text" id="powder" class="input-field" placeholder="Powder" maxlength="20"></div>
+                        <div class="col-span-1"><input type="text" id="primer" class="input-field" placeholder="Primer" maxlength="20"></div>
+                        <div class="col-span-1"><input type="text" id="col" class="input-field" placeholder="C.O.L" maxlength="20"></div>
+                        <div class="col-span-1"><input type="text" id="rings" class="input-field" placeholder="Rings" maxlength="20"></div>
+                        <div class="col-span-1"><input type="text" id="velocity" class="input-field" placeholder="Velocity" maxlength="20"></div>
+                        <div class="col-span-1"><input type="text" id="g1" class="input-field" placeholder="G-1 / BC" maxlength="20"></div>
+                        <div class="col-span-1"><input type="text" id="weather" class="input-field" placeholder="Environment" maxlength="20"></div>
+                        <div class="col-span-1"><input type="text" id="targetSize" class="input-field" placeholder="Target Size" maxlength="20"></div>
+                        <div class="col-span-1"><input type="text" id="groupSize" class="input-field" placeholder="Group Size" maxlength="20"></div>
+                        <div class="col-span-2"><input type="text" id="box-count-input" class="input-field text-neon-green border-neon-green/40 font-bold tracking-wide" placeholder="BOX COUNT (RDS)" maxlength="20"></div>
                     </div>
 
                     <h2 class="section-label">Solution & Equipment</h2>
                     <div class="grid grid-cols-2 gap-4">
-                        <div class="col-span-1"><input aria-label="Elevation" type="text" id="elevation" class="input-field" placeholder="Elevation" maxlength="20"></div>
-                        <div class="col-span-1"><input aria-label="Hold" type="text" id="hold-data" class="input-field" placeholder="Hold" maxlength="20"></div>
-                        <div class="col-span-2"><input aria-label="Final DOPE" type="text" id="final-dope" class="input-field border-neon-green/50" placeholder="Final DOPE" maxlength="20"></div>
+                        <div class="col-span-1"><input type="text" id="elevation" class="input-field" placeholder="Elevation" maxlength="20"></div>
+                        <div class="col-span-1"><input type="text" id="hold-data" class="input-field" placeholder="Hold" maxlength="20"></div>
+                        <div class="col-span-2"><input type="text" id="final-dope" class="input-field border-neon-green/50" placeholder="Final DOPE" maxlength="20"></div>
 
                         <h2 class="section-label">Gear</h2>
-                        <div class="col-span-2"><input aria-label="Rifle / Pistol" type="text" id="rifle-notes" class="input-field" placeholder="Rifle / Pistol" maxlength="20"></div>
-                        <div class="col-span-2"><input aria-label="Scope Settings" type="text" id="scope-notes" class="input-field" placeholder="Scope Settings" maxlength="20"></div>
-                        <div class="col-span-2"><input aria-label="LRF Notes" type="text" id="lrf-notes" class="input-field" placeholder="LRF Notes" maxlength="20"></div>
-                        <div class="col-span-2"><input aria-label="Wind Notes" type="text" id="wind-notes" class="input-field" placeholder="Wind Notes" maxlength="20"></div>
-                        <div class="col-span-2"><input aria-label="Compass Icon Label (North/South)" type="text" id="direction-notes" class="input-field" placeholder="Compass Icon Label (North/South)" maxlength="20"></div>
+                        <div class="col-span-2"><input type="text" id="rifle-notes" class="input-field" placeholder="Rifle / Pistol" maxlength="20"></div>
+                        <div class="col-span-2"><input type="text" id="scope-notes" class="input-field" placeholder="Scope Settings" maxlength="20"></div>
+                        <div class="col-span-2"><input type="text" id="lrf-notes" class="input-field" placeholder="LRF Notes" maxlength="20"></div>
+                        <div class="col-span-2"><input type="text" id="wind-notes" class="input-field" placeholder="Wind Notes" maxlength="20"></div>
+                        <div class="col-span-2"><input type="text" id="direction-notes" class="input-field" placeholder="Compass Icon Label (North/South)" maxlength="20"></div>
 
                         <h2 class="section-label">Shooters Direction and Yardage</h2>
                         <div class="grid grid-cols-[80px_1fr] gap-2 col-span-2">
-                            <input aria-label="T1=DIR:" type="text" id="shooting-angle" class="input-field" placeholder="T1=DIR:" maxlength="20">
-                            <input aria-label="Range / Note" type="text" id="compass-range" class="input-field" placeholder="Range / Note" maxlength="20">
+                            <input type="text" id="shooting-angle" class="input-field" placeholder="T1=DIR:" maxlength="20">
+                            <input type="text" id="compass-range" class="input-field" placeholder="Range / Note" maxlength="20">
                         </div>
                         <div class="grid grid-cols-[80px_1fr] gap-2 col-span-2 items-center">
                             <span class="text-[10px] font-bold uppercase text-gray-400 pl-1">Location</span>
-                            <input aria-label="Indoor / Outdoor, Hunting Lease  or Range Name, ect...." type="text" id="compass-range-2" class="input-field" placeholder="Indoor / Outdoor, Hunting Lease  or Range Name, ect...." maxlength="20">
+                            <input type="text" id="compass-range-2" class="input-field" placeholder="Indoor / Outdoor, Hunting Lease  or Range Name, ect...." maxlength="20">
                         </div>
                         
                     </div>
@@ -251,63 +251,63 @@
                             <div class="space-y-1.5 max-h-[300px] overflow-y-auto pr-1 custom-scrollbar">
                                 <!-- Range 100 -->
                                 <div class="grid grid-cols-4 gap-2 items-center bg-gray-900/50 p-1 rounded border border-gray-800/50 hover:border-gray-700 transition-colors">
-                                    <div class="col-span-1 flex items-center gap-0.5"><input aria-label="dist 100" type="text" id="dist-100" class="w-full bg-transparent border-none text-[10px] font-extrabold text-neon-green/80 p-0 focus:ring-0 outline-none" value="100" maxlength="20"><span class="text-[8px] opacity-50 text-neon-green/50">Y</span></div>
-                                    <div class="col-span-2"><input aria-label="---" type="text" id="clicks-100" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30" placeholder="---" maxlength="20"></div>
-                                    <div class="col-span-1"><input aria-label="---" type="text" id="udlr-100" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30 uppercase" placeholder="---" maxlength="20"></div>
+                                    <div class="col-span-1 flex items-center gap-0.5"><input type="text" id="dist-100" class="w-full bg-transparent border-none text-[10px] font-extrabold text-neon-green/80 p-0 focus:ring-0 outline-none" value="100" maxlength="20"><span class="text-[8px] opacity-50 text-neon-green/50">Y</span></div>
+                                    <div class="col-span-2"><input type="text" id="clicks-100" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30" placeholder="---" maxlength="20"></div>
+                                    <div class="col-span-1"><input type="text" id="udlr-100" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30 uppercase" placeholder="---" maxlength="20"></div>
                                 </div>
                                 <!-- Range 200 -->
                                 <div class="grid grid-cols-4 gap-2 items-center bg-gray-900/50 p-1 rounded border border-gray-800/50 hover:border-gray-700 transition-colors">
-                                    <div class="col-span-1 flex items-center gap-0.5"><input aria-label="dist 200" type="text" id="dist-200" class="w-full bg-transparent border-none text-[10px] font-extrabold text-neon-green/80 p-0 focus:ring-0 outline-none" value="200" maxlength="20"><span class="text-[8px] opacity-50 text-neon-green/50">Y</span></div>
-                                    <div class="col-span-2"><input aria-label="---" type="text" id="clicks-200" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30" placeholder="---" maxlength="20"></div>
-                                    <div class="col-span-1"><input aria-label="---" type="text" id="udlr-200" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30 uppercase" placeholder="---" maxlength="20"></div>
+                                    <div class="col-span-1 flex items-center gap-0.5"><input type="text" id="dist-200" class="w-full bg-transparent border-none text-[10px] font-extrabold text-neon-green/80 p-0 focus:ring-0 outline-none" value="200" maxlength="20"><span class="text-[8px] opacity-50 text-neon-green/50">Y</span></div>
+                                    <div class="col-span-2"><input type="text" id="clicks-200" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30" placeholder="---" maxlength="20"></div>
+                                    <div class="col-span-1"><input type="text" id="udlr-200" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30 uppercase" placeholder="---" maxlength="20"></div>
                                 </div>
                                 <!-- Range 300 -->
                                 <div class="grid grid-cols-4 gap-2 items-center bg-gray-900/50 p-1 rounded border border-gray-800/50 hover:border-gray-700 transition-colors">
-                                    <div class="col-span-1 flex items-center gap-0.5"><input aria-label="dist 300" type="text" id="dist-300" class="w-full bg-transparent border-none text-[10px] font-extrabold text-neon-green/80 p-0 focus:ring-0 outline-none" value="300" maxlength="20"><span class="text-[8px] opacity-50 text-neon-green/50">Y</span></div>
-                                    <div class="col-span-2"><input aria-label="---" type="text" id="clicks-300" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30" placeholder="---" maxlength="20"></div>
-                                    <div class="col-span-1"><input aria-label="---" type="text" id="udlr-300" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30 uppercase" placeholder="---" maxlength="20"></div>
+                                    <div class="col-span-1 flex items-center gap-0.5"><input type="text" id="dist-300" class="w-full bg-transparent border-none text-[10px] font-extrabold text-neon-green/80 p-0 focus:ring-0 outline-none" value="300" maxlength="20"><span class="text-[8px] opacity-50 text-neon-green/50">Y</span></div>
+                                    <div class="col-span-2"><input type="text" id="clicks-300" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30" placeholder="---" maxlength="20"></div>
+                                    <div class="col-span-1"><input type="text" id="udlr-300" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30 uppercase" placeholder="---" maxlength="20"></div>
                                 </div>
                                 <!-- Range 400 -->
                                 <div class="grid grid-cols-4 gap-2 items-center bg-gray-900/50 p-1 rounded border border-gray-800/50 hover:border-gray-700 transition-colors">
-                                    <div class="col-span-1 flex items-center gap-0.5"><input aria-label="dist 400" type="text" id="dist-400" class="w-full bg-transparent border-none text-[10px] font-extrabold text-neon-green/80 p-0 focus:ring-0 outline-none" value="400" maxlength="20"><span class="text-[8px] opacity-50 text-neon-green/50">Y</span></div>
-                                    <div class="col-span-2"><input aria-label="---" type="text" id="clicks-400" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30" placeholder="---" maxlength="20"></div>
-                                    <div class="col-span-1"><input aria-label="---" type="text" id="udlr-400" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30 uppercase" placeholder="---" maxlength="20"></div>
+                                    <div class="col-span-1 flex items-center gap-0.5"><input type="text" id="dist-400" class="w-full bg-transparent border-none text-[10px] font-extrabold text-neon-green/80 p-0 focus:ring-0 outline-none" value="400" maxlength="20"><span class="text-[8px] opacity-50 text-neon-green/50">Y</span></div>
+                                    <div class="col-span-2"><input type="text" id="clicks-400" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30" placeholder="---" maxlength="20"></div>
+                                    <div class="col-span-1"><input type="text" id="udlr-400" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30 uppercase" placeholder="---" maxlength="20"></div>
                                 </div>
                                 <!-- Range 500 -->
                                 <div class="grid grid-cols-4 gap-2 items-center bg-gray-900/50 p-1 rounded border border-gray-800/50 hover:border-gray-700 transition-colors">
-                                    <div class="col-span-1 flex items-center gap-0.5"><input aria-label="dist 500" type="text" id="dist-500" class="w-full bg-transparent border-none text-[10px] font-extrabold text-neon-green/80 p-0 focus:ring-0 outline-none" value="500" maxlength="20"><span class="text-[8px] opacity-50 text-neon-green/50">Y</span></div>
-                                    <div class="col-span-2"><input aria-label="---" type="text" id="clicks-500" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30" placeholder="---" maxlength="20"></div>
-                                    <div class="col-span-1"><input aria-label="---" type="text" id="udlr-500" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30 uppercase" placeholder="---" maxlength="20"></div>
+                                    <div class="col-span-1 flex items-center gap-0.5"><input type="text" id="dist-500" class="w-full bg-transparent border-none text-[10px] font-extrabold text-neon-green/80 p-0 focus:ring-0 outline-none" value="500" maxlength="20"><span class="text-[8px] opacity-50 text-neon-green/50">Y</span></div>
+                                    <div class="col-span-2"><input type="text" id="clicks-500" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30" placeholder="---" maxlength="20"></div>
+                                    <div class="col-span-1"><input type="text" id="udlr-500" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30 uppercase" placeholder="---" maxlength="20"></div>
                                 </div>
                                 <!-- Range 600 -->
                                 <div class="grid grid-cols-4 gap-2 items-center bg-gray-900/50 p-1 rounded border border-gray-800/50 hover:border-gray-700 transition-colors">
-                                    <div class="col-span-1 flex items-center gap-0.5"><input aria-label="dist 600" type="text" id="dist-600" class="w-full bg-transparent border-none text-[10px] font-extrabold text-neon-green/80 p-0 focus:ring-0 outline-none" value="600" maxlength="20"><span class="text-[8px] opacity-50 text-neon-green/50">Y</span></div>
-                                    <div class="col-span-2"><input aria-label="---" type="text" id="clicks-600" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30" placeholder="---" maxlength="20"></div>
-                                    <div class="col-span-1"><input aria-label="---" type="text" id="udlr-600" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30 uppercase" placeholder="---" maxlength="20"></div>
+                                    <div class="col-span-1 flex items-center gap-0.5"><input type="text" id="dist-600" class="w-full bg-transparent border-none text-[10px] font-extrabold text-neon-green/80 p-0 focus:ring-0 outline-none" value="600" maxlength="20"><span class="text-[8px] opacity-50 text-neon-green/50">Y</span></div>
+                                    <div class="col-span-2"><input type="text" id="clicks-600" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30" placeholder="---" maxlength="20"></div>
+                                    <div class="col-span-1"><input type="text" id="udlr-600" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30 uppercase" placeholder="---" maxlength="20"></div>
                                 </div>
                                 <!-- Range 700 -->
                                 <div class="grid grid-cols-4 gap-2 items-center bg-gray-900/50 p-1 rounded border border-gray-800/50 hover:border-gray-700 transition-colors">
-                                    <div class="col-span-1 flex items-center gap-0.5"><input aria-label="dist 700" type="text" id="dist-700" class="w-full bg-transparent border-none text-[10px] font-extrabold text-neon-green/80 p-0 focus:ring-0 outline-none" value="700" maxlength="20"><span class="text-[8px] opacity-50 text-neon-green/50">Y</span></div>
-                                    <div class="col-span-2"><input aria-label="---" type="text" id="clicks-700" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30" placeholder="---" maxlength="20"></div>
-                                    <div class="col-span-1"><input aria-label="---" type="text" id="udlr-700" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30 uppercase" placeholder="---" maxlength="20"></div>
+                                    <div class="col-span-1 flex items-center gap-0.5"><input type="text" id="dist-700" class="w-full bg-transparent border-none text-[10px] font-extrabold text-neon-green/80 p-0 focus:ring-0 outline-none" value="700" maxlength="20"><span class="text-[8px] opacity-50 text-neon-green/50">Y</span></div>
+                                    <div class="col-span-2"><input type="text" id="clicks-700" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30" placeholder="---" maxlength="20"></div>
+                                    <div class="col-span-1"><input type="text" id="udlr-700" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30 uppercase" placeholder="---" maxlength="20"></div>
                                 </div>
                                 <!-- Range 800 -->
                                 <div class="grid grid-cols-4 gap-2 items-center bg-gray-900/50 p-1 rounded border border-gray-800/50 hover:border-gray-700 transition-colors">
-                                    <div class="col-span-1 flex items-center gap-0.5"><input aria-label="dist 800" type="text" id="dist-800" class="w-full bg-transparent border-none text-[10px] font-extrabold text-neon-green/80 p-0 focus:ring-0 outline-none" value="800" maxlength="20"><span class="text-[8px] opacity-50 text-neon-green/50">Y</span></div>
-                                    <div class="col-span-2"><input aria-label="---" type="text" id="clicks-800" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30" placeholder="---" maxlength="20"></div>
-                                    <div class="col-span-1"><input aria-label="---" type="text" id="udlr-800" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30 uppercase" placeholder="---" maxlength="20"></div>
+                                    <div class="col-span-1 flex items-center gap-0.5"><input type="text" id="dist-800" class="w-full bg-transparent border-none text-[10px] font-extrabold text-neon-green/80 p-0 focus:ring-0 outline-none" value="800" maxlength="20"><span class="text-[8px] opacity-50 text-neon-green/50">Y</span></div>
+                                    <div class="col-span-2"><input type="text" id="clicks-800" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30" placeholder="---" maxlength="20"></div>
+                                    <div class="col-span-1"><input type="text" id="udlr-800" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30 uppercase" placeholder="---" maxlength="20"></div>
                                 </div>
                                 <!-- Range 900 -->
                                 <div class="grid grid-cols-4 gap-2 items-center bg-gray-900/50 p-1 rounded border border-gray-800/50 hover:border-gray-700 transition-colors">
-                                    <div class="col-span-1 flex items-center gap-0.5"><input aria-label="dist 900" type="text" id="dist-900" class="w-full bg-transparent border-none text-[10px] font-extrabold text-neon-green/80 p-0 focus:ring-0 outline-none" value="900" maxlength="20"><span class="text-[8px] opacity-50 text-neon-green/50">Y</span></div>
-                                    <div class="col-span-2"><input aria-label="---" type="text" id="clicks-900" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30" placeholder="---" maxlength="20"></div>
-                                    <div class="col-span-1"><input aria-label="---" type="text" id="udlr-900" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30 uppercase" placeholder="---" maxlength="20"></div>
+                                    <div class="col-span-1 flex items-center gap-0.5"><input type="text" id="dist-900" class="w-full bg-transparent border-none text-[10px] font-extrabold text-neon-green/80 p-0 focus:ring-0 outline-none" value="900" maxlength="20"><span class="text-[8px] opacity-50 text-neon-green/50">Y</span></div>
+                                    <div class="col-span-2"><input type="text" id="clicks-900" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30" placeholder="---" maxlength="20"></div>
+                                    <div class="col-span-1"><input type="text" id="udlr-900" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30 uppercase" placeholder="---" maxlength="20"></div>
                                 </div>
                                 <!-- Range 1000 -->
                                 <div class="grid grid-cols-4 gap-2 items-center bg-gray-900/50 p-1 rounded border border-gray-800/50 hover:border-gray-700 transition-colors">
-                                    <div class="col-span-1 flex items-center gap-0.5"><input aria-label="dist 1000" type="text" id="dist-1000" class="w-full bg-transparent border-none text-[10px] font-extrabold text-neon-green/80 p-0 focus:ring-0 outline-none" value="1000" maxlength="20"><span class="text-[8px] opacity-50 text-neon-green/50">Y</span></div>
-                                    <div class="col-span-2"><input aria-label="---" type="text" id="clicks-1000" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30" placeholder="---" maxlength="20"></div>
-                                    <div class="col-span-1"><input aria-label="---" type="text" id="udlr-1000" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30 uppercase" placeholder="---" maxlength="20"></div>
+                                    <div class="col-span-1 flex items-center gap-0.5"><input type="text" id="dist-1000" class="w-full bg-transparent border-none text-[10px] font-extrabold text-neon-green/80 p-0 focus:ring-0 outline-none" value="1000" maxlength="20"><span class="text-[8px] opacity-50 text-neon-green/50">Y</span></div>
+                                    <div class="col-span-2"><input type="text" id="clicks-1000" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30" placeholder="---" maxlength="20"></div>
+                                    <div class="col-span-1"><input type="text" id="udlr-1000" class="input-field py-1 text-center text-xs border-transparent focus:border-neon-green/30 uppercase" placeholder="---" maxlength="20"></div>
                                 </div>
                             </div>
                         </div>
@@ -321,7 +321,7 @@
                                 <label for="pencil-toggle" class="text-[10px] font-bold uppercase text-gray-200 flex items-center gap-1.5">
                                     <span class="w-2 h-2 rounded-full bg-gray-500"></span> Pencil Tool
                                 </label>
-                                <input aria-label="pencil toggle" type="checkbox" id="pencil-toggle" class="w-4 h-4 accent-neon-green">
+                                <input type="checkbox" id="pencil-toggle" class="w-4 h-4 accent-neon-green">
                             </div>
                             <div class="flex items-center gap-1">
                                 <button id="clear-pencil" aria-label="Clear sketch" class="p-1 text-red-500 hover:text-red-400 transition-colors">
@@ -337,7 +337,7 @@
                                 <label for="grade-toggle" class="text-[10px] font-bold uppercase text-gray-200 flex items-center gap-1.5">
                                     <span class="w-2 h-2 rounded-full bg-red-500"></span> Grade Tool
                                 </label>
-                                <input aria-label="grade toggle" type="checkbox" id="grade-toggle" class="w-4 h-4 accent-red-500">
+                                <input type="checkbox" id="grade-toggle" class="w-4 h-4 accent-red-500">
                             </div>
                             <button id="clear-grade" aria-label="Clear grade drawings" class="p-1 text-red-500 hover:text-red-400 transition-colors">
                                 <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -388,11 +388,11 @@
                     <section class="space-y-4">
                         <h2 class="section-label">1. Set Scenario Name</h2>
                         <div class="col-span-2">
-                            <input aria-label="Scenario Name (Course 1)" type="text" id="recon-scenario-name" class="input-field border-emerald-500/50" placeholder="Scenario Name (e.g. Course 1)" maxlength="20">
+                            <input type="text" id="recon-scenario-name" class="input-field border-emerald-500/50" placeholder="Scenario Name (e.g. Course 1)" maxlength="20">
                         </div>
 
                         <h2 class="section-label">2. Map Background</h2>
-                        <input aria-label="map bg upload" type="file" id="map-bg-upload" class="hidden" accept="image/*">
+                        <input type="file" id="map-bg-upload" class="hidden" accept="image/*">
                         <button onclick="document.getElementById('map-bg-upload').click()" class="w-full bg-gray-800 border border-gray-600 rounded p-2 text-xs font-bold flex items-center justify-center gap-2 hover:bg-gray-700 transition-colors mb-2">
                             <i data-lucide="upload" class="w-4 h-4 text-neon-green"></i> UPLOAD SATELLITE SCREENSHOT
                         </button>
@@ -461,7 +461,7 @@
                         <h2 class="section-label">4. Path Drawing</h2>
                         <div class="grid grid-cols-2 gap-2">
                             <label class="flex items-center gap-2 bg-gray-800 border border-gray-600 rounded p-2 text-xs font-bold cursor-pointer justify-center hover:bg-gray-700">
-                                <input aria-label="recon pencil toggle" type="checkbox" id="recon-pencil-toggle" class="form-checkbox h-3 w-3 text-neon-green rounded bg-gray-900 border-gray-700 focus:ring-0 focus:ring-offset-0">
+                                <input type="checkbox" id="recon-pencil-toggle" class="form-checkbox h-3 w-3 text-neon-green rounded bg-gray-900 border-gray-700 focus:ring-0 focus:ring-offset-0">
                                 <span>🖊️ DRAW PATH</span>
                             </label>
                             <button id="clear-recon-drawings" class="bg-red-950/20 border border-red-900 rounded p-2 text-xs font-bold text-red-500 hover:bg-red-900/40">🧹 CLEAR WORKSPACE</button>
@@ -491,7 +491,7 @@
                         <div class="flex justify-between border-b-2 border-black pb-2 mb-2 text-black">
                              <div class="flex flex-col">
                                  <h2 class="text-xl font-black uppercase leading-none text-black">TACTICAL RECON</h2>
-                                 <div class="text-[10px] font-bold text-black">SCENARIO: <span id="mobile-display-recon-title-label" class="font-handwriting text-blue-950">NEW SCENARIO</span></div>
+                                 <div class="text-[10px] font-bold text-black">SCENARIO: <span id="mobile-display-recon-title-label" class="font-handwriting text-blue-800">NEW SCENARIO</span></div>
                              </div>
                              <div class="flex flex-col items-end">
                                  <span class="text-[8px] uppercase">RECORD</span>
@@ -504,7 +504,7 @@
                                  <div id="mobile-display-recon-report-label" class="font-handwriting text-blue-900 bg-gray-50 p-2 rounded border border-gray-200 min-h-[3rem] whitespace-pre-wrap">NO SITREP FILED</div>
                              </div>
                              <div class="text-[8px] text-gray-500 uppercase">
-                                 LAST UPDATED: <span id="mobile-display-recon-timestamp-label" class="font-handwriting text-blue-950 font-bold">--:--:--</span>
+                                 LAST UPDATED: <span id="mobile-display-recon-timestamp-label" class="font-handwriting text-blue-800 font-bold">--:--:--</span>
                              </div>
                         </div>
                     </div>
@@ -525,32 +525,32 @@
                 <div id="mobile-live-preview-complete" class="space-y-6 mt-8 border-t border-gray-700 pt-8 pb-10">
                     <div class="bg-white text-black p-4 rounded shadow-lg font-mono">
                         <div class="flex justify-between border-b-2 border-black pb-2 mb-2 text-black">
-                             <div class="flex flex-col"><h2 class="text-xl font-black uppercase leading-none text-black">RELOAD DATA</h2><div class="text-[10px] font-bold">NOTES: <span id="mobile-display-header-notes" class="font-handwriting text-blue-950"></span></div></div>
-                             <div class="flex flex-col items-end"><span class="text-[8px] uppercase">SHOOTER / COMPANY</span><span id="mobile-display-shooter-name" class="font-handwriting text-blue-950 font-bold text-right"></span></div>
+                             <div class="flex flex-col"><h2 class="text-xl font-black uppercase leading-none text-black">RELOAD DATA</h2><div class="text-[10px] font-bold">NOTES: <span id="mobile-display-header-notes" class="font-handwriting text-blue-800"></span></div></div>
+                             <div class="flex flex-col items-end"><span class="text-[8px] uppercase">SHOOTER / COMPANY</span><span id="mobile-display-shooter-name" class="font-handwriting text-blue-800 font-bold text-right"></span></div>
                         </div>
                         <div class="grid grid-cols-[1.4fr_0.8fr_0.8fr] gap-x-2 gap-y-1 text-[10px] font-bold text-black">
-                            <div class="flex flex-col"><span>Timestamp</span><div class="flex gap-1"><span id="mobile-display-date" class="text-black font-normal"></span><span>@</span><span id="mobile-display-time" class="text-black font-normal"></span></div></div>
-                            <div>Zero Range<span id="mobile-display-zero" class="text-black block font-normal"></span></div>
-                            <div>Caliber<span id="mobile-display-caliber" class="text-black block font-normal"></span></div>
-                            <div>Bullet<span id="mobile-display-bullet" class="text-blue-950 block font-normal"></span></div>
-                            <div>Barrel<span id="mobile-display-barrel" class="text-blue-950 block font-normal"></span></div>
-                            <div>Powder<span id="mobile-display-powder" class="text-blue-950 block font-normal"></span></div>
-                            <div>Load (gr)<span id="mobile-display-load" class="text-blue-950 block font-normal"></span></div>
-                            <div>C.O.L<span id="mobile-display-col" class="text-blue-950 block font-normal"></span></div>
-                            <div>Primer<span id="mobile-display-primer" class="text-blue-950 block font-normal"></span></div>
-                            <div>Velocity<span id="mobile-display-velocity" class="text-blue-950 block font-normal"></span></div>
-                            <div>Target<span id="mobile-display-targetSize" class="text-blue-950 block font-normal"></span></div>
-                            <div>G-1 BC<span id="mobile-display-g1" class="text-blue-950 block font-normal"></span></div>
-                            <div class="col-span-2">Env<span id="mobile-display-weather" class="text-blue-950 block font-normal"></span></div>
-                            <div>Rings<span id="mobile-display-rings" class="text-blue-950 block font-normal"></span></div>
-                            <div class="col-span-2">Group<span id="mobile-display-groupSize" class="text-blue-950 block font-normal"></span></div>
+                            <div class="flex flex-col"><span>Timestamp</span><div class="flex gap-1"><span id="mobile-display-date" class="text-blue-800 font-normal"></span><span>@</span><span id="mobile-display-time" class="text-blue-800 font-normal"></span></div></div>
+                            <div>Zero Range<span id="mobile-display-zero" class="text-blue-800 block font-normal"></span></div>
+                            <div>Caliber<span id="mobile-display-caliber" class="text-blue-800 block font-normal"></span></div>
+                            <div>Bullet<span id="mobile-display-bullet" class="text-blue-800 block font-normal"></span></div>
+                            <div>Barrel<span id="mobile-display-barrel" class="text-blue-800 block font-normal"></span></div>
+                            <div>Powder<span id="mobile-display-powder" class="text-blue-800 block font-normal"></span></div>
+                            <div>Load (gr)<span id="mobile-display-load" class="text-blue-800 block font-normal"></span></div>
+                            <div>C.O.L<span id="mobile-display-col" class="text-blue-800 block font-normal"></span></div>
+                            <div>Primer<span id="mobile-display-primer" class="text-blue-800 block font-normal"></span></div>
+                            <div>Velocity<span id="mobile-display-velocity" class="text-blue-800 block font-normal"></span></div>
+                            <div>Target<span id="mobile-display-targetSize" class="text-blue-800 block font-normal"></span></div>
+                            <div>G-1 BC<span id="mobile-display-g1" class="text-blue-800 block font-normal"></span></div>
+                            <div class="col-span-2">Env<span id="mobile-display-weather" class="text-blue-800 block font-normal"></span></div>
+                            <div>Rings<span id="mobile-display-rings" class="text-blue-800 block font-normal"></span></div>
+                            <div class="col-span-2">Group<span id="mobile-display-groupSize" class="text-blue-800 block font-normal"></span></div>
                             <div class="border border-neon-green/30 bg-neon-green/5 px-1 rounded-sm">BOX RDS<span id="mobile-display-box-count-input" class="text-green-900 block font-black text-center"></span></div>
                         </div>
                     </div>
                     <div class="bg-white text-black p-4 rounded shadow-lg border border-black text-[10px] font-bold">
                         <div class="grid grid-cols-2 gap-4 text-black">
-                            <div class="flex justify-between"><span>ELEV:</span> <span id="mobile-display-elevation" class="text-blue-950"></span></div>
-                            <div class="flex justify-between"><span>HOLD:</span> <span id="mobile-display-hold-data" class="text-blue-950"></span></div>
+                            <div class="flex justify-between"><span>ELEV:</span> <span id="mobile-display-elevation" class="text-blue-800"></span></div>
+                            <div class="flex justify-between"><span>HOLD:</span> <span id="mobile-display-hold-data" class="text-blue-800"></span></div>
                         </div>
                         <div class="bg-black text-white px-2 py-1 mt-1 flex justify-between"><span class="text-neon-green">FINAL DOPE:</span><span id="mobile-display-final-dope" class="text-blue-400 font-bold"></span></div>
                     </div>
@@ -578,9 +578,9 @@
                         <span class="absolute bottom-1 left-1/2 -translate-x-1/2 font-bold text-[10px] text-black z-20">S 180°</span>
                         <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0"><div class="w-32 h-32 border border-gray-200 rounded-full flex items-center justify-center"><p class="font-bold text-gray-200 tracking-widest text-xs uppercase text-black">YOU</p></div></div>
                         <div class="absolute top-2 left-2 z-30 font-bold text-[10px] pointer-events-none text-black">
-                            <div class="flex gap-2"><span>DIR:</span><span id="mobile-display-shooting-angle" class="text-blue-950"></span></div>
-                            <div class="flex gap-2"><span>T1:</span><span id="mobile-display-compass-range" class="text-blue-950"></span></div>
-                            <div class="flex gap-2"><span>Location:</span><span id="mobile-display-compass-range-2" class="text-blue-950"></span></div>
+                            <div class="flex gap-2"><span>DIR:</span><span id="mobile-display-shooting-angle" class="text-blue-800"></span></div>
+                            <div class="flex gap-2"><span>T1:</span><span id="mobile-display-compass-range" class="text-blue-800"></span></div>
+                            <div class="flex gap-2"><span>Location:</span><span id="mobile-display-compass-range-2" class="text-blue-800"></span></div>
                         </div>
                         <canvas id="mobile-compass-vector" width="300" height="300" class="absolute inset-0 w-full h-full z-10"></canvas>
                         <canvas id="mobile-pencil-canvas" width="600" height="600" class="absolute inset-0 w-full h-full z-20"></canvas>
@@ -605,32 +605,32 @@
                     <div class="flex justify-between items-end mb-6 border-b-2 border-black pb-2 text-black">
                         <div class="flex items-center gap-8">
                             <div class="flex flex-col"><h2 class="text-4xl font-extrabold uppercase leading-none text-black">Reload Data</h2><p class="text-[10px] text-orange-500 font-bold italic">TACTICAL SYSTEM UPGRADE</p></div>
-                            <div class="text-xl font-bold text-black">NOTES : <span id="display-header-notes" class="font-handwriting text-blue-950"></span></div>
+                            <div class="text-xl font-bold text-black">NOTES : <span id="display-header-notes" class="font-handwriting text-blue-800"></span></div>
                         </div>
-                        <div class="flex flex-col items-end pb-1 text-black"><span class="text-[10px] font-bold uppercase tracking-widest">Shooter / Company</span><span id="display-shooter-name" class="font-handwriting text-blue-950 font-bold text-xl leading-none text-right"></span></div>
+                        <div class="flex flex-col items-end pb-1 text-black"><span class="text-[10px] font-bold uppercase tracking-widest">Shooter / Company</span><span id="display-shooter-name" class="font-handwriting text-blue-800 font-bold text-xl leading-none text-right"></span></div>
                     </div>
 
                     <div class="flex gap-4 h-[40%] text-black">
                         <div class="w-1/2 grid grid-cols-[1.4fr_0.8fr_0.8fr] gap-x-2 gap-y-1 text-[11px] font-bold content-start text-black">
-                            <div class="flex flex-col min-w-0"><span>Timestamp</span><div class="flex gap-1 min-w-0"><span id="display-date" class="text-blue-950 font-normal leading-normal"></span><span>@</span><span id="display-time" class="text-blue-950 font-normal leading-normal"></span></div></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Zero Range</span><span id="display-zero" class="text-blue-950 font-normal leading-normal"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Caliber</span><span id="display-caliber" class="text-blue-950 font-normal leading-normal"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Bullet</span><span id="display-bullet" class="text-blue-950 font-normal leading-normal"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Barrel</span><span id="display-barrel" class="text-blue-950 font-normal leading-normal"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Powder</span><span id="display-powder" class="text-blue-950 font-normal leading-normal"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Load (gr)</span><span id="display-load" class="text-blue-950 font-normal leading-normal"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">C.O.L</span><span id="display-col" class="text-blue-950 font-normal leading-normal"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Primer</span><span id="display-primer" class="text-blue-950 font-normal leading-normal"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Velocity</span><span id="display-velocity" class="text-blue-950 font-normal leading-normal"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Target</span><span id="display-targetSize" class="text-blue-950 font-normal leading-normal"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">G-1 BC</span><span id="display-g1" class="text-blue-950 font-normal leading-normal"></span></div>
-                            <div class="flex flex-col col-span-2 min-w-0"><span class="text-[8px] text-gray-600">Environment</span><span id="display-weather" class="text-blue-950 font-normal leading-normal"></span></div>
-                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Rings</span><span id="display-rings" class="text-blue-950 font-normal leading-normal"></span></div>
-                            <div class="flex flex-col col-span-2 min-w-0"><span class="text-[8px] text-gray-600">Group</span><span id="display-groupSize" class="text-blue-950 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span>Timestamp</span><div class="flex gap-1 min-w-0"><span id="display-date" class="text-blue-800 font-normal leading-normal"></span><span>@</span><span id="display-time" class="text-blue-800 font-normal leading-normal"></span></div></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Zero Range</span><span id="display-zero" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Caliber</span><span id="display-caliber" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Bullet</span><span id="display-bullet" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Barrel</span><span id="display-barrel" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Powder</span><span id="display-powder" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Load (gr)</span><span id="display-load" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">C.O.L</span><span id="display-col" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Primer</span><span id="display-primer" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Velocity</span><span id="display-velocity" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Target</span><span id="display-targetSize" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">G-1 BC</span><span id="display-g1" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col col-span-2 min-w-0"><span class="text-[8px] text-gray-600">Environment</span><span id="display-weather" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Rings</span><span id="display-rings" class="text-blue-800 font-normal leading-normal"></span></div>
+                            <div class="flex flex-col col-span-2 min-w-0"><span class="text-[8px] text-gray-600">Group</span><span id="display-groupSize" class="text-blue-800 font-normal leading-normal"></span></div>
                             <div class="flex flex-col border border-neon-green/30 bg-neon-green/5 px-1 rounded-sm justify-center min-w-0"><span class="text-[8px] font-black text-green-800">BOX RDS</span><span id="display-box-count-input" class="text-green-900 font-black text-center text-[12px] truncate"></span></div>
                             <div class="col-span-3 mt-2 grid grid-cols-2 gap-2 bg-gray-50 p-2 pb-3 border border-black rounded-sm">
-                                <div class="flex justify-between text-black min-w-0"><span>ELEV:</span> <span id="display-elevation" class="text-blue-950 font-bold leading-normal text-right"></span></div>
-                                <div class="flex justify-between text-black min-w-0"><span>HOLD:</span> <span id="display-hold-data" class="text-blue-950 font-bold leading-normal text-right"></span></div>
+                                <div class="flex justify-between text-black min-w-0"><span>ELEV:</span> <span id="display-elevation" class="text-blue-800 font-bold leading-normal text-right"></span></div>
+                                <div class="flex justify-between text-black min-w-0"><span>HOLD:</span> <span id="display-hold-data" class="text-blue-800 font-bold leading-normal text-right"></span></div>
                                 <div class="col-span-2 flex justify-between items-center bg-black text-white px-2 py-2 mt-2 min-w-0 rounded-sm"><span class="text-[10px] font-bold text-neon-green shrink-0">FINAL DOPE:</span><span id="display-final-dope" class="text-sm font-bold text-right ml-2 leading-normal"></span></div>
                             </div>
                         </div>
@@ -664,9 +664,9 @@
                             <span class="absolute bottom-1 left-1/2 -translate-x-1/2 font-bold text-[10px] z-20">S 180°</span>
                             <div class="absolute inset-0 flex items-center justify-center pointer-events-none z-0"><div class="w-32 h-32 border border-gray-200 rounded-full flex items-center justify-center"><p class="font-bold text-gray-200 tracking-widest text-xs uppercase">YOU</p></div></div>
                             <div class="absolute top-2 left-2 z-30 font-bold text-[10px] pointer-events-none text-black">
-                                <div class="flex gap-2"><span>DIR:</span><span id="display-shooting-angle" class="text-blue-950"></span></div>
-                                <div class="flex gap-2"><span>T1:</span><span id="display-compass-range" class="text-blue-950"></span></div>
-                                <div class="flex gap-2"><span>Location:</span><span id="display-compass-range-2" class="text-blue-950"></span></div>
+                                <div class="flex gap-2"><span>DIR:</span><span id="display-shooting-angle" class="text-blue-800"></span></div>
+                                <div class="flex gap-2"><span>T1:</span><span id="display-compass-range" class="text-blue-800"></span></div>
+                                <div class="flex gap-2"><span>Location:</span><span id="display-compass-range-2" class="text-blue-800"></span></div>
                             </div>
                             <canvas id="compass-vector" width="300" height="300" class="absolute inset-0 w-full h-full z-10"></canvas>
                             <canvas id="pencil-canvas" width="600" height="600" class="absolute inset-0 w-full h-full z-20"></canvas>
@@ -711,7 +711,7 @@
                             
                             <div class="border-t border-black pt-2 mt-2">
                                 <div class="text-[8px] font-bold uppercase text-black">LAST UPDATED</div>
-                                <div id="display-recon-timestamp" class="text-[10px] font-extrabold text-blue-950 font-handwriting">--:--:--</div>
+                                <div id="display-recon-timestamp" class="text-[10px] font-extrabold text-blue-800 font-handwriting">--:--:--</div>
                             </div>
                         </div>
                     </div>
@@ -916,35 +916,35 @@
                     <div class="space-y-3 font-mono text-xs text-black">
                         <div class="flex flex-col gap-1">
                             <label class="text-[9px] text-gray-500 uppercase">Load / Batch Name</label>
-                            <input aria-label="Hornady ELD Match" type="text" id="ammo-name" class="bg-black/60 border border-gray-700 p-2 rounded text-white focus:outline-none focus:border-emerald-500" placeholder="e.g. Hornady ELD Match" maxlength="20">
+                            <input type="text" id="ammo-name" class="bg-black/60 border border-gray-700 p-2 rounded text-white focus:outline-none focus:border-emerald-500" placeholder="e.g. Hornady ELD Match" maxlength="20">
                         </div>
                         <div class="flex flex-col gap-1">
                             <label class="text-[9px] text-gray-500 uppercase">Caliber</label>
-                            <input aria-label="6.5 Creedmoor" type="text" id="ammo-caliber" class="bg-black/60 border border-gray-700 p-2 rounded text-white focus:outline-none focus:border-emerald-500" placeholder="e.g. 6.5 Creedmoor" maxlength="20">
+                            <input type="text" id="ammo-caliber" class="bg-black/60 border border-gray-700 p-2 rounded text-white focus:outline-none focus:border-emerald-500" placeholder="e.g. 6.5 Creedmoor" maxlength="20">
                         </div>
                         <div class="flex flex-col gap-1">
                             <label class="text-[9px] text-gray-500 uppercase">Bullet Brand & Weight</label>
-                            <input aria-label="Hornady 140gr ELD-M" type="text" id="ammo-bullet" class="bg-black/60 border border-gray-700 p-2 rounded text-white focus:outline-none focus:border-emerald-500" placeholder="e.g. Hornady 140gr ELD-M" maxlength="20">
+                            <input type="text" id="ammo-bullet" class="bg-black/60 border border-gray-700 p-2 rounded text-white focus:outline-none focus:border-emerald-500" placeholder="e.g. Hornady 140gr ELD-M" maxlength="20">
                         </div>
                         <div class="flex flex-col gap-1">
                             <label class="text-[9px] text-gray-500 uppercase">Powder Brand & Charge (gr)</label>
-                            <input aria-label="H4350 - 41.5gr" type="text" id="ammo-powder" class="bg-black/60 border border-gray-700 p-2 rounded text-white focus:outline-none focus:border-emerald-500" placeholder="e.g. H4350 - 41.5gr" maxlength="20">
+                            <input type="text" id="ammo-powder" class="bg-black/60 border border-gray-700 p-2 rounded text-white focus:outline-none focus:border-emerald-500" placeholder="e.g. H4350 - 41.5gr" maxlength="20">
                         </div>
                         <div class="flex flex-col gap-1">
                             <label class="text-[9px] text-gray-500 uppercase">Primer Type</label>
-                            <input aria-label="CCI #200" type="text" id="ammo-primer" class="bg-black/60 border border-gray-700 p-2 rounded text-white focus:outline-none focus:border-emerald-500" placeholder="e.g. CCI #200" maxlength="20">
+                            <input type="text" id="ammo-primer" class="bg-black/60 border border-gray-700 p-2 rounded text-white focus:outline-none focus:border-emerald-500" placeholder="e.g. CCI #200" maxlength="20">
                         </div>
                         <div class="flex flex-col gap-1">
                             <label class="text-[9px] text-gray-500 uppercase">C.O.L (inches)</label>
-                            <input aria-label="2.825" type="text" id="ammo-col" class="bg-black/60 border border-gray-700 p-2 rounded text-white focus:outline-none focus:border-emerald-500" placeholder="e.g. 2.825" maxlength="20">
+                            <input type="text" id="ammo-col" class="bg-black/60 border border-gray-700 p-2 rounded text-white focus:outline-none focus:border-emerald-500" placeholder="e.g. 2.825" maxlength="20">
                         </div>
                         <div class="flex flex-col gap-1">
                             <label class="text-[9px] text-gray-500 uppercase">Velocity (FPS)</label>
-                            <input aria-label="2710" type="text" id="ammo-velocity" class="bg-black/60 border border-gray-700 p-2 rounded text-white focus:outline-none focus:border-emerald-500" placeholder="e.g. 2710" maxlength="20">
+                            <input type="text" id="ammo-velocity" class="bg-black/60 border border-gray-700 p-2 rounded text-white focus:outline-none focus:border-emerald-500" placeholder="e.g. 2710" maxlength="20">
                         </div>
                         <div class="flex flex-col gap-1">
                             <label class="text-[9px] text-gray-500 uppercase">Starting Box Count (Rounds)</label>
-                            <input aria-label="100" type="text" inputmode="decimal" id="ammo-count" class="bg-black/60 border border-gray-700 p-2 rounded text-white focus:outline-none focus:border-emerald-500" placeholder="e.g. 100" min="0">
+                            <input type="text" inputmode="decimal" id="ammo-count" class="bg-black/60 border border-gray-700 p-2 rounded text-white focus:outline-none focus:border-emerald-500" placeholder="e.g. 100" min="0">
                         </div>
                     </div>
                     
@@ -1021,7 +1021,7 @@
                         <span class="text-[9px] font-black text-yellow-500 uppercase tracking-widest flex items-center gap-1"><i data-lucide="edit-3" class="w-3 h-3"></i> ReMarks (DRAG ME)</span>
                         <button id="remarks-close-btn" class="text-gray-500 hover:text-red-400"><i data-lucide="x" class="w-3 h-3"></i></button>
                     </div>
-                    <input aria-label="Note Title..." type="text" id="remarks-title-input" class="w-full bg-black border border-gray-700 rounded p-1 text-[10px] text-yellow-400 font-bold focus:outline-none focus:border-yellow-500 uppercase placeholder-gray-600" placeholder="Note Title...">
+                    <input type="text" id="remarks-title-input" class="w-full bg-black border border-gray-700 rounded p-1 text-[10px] text-yellow-400 font-bold focus:outline-none focus:border-yellow-500 uppercase placeholder-gray-600" placeholder="Note Title...">
                     <textarea id="remarks-input" maxlength="500" class="w-full h-24 bg-black border border-gray-700 rounded p-2 text-[10px] text-yellow-100 font-mono resize-none focus:outline-none focus:border-yellow-500 custom-scrollbar" placeholder="Jot a note... (max 500 chars)"></textarea>
                     <div class="flex justify-between items-center mt-1">
                         <span id="remarks-counter" class="text-[8px] text-gray-500 font-mono">0/500</span>
@@ -1114,15 +1114,15 @@
                         <div class="flex gap-2 p-1.5 border-b border-gray-800/50 bg-black/30 mb-2">
                             <div class="flex-1 flex flex-col">
                                 <label for="bal-weapon-platform" class="text-[6px] font-black text-gray-500 uppercase">WEAPON PLATFORM</label>
-                                <input aria-label="TIKKA T3X TAC" type="text" id="bal-weapon-platform" name="weapon-platform" placeholder="e.g. TIKKA T3X TAC" class="bg-transparent text-[9px] text-emerald-100 font-bold border-b border-gray-700/50 focus:border-emerald-500 outline-none py-0.5 placeholder-gray-700 uppercase">
+                                <input type="text" id="bal-weapon-platform" name="weapon-platform" placeholder="e.g. TIKKA T3X TAC" class="bg-transparent text-[9px] text-emerald-100 font-bold border-b border-gray-700/50 focus:border-emerald-500 outline-none py-0.5 placeholder-gray-700 uppercase">
                             </div>
                             <div class="w-20 flex flex-col border-l border-gray-800 pl-2">
                                 <label for="bal-weapon-caliber" class="text-[6px] font-black text-gray-500 uppercase">CALIBER</label>
-                                <input aria-label="6.5 CM" type="text" id="bal-weapon-caliber" name="weapon-caliber" placeholder="e.g. 6.5 CM" class="bg-transparent text-[9px] text-emerald-100 font-bold border-b border-gray-700/50 focus:border-emerald-500 outline-none py-0.5 placeholder-gray-700 uppercase">
+                                <input type="text" id="bal-weapon-caliber" name="weapon-caliber" placeholder="e.g. 6.5 CM" class="bg-transparent text-[9px] text-emerald-100 font-bold border-b border-gray-700/50 focus:border-emerald-500 outline-none py-0.5 placeholder-gray-700 uppercase">
                             </div>
                             <div class="flex-1 flex flex-col border-l border-gray-800 pl-2">
                                 <label for="bal-weapon-bullet" class="text-[6px] font-black text-gray-500 uppercase">LOADOUT / BULLET</label>
-                                <input aria-label="140GR SST" type="text" id="bal-weapon-bullet" name="weapon-bullet" placeholder="e.g. 140GR SST" class="bg-transparent text-[9px] text-emerald-100 font-bold border-b border-gray-700/50 focus:border-emerald-500 outline-none py-0.5 placeholder-gray-700 uppercase">
+                                <input type="text" id="bal-weapon-bullet" name="weapon-bullet" placeholder="e.g. 140GR SST" class="bg-transparent text-[9px] text-emerald-100 font-bold border-b border-gray-700/50 focus:border-emerald-500 outline-none py-0.5 placeholder-gray-700 uppercase">
                             </div>
                         </div>
 
@@ -1146,14 +1146,14 @@
                                              <button id="bal-sync-map" class="text-[5px] bg-blue-950 border border-blue-800 text-blue-400 px-1 rounded font-black hover:bg-blue-600 hover:text-white">SYNC</button>
                                          </div>
                                          <div class="flex items-baseline gap-1 mt-0.5">
-                                             <input aria-label="1000" type="text" inputmode="decimal" maxlength="25" id="bal-input-range" placeholder="1000" class="bg-transparent text-white text-base font-black font-mono outline-none w-full min-w-0 flex-1 leading-none p-0">
+                                             <input type="text" inputmode="decimal" maxlength="25" id="bal-input-range" placeholder="1000" class="bg-transparent text-white text-base font-black font-mono outline-none w-full min-w-0 flex-1 leading-none p-0">
                                              <span class="text-[7px] text-blue-400 font-black uppercase shrink-0">YDS</span>
                                          </div>
                                      </div>
                                      <div class="w-[1px] bg-gray-800/50 self-stretch my-1"></div>
                                      <div class="w-12 flex flex-col"><span class="text-[6px] text-blue-400 font-black uppercase">01B: SHOT DIR</span>
                                          <div class="flex items-baseline gap-1 mt-0.5">
-                                             <input aria-label="0" type="text" inputmode="decimal" maxlength="25" id="bal-input-shot-dir" placeholder="0" class="bg-transparent text-blue-300 text-base font-black font-mono outline-none w-full min-w-0 flex-1 leading-none p-0">
+                                             <input type="text" inputmode="decimal" maxlength="25" id="bal-input-shot-dir" placeholder="0" class="bg-transparent text-blue-300 text-base font-black font-mono outline-none w-full min-w-0 flex-1 leading-none p-0">
                                              <span class="text-[7px] text-gray-600 font-black uppercase shrink-0">DEG</span>
                                          </div>
                                      </div>
@@ -1166,7 +1166,7 @@
                                             <button id="bal-sync-wx" class="text-[5px] bg-emerald-950 border border-emerald-800 text-emerald-400 px-1 rounded font-black hover:bg-emerald-600 hover:text-white">SYNC</button>
                                         </div>
                                         <div class="flex items-baseline gap-1 mt-0.5">
-                                            <input aria-label="3" type="text" inputmode="decimal" maxlength="25" id="bal-input-wind" placeholder="3" class="bg-transparent text-white text-xl font-black font-mono outline-none w-full leading-none">
+                                            <input type="text" inputmode="decimal" maxlength="25" id="bal-input-wind" placeholder="3" class="bg-transparent text-white text-xl font-black font-mono outline-none w-full leading-none">
                                             <span class="text-[7px] text-emerald-600 font-black uppercase shrink-0">MPH</span>
                                         </div>
                                     </div>
@@ -1174,7 +1174,7 @@
                                     <div class="w-20 flex flex-col">
                                         <span class="text-[6px] text-emerald-600 font-black uppercase">02B: DIR</span>
                                         <div class="flex items-baseline gap-1 mt-0.5">
-                                            <input aria-label="90" type="text" inputmode="decimal" maxlength="25" id="bal-input-wind-dir" placeholder="90" class="bg-transparent text-emerald-400 text-lg font-black font-mono outline-none w-full leading-none">
+                                            <input type="text" inputmode="decimal" maxlength="25" id="bal-input-wind-dir" placeholder="90" class="bg-transparent text-emerald-400 text-lg font-black font-mono outline-none w-full leading-none">
                                             <span class="text-[7px] text-gray-600 font-black uppercase shrink-0">DEG</span>
                                         </div>
                                     </div>
@@ -1184,7 +1184,7 @@
                                 <div class="relative bg-gray-900/50 border border-gray-800 rounded-sm p-1 group flex flex-col">
                                     <span class="text-[6px] text-gray-500 font-black uppercase">03: MUZZLE VEL</span>
                                     <div class="flex items-baseline gap-1 mt-0.5">
-                                        <input aria-label="2600" type="text" inputmode="decimal" maxlength="25" id="bal-input-mv" placeholder="2600" class="bg-transparent text-white text-xl font-black font-mono outline-none w-full leading-none">
+                                        <input type="text" inputmode="decimal" maxlength="25" id="bal-input-mv" placeholder="2600" class="bg-transparent text-white text-xl font-black font-mono outline-none w-full leading-none">
                                     </div>
                                     <div class="text-[5px] text-gray-600 font-mono mt-auto">CORR. FPS</div>
                                 </div>
@@ -1192,7 +1192,7 @@
                                 <div class="relative bg-gray-900/50 border border-gray-800 rounded-sm p-1 group flex flex-col">
                                     <span class="text-[6px] text-gray-500 font-black uppercase">04: BALLISTIC COEF</span>
                                     <div class="flex items-baseline gap-1 mt-0.5">
-                                        <input aria-label="0.569" type="text" inputmode="decimal" maxlength="25" id="bal-input-bc" placeholder="0.569" step="0.001" class="bg-transparent text-white text-xl font-black font-mono outline-none w-full leading-none">
+                                        <input type="text" inputmode="decimal" maxlength="25" id="bal-input-bc" placeholder="0.569" step="0.001" class="bg-transparent text-white text-xl font-black font-mono outline-none w-full leading-none">
                                     </div>
                                     <div class="text-[5px] text-gray-600 font-mono mt-auto">G1 MODEL</div>
                                 </div>
@@ -1201,7 +1201,7 @@
                                 <div class="relative bg-gray-900/50 border border-gray-800 rounded-sm p-1 group flex flex-col">
                                     <span class="text-[6px] text-yellow-600 font-black uppercase">05: SIGHT HGT</span>
                                     <div class="flex items-baseline gap-1 mt-0.5">
-                                        <input aria-label="1.5" type="text" inputmode="decimal" maxlength="25" id="bal-input-sh" placeholder="1.5" step="0.1" class="bg-transparent text-yellow-500 text-lg font-black font-mono outline-none w-full leading-none">
+                                        <input type="text" inputmode="decimal" maxlength="25" id="bal-input-sh" placeholder="1.5" step="0.1" class="bg-transparent text-yellow-500 text-lg font-black font-mono outline-none w-full leading-none">
                                     </div>
                                     <div class="text-[5px] text-gray-600 font-mono mt-auto">INCHES ABOVE BORE</div>
                                 </div>
@@ -1209,7 +1209,7 @@
                                 <div class="relative bg-gray-900/50 border border-gray-800 rounded-sm p-1 group flex flex-col">
                                     <span class="text-[6px] text-yellow-600 font-black uppercase">06: ZERO RANGE</span>
                                     <div class="flex items-baseline gap-1 mt-0.5">
-                                        <input aria-label="100" type="text" inputmode="decimal" maxlength="25" id="bal-input-zr" placeholder="100" class="bg-transparent text-yellow-500 text-lg font-black font-mono outline-none w-full leading-none">
+                                        <input type="text" inputmode="decimal" maxlength="25" id="bal-input-zr" placeholder="100" class="bg-transparent text-yellow-500 text-lg font-black font-mono outline-none w-full leading-none">
                                     </div>
                                     <div class="text-[5px] text-gray-600 font-mono mt-auto">YARDS ZEROED</div>
                                 </div>
@@ -1218,7 +1218,7 @@
                                 <div class="relative bg-gray-900/50 border border-gray-800 rounded-sm p-1 group flex flex-col">
                                     <span class="text-[6px] text-orange-600 font-black uppercase">07: FIELD ELEV</span>
                                     <div class="flex items-baseline gap-1 mt-0.5">
-                                        <input aria-label="0" type="text" inputmode="decimal" maxlength="25" id="bal-input-alt" placeholder="0" class="bg-transparent text-orange-400 text-lg font-black font-mono outline-none w-full leading-none">
+                                        <input type="text" inputmode="decimal" maxlength="25" id="bal-input-alt" placeholder="0" class="bg-transparent text-orange-400 text-lg font-black font-mono outline-none w-full leading-none">
                                     </div>
                                     <div class="text-[5px] text-gray-600 font-mono mt-auto">FEET ABOVE SEA</div>
                                 </div>
@@ -1226,7 +1226,7 @@
                                 <div class="relative bg-gray-900/50 border border-gray-800 rounded-sm p-1 group flex flex-col">
                                     <span class="text-[6px] text-orange-600 font-black uppercase">08: AMBIENT TEMP</span>
                                     <div class="flex items-baseline gap-1 mt-0.5">
-                                        <input aria-label="59" type="text" inputmode="decimal" maxlength="25" id="bal-input-temp" placeholder="59" class="bg-transparent text-orange-400 text-lg font-black font-mono outline-none w-full leading-none">
+                                        <input type="text" inputmode="decimal" maxlength="25" id="bal-input-temp" placeholder="59" class="bg-transparent text-orange-400 text-lg font-black font-mono outline-none w-full leading-none">
                                     </div>
                                     <div class="text-[5px] text-gray-600 font-mono mt-auto">DEGREES F</div>
                                 </div>
@@ -1235,7 +1235,7 @@
                                 <div class="relative bg-gray-900/50 border border-gray-800 rounded-sm p-1 group flex flex-col col-span-2">
                                     <span class="text-[6px] text-cyan-500 font-black uppercase">09: BAROMETRIC PRESSURE (STATION)</span>
                                     <div class="flex items-baseline gap-1 mt-0.5">
-                                        <input aria-label="29.92" type="text" inputmode="decimal" maxlength="25" id="bal-input-baro" placeholder="29.92" step="0.01" class="bg-transparent text-cyan-400 text-xl font-black font-mono outline-none w-full leading-none">
+                                        <input type="text" inputmode="decimal" maxlength="25" id="bal-input-baro" placeholder="29.92" step="0.01" class="bg-transparent text-cyan-400 text-xl font-black font-mono outline-none w-full leading-none">
                                         <span class="text-[8px] text-gray-500 font-bold uppercase">INHG</span>
                                     </div>
                                     <div class="text-[5px] text-gray-600 font-mono mt-auto">CRITICAL AIR DENSITY CALIBRATOR</div>
@@ -1246,7 +1246,7 @@
                                     <div class="flex-1 flex flex-col">
                                         <span class="text-[6px] text-pink-500 font-black uppercase">10A: SHOT ANGLE</span>
                                         <div class="flex items-baseline gap-1 mt-0.5">
-                                            <input aria-label="0" type="text" inputmode="decimal" maxlength="25" id="bal-input-angle" placeholder="0" class="bg-transparent text-pink-400 text-lg font-black font-mono outline-none w-full leading-none">
+                                            <input type="text" inputmode="decimal" maxlength="25" id="bal-input-angle" placeholder="0" class="bg-transparent text-pink-400 text-lg font-black font-mono outline-none w-full leading-none">
                                             <span class="text-[7px] text-gray-600 font-black uppercase">DEG</span>
                                         </div>
                                     </div>
@@ -1254,7 +1254,7 @@
                                     <div class="flex-1 flex flex-col">
                                         <span class="text-[6px] text-pink-600 font-black uppercase">10B: COSINE</span>
                                         <div class="flex items-baseline gap-1 mt-0.5">
-                                            <input aria-label="1.00" type="text" inputmode="decimal" maxlength="25" id="bal-input-cos" placeholder="1.00" step="0.01" class="bg-transparent text-white text-lg font-black font-mono outline-none w-full leading-none">
+                                            <input type="text" inputmode="decimal" maxlength="25" id="bal-input-cos" placeholder="1.00" step="0.01" class="bg-transparent text-white text-lg font-black font-mono outline-none w-full leading-none">
                                             <span class="text-[7px] text-gray-600 font-black uppercase shrink-0">MULT</span>
                                         </div>
                                     </div>
@@ -1572,7 +1572,7 @@
                                     <h3 class="text-[10px] font-black text-emerald-400 uppercase tracking-[0.2em]">SNAPSHOT DATABASE</h3>
                                 </div>
                                 <div class="flex flex-wrap items-center gap-2 gap-y-2">
-                                    <input aria-label="vault import input" type="file" id="vault-import-input" class="hidden" accept="image/png, image/jpeg" multiple>
+                                    <input type="file" id="vault-import-input" class="hidden" accept="image/png, image/jpeg" multiple>
                                     <button id="vault-import-btn" class="text-[8px] bg-blue-950/80 text-blue-300 px-2 py-1 rounded border border-blue-700 hover:bg-blue-600 hover:text-white transition-colors flex items-center gap-1 font-bold">
                                         <i data-lucide="download" class="w-3 h-3"></i> IMPORT
                                     </button>
@@ -1623,20 +1623,20 @@
                         <div class="flex flex-col md:flex-row items-stretch md:items-end gap-3 w-full max-w-4xl bg-black/40 p-3 rounded border border-emerald-900/20">
                             <div class="flex-1 space-y-1">
                                 <label class="text-[7px] text-gray-500 uppercase font-black ml-1">Team / Unit</label>
-                                <input aria-label="ALPHA" type="text" id="comms-team" class="w-full bg-black border border-emerald-900/50 rounded px-2 py-2 text-[10px] text-white focus:border-emerald-500 outline-none uppercase placeholder-gray-800" placeholder="e.g. ALPHA">
+                                <input type="text" id="comms-team" class="w-full bg-black border border-emerald-900/50 rounded px-2 py-2 text-[10px] text-white focus:border-emerald-500 outline-none uppercase placeholder-gray-800" placeholder="e.g. ALPHA">
                             </div>
                             <div class="flex-1 space-y-1">
                                 <label class="text-[7px] text-emerald-500 uppercase font-black ml-1">Mission Code</label>
-                                <input aria-label="MIN 10: 5L+2N+3S" type="password" id="comms-passcode" class="w-full bg-black border border-emerald-500/50 rounded px-2 py-2 text-[10px] text-emerald-400 focus:border-emerald-400 outline-none uppercase placeholder-gray-800 text-center font-black tracking-widest" placeholder="MIN 10: 5L+2N+3S">
+                                <input type="password" id="comms-passcode" class="w-full bg-black border border-emerald-500/50 rounded px-2 py-2 text-[10px] text-emerald-400 focus:border-emerald-400 outline-none uppercase placeholder-gray-800 text-center font-black tracking-widest" placeholder="MIN 10: 5L+2N+3S">
                                 <span class="text-[6px] text-gray-600 font-mono uppercase tracking-wider block text-center mt-0.5">5 letters · 2 numbers · 3 special chars</span>
                             </div>
                             <div class="flex-1 space-y-1">
                                 <label class="text-[7px] text-gray-500 uppercase font-black ml-1">Call Sign</label>
-                                <input aria-label="CMDPST" type="text" id="comms-callsign" class="w-full bg-black border border-emerald-900/50 rounded px-2 py-2 text-[10px] text-white focus:border-emerald-500 outline-none uppercase placeholder-gray-800" placeholder="e.g. CMDPST">
+                                <input type="text" id="comms-callsign" class="w-full bg-black border border-emerald-900/50 rounded px-2 py-2 text-[10px] text-white focus:border-emerald-500 outline-none uppercase placeholder-gray-800" placeholder="e.g. CMDPST">
                             </div>
                             <div class="flex-1 space-y-1">
                                 <label class="text-[7px] text-gray-500 uppercase font-black ml-1">Role</label>
-                                <input aria-label="OPERATIONS" type="text" id="comms-role" class="w-full bg-black border border-emerald-900/50 rounded px-2 py-2 text-[10px] text-white focus:border-emerald-500 outline-none uppercase placeholder-gray-800" placeholder="e.g. OPERATIONS">
+                                <input type="text" id="comms-role" class="w-full bg-black border border-emerald-900/50 rounded px-2 py-2 text-[10px] text-white focus:border-emerald-500 outline-none uppercase placeholder-gray-800" placeholder="e.g. OPERATIONS">
                             </div>
                             <button id="comms-connect-btn" class="bg-emerald-600 hover:bg-emerald-500 text-white font-black px-6 py-2 rounded text-[10px] uppercase tracking-widest transition-all shadow-[0_0_15px_rgba(16,185,129,0.3)] active:scale-95 h-[34px]">
                                 Establish Link
@@ -1673,9 +1673,9 @@
                             <div class="p-2 bg-black/60 border-t border-gray-800 flex gap-1 items-center">
                                 <label for="chat-image-upload" class="bg-gray-800 hover:bg-gray-700 text-gray-400 p-1 rounded transition-colors cursor-pointer flex items-center justify-center h-[22px] w-[22px]">
                                     <i data-lucide="image" class="w-3 h-3"></i>
-                                    <input aria-label="chat image upload" type="file" id="chat-image-upload" accept="image/*" class="hidden">
+                                    <input type="file" id="chat-image-upload" accept="image/*" class="hidden">
                                 </label>
-                                <input aria-label="SEND INTEL..." type="text" id="chat-input" class="flex-1 bg-black border border-gray-800 rounded px-2 py-1 text-[9px] text-white outline-none focus:border-blue-500 h-[22px]" placeholder="SEND INTEL...">
+                                <input type="text" id="chat-input" class="flex-1 bg-black border border-gray-800 rounded px-2 py-1 text-[9px] text-white outline-none focus:border-blue-500 h-[22px]" placeholder="SEND INTEL...">
                                 <button id="chat-send-btn" class="bg-blue-900 hover:bg-blue-700 text-white p-1 rounded transition-colors h-[22px] w-[22px] flex items-center justify-center">
                                     <i data-lucide="send" class="w-3 h-3"></i>
                                 </button>
@@ -1733,7 +1733,7 @@
             <p class="text-sm text-slate-300 mb-4 leading-relaxed">
                 Enter profile name to save current session to your secure vault:
             </p>
-            <input aria-label="PROFILE NAME..." type="text" id="save-profile-input" class="w-full bg-black border border-slate-600 rounded p-3 text-white focus:outline-none focus:border-blue-500 mb-6 uppercase" placeholder="PROFILE NAME..." maxlength="30" autocomplete="off">
+            <input type="text" id="save-profile-input" class="w-full bg-black border border-slate-600 rounded p-3 text-white focus:outline-none focus:border-blue-500 mb-6 uppercase" placeholder="PROFILE NAME..." maxlength="30" autocomplete="off">
             <div class="flex justify-end gap-3">
                 <button id="save-profile-cancel" class="bg-transparent border border-slate-600 text-slate-400 px-4 py-2 rounded font-bold uppercase hover:text-white transition-colors">Cancel</button>
                 <button id="save-profile-confirm" class="bg-blue-600 border-none text-white px-4 py-2 rounded font-bold uppercase shadow-[0_4px_6px_-1px_rgba(59,130,246,0.5)] hover:bg-blue-500 transition-colors">Save To Vault</button>
@@ -1744,7 +1744,7 @@
     <!-- PWA SERVICE WORKER REGISTRATION & API UPDATE CHECK -->
 
     <script>
-        window.APP_VERSION = 'v3.0.18';
+        window.APP_VERSION = 'v3.0.17';
         if(document.getElementById('header-version-display')) {
             document.getElementById('header-version-display').innerText = window.APP_VERSION;
         }

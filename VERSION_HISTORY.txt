@@ -310,8 +310,8 @@ v3.0.17 - DEPLOYED 2026-05-24 20:12:31
 * Toast updater: ACTIVE - users will see update prompt on next app open
 
 ============================================================
-v3.0.18 - DEPLOYED 2026-05-24 20:35:55
-* Version auto-bumped from v3.0.17
-* Service Worker cache updated to: trc-vv3.0.18
+v3.0.19 - DEPLOYED 2026-05-24 20:54:10
+* Version auto-bumped from v3.0.18
+* Service Worker cache updated to: trc-vv3.0.19
 * All tactical systems: OPERATIONAL
 * Toast updater: ACTIVE - users will see update prompt on next app open
