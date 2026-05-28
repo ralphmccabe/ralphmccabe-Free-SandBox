@@ -983,8 +983,8 @@ function initializeTacticalDashboard1() {
                 logging: true,
                 scrollX: 0,
                 scrollY: 0,
-                windowWidth: 1000,
-                windowHeight: 750
+                windowWidth: 1200,
+                windowHeight: 800
             }).then(canvas => {
                 // Restore context
                 document.body.classList.remove('is-capturing');
@@ -1408,8 +1408,8 @@ function initializeTacticalDashboard1() {
                 logging: true,        // Prints errors to F12 Console
                 scrollX: 0,
                 scrollY: 0,
-                windowWidth: 1000,
-                windowHeight: 750,
+                windowWidth: 1200,
+                windowHeight: 800,
                 onclone: (clonedDoc) => {
                     // This forces the "X" and "Pencil" to be visible in the capture
                     const icons = clonedDoc.querySelectorAll('[data-lucide]');
@@ -1781,6 +1781,7 @@ function initializeTacticalDashboard2() {
         primer: document.getElementById('ammo-primer'),
         col: document.getElementById('ammo-col'),
         velocity: document.getElementById('ammo-velocity'),
+        bc: document.getElementById('ammo-bc'),
         count: document.getElementById('ammo-count')
     };
 
@@ -1812,39 +1813,40 @@ function initializeTacticalDashboard2() {
         keys.forEach(key => {
             const p = profiles[key];
             const card = document.createElement('div');
-            card.className = "bg-gray-900 border border-gray-800 p-4 rounded-xl flex flex-col justify-between hover:border-emerald-500/50 transition-all shadow-md relative group overflow-hidden";
+            card.className = "bg-black border border-emerald-500/30 p-4 rounded-xl flex flex-col justify-between hover:border-emerald-400 hover:shadow-[0_0_15px_rgba(16,185,129,0.2)] transition-all shadow-md relative group overflow-hidden";
             card.innerHTML = `
                 <!-- Send to Vault Checkbox -->
-                <div class="absolute top-1 left-1 z-30 bg-black/60 p-0.5 rounded">
-                    <input type="checkbox" class="ammo-vault-checkbox w-3.5 h-3.5 cursor-pointer" data-profile-name="${key}" title="Mark for Vault">
+                <div class="absolute top-2 left-2 z-30 bg-black/80 p-1 rounded border border-emerald-500/20">
+                    <input type="checkbox" class="ammo-vault-checkbox w-4 h-4 cursor-pointer accent-emerald-500" data-profile-name="${key}" title="Mark for Vault">
                 </div>
                 
-                <div class="space-y-2 text-left mt-2">
-                    <div class="flex justify-between items-start border-b border-gray-800 pb-2 mb-2">
-                        <div class="pl-4">
-                            <h4 class="text-white font-bold uppercase text-sm tracking-wide truncate max-w-[150px]">${key}</h4>
-                            <span class="text-[9px] text-emerald-400 font-mono uppercase">${p.caliber || 'General'}</span>
+                <div class="space-y-3 text-left mt-3">
+                    <div class="flex justify-between items-start border-b border-emerald-500/20 pb-3 mb-2">
+                        <div class="pl-12">
+                            <h4 class="text-white font-black uppercase text-base tracking-widest truncate max-w-[150px] drop-shadow-[0_0_2px_rgba(255,255,255,0.8)]">${key}</h4>
+                            <span class="text-[10px] text-emerald-400 font-mono uppercase tracking-widest bg-emerald-500/10 px-1.5 py-0.5 rounded-sm">${p.caliber || 'General'}</span>
                         </div>
-                        <button class="delete-ammo-btn text-red-500 hover:text-red-400 p-1 bg-black/40 hover:bg-red-950/20 rounded transition-colors z-30" data-name="${key}">
+                        <button class="delete-ammo-btn text-emerald-500/50 hover:text-red-500 hover:bg-red-950/40 p-1.5 rounded transition-colors z-30" data-name="${key}">
                             <i data-lucide="trash-2" class="w-4 h-4"></i>
                         </button>
                     </div>
                     
-                    <div class="grid grid-cols-2 gap-y-1.5 text-[10px] font-mono text-gray-400">
-                        <div class="truncate">Bullet: <span class="text-gray-200 font-bold">${p.bullet || '--'}</span></div>
-                        <div class="truncate">Powder: <span class="text-gray-200 font-bold">${p.powder || '--'}</span></div>
-                        <div class="truncate">Primer: <span class="text-gray-200 font-bold">${p.primer || '--'}</span></div>
-                        <div class="truncate">C.O.L: <span class="text-gray-200 font-bold">${p.col || '--'}</span></div>
-                        <div class="truncate col-span-2">Velocity: <span class="text-gray-200 font-bold">${p.velocity || '--'} FPS</span></div>
+                    <div class="grid grid-cols-2 gap-y-2 text-[10px] font-mono text-emerald-100/70 uppercase tracking-wider">
+                        <div class="truncate">Projectile: <span class="text-white font-bold ml-1">${p.bullet || '--'}</span></div>
+                        <div class="truncate">Propellant: <span class="text-white font-bold ml-1">${p.powder || '--'}</span></div>
+                        <div class="truncate">Primer: <span class="text-white font-bold ml-1">${p.primer || '--'}</span></div>
+                        <div class="truncate">Overall Length: <span class="text-white font-bold ml-1">${p.col || '--'}</span></div>
+                        <div class="truncate col-span-2">Muzzle Velocity: <span class="text-emerald-400 font-bold text-[11px] ml-1">${p.velocity || '--'} Feet Per Second</span></div>
+                        <div class="truncate col-span-2">Ballistic Coef: <span class="text-emerald-400 font-bold text-[11px] ml-1">${p.bc || '--'}</span></div>
                     </div>
                 </div>
                 
-                <div class="mt-4 pt-3 border-t border-gray-800 flex items-center justify-start gap-4">
+                <div class="mt-4 pt-3 border-t border-emerald-500/20 flex items-center justify-start gap-4">
                     <!-- Adjustment Counter -->
-                    <div class="flex items-center gap-1.5 bg-black/40 p-1 rounded border border-gray-800">
-                        <button class="adjust-ammo-btn bg-gray-800 text-white font-bold text-xs w-6 h-6 rounded flex items-center justify-center hover:bg-gray-700 active:bg-gray-600 transition-colors z-30" data-name="${key}" data-amount="-1">-1</button>
-                        <span class="text-white font-black text-xs px-2 min-w-[32px] text-center">${p.count || '0'} rds</span>
-                        <button class="adjust-ammo-btn bg-gray-800 text-white font-bold text-xs w-6 h-6 rounded flex items-center justify-center hover:bg-gray-700 active:bg-gray-600 transition-colors z-30" data-name="${key}" data-amount="1">+1</button>
+                    <div class="flex items-center gap-2 bg-emerald-500/5 p-1 rounded border border-emerald-500/30">
+                        <button class="adjust-ammo-btn bg-black text-emerald-400 border border-emerald-500/50 font-bold text-sm w-7 h-7 rounded flex items-center justify-center hover:bg-emerald-500 hover:text-black transition-colors z-30" data-name="${key}" data-amount="-1">-1</button>
+                        <span class="text-white font-black text-xs px-2 min-w-[50px] text-center tracking-widest">${p.count || '0'} Rounds</span>
+                        <button class="adjust-ammo-btn bg-black text-emerald-400 border border-emerald-500/50 font-bold text-sm w-7 h-7 rounded flex items-center justify-center hover:bg-emerald-500 hover:text-black transition-colors z-30" data-name="${key}" data-amount="1">+1</button>
                     </div>
                 </div>
             `;
@@ -1966,6 +1968,7 @@ function initializeTacticalDashboard2() {
                 primer: ammoInputs.primer.value.trim(),
                 col: ammoInputs.col.value.trim(),
                 velocity: ammoInputs.velocity.value.trim(),
+                bc: ammoInputs.bc ? ammoInputs.bc.value.trim() : '',
                 count: parseInt(ammoInputs.count.value) || 0
             };
 
@@ -2015,6 +2018,7 @@ function initializeTacticalDashboard2() {
     
     if (toggleReconMapperBtn) {
         toggleReconMapperBtn.addEventListener('click', () => {
+            if (document.getElementById('remarks-modal')) document.getElementById('remarks-modal').classList.add('hidden');
             isReconActive = !isReconActive;
             if (isReconActive) {
                 toggleReconMapperBtn.innerHTML = '<i data-lucide="crosshair" class="w-4 h-4"></i> BACK TO RANGE CARD';
@@ -2445,8 +2449,8 @@ function initializeTacticalDashboard2() {
                     logging: true,
                     scrollX: 0,
                     scrollY: 0,
-                    windowWidth: 1000,
-                    windowHeight: 750
+                    windowWidth: 1200,
+                    windowHeight: 800
                 }).then(canvas => {
                     document.body.classList.remove('is-capturing');
                     previewPanel.style.transition = originalTransition;
@@ -2629,6 +2633,7 @@ function initializeTacticalDashboard2() {
     // --- HUD Control & Open/Close ---
     if (launchDualHudBtn && dualHudView) {
         launchDualHudBtn.addEventListener('click', () => {
+            if (document.getElementById('remarks-modal')) document.getElementById('remarks-modal').classList.add('hidden');
             dualHudView.classList.remove('hidden');
             document.body.style.overflow = 'hidden'; // Lock main scroll
             if (window.lucide) window.lucide.createIcons();
@@ -2744,6 +2749,7 @@ function initializeTacticalDashboard2() {
 
     if (launchBtn && dashShell) {
         launchBtn.addEventListener('click', () => {
+            if (document.getElementById('remarks-modal')) document.getElementById('remarks-modal').classList.add('hidden');
             dashShell.classList.remove('hidden');
             dashShell.classList.add('flex');
             document.body.classList.add('tactical-dashboard-active');
@@ -2762,6 +2768,7 @@ function initializeTacticalDashboard2() {
 
     if (exitBtn && dashShell) {
         exitBtn.addEventListener('click', () => {
+            if (document.getElementById('remarks-modal')) document.getElementById('remarks-modal').classList.add('hidden');
             dashShell.classList.add('hidden');
             dashShell.classList.remove('flex');
             document.body.classList.remove('tactical-dashboard-active');
@@ -3512,9 +3519,8 @@ function initializeTacticalDashboard2() {
                     backgroundColor: '#030712',
                     logging: false,
                     allowTaint: true,
-                    // Explicitly set width/height to current visible state
-                    width: target.clientWidth,
-                    height: target.clientHeight,
+                    windowWidth: 1200,
+                    windowHeight: 800,
                     onclone: (clonedDoc) => {
                         // Force cloned text to display strongly in clone before snapshot
                         const distSpan = clonedDoc.getElementById('live-map-dist');
@@ -4230,7 +4236,12 @@ function initializeTacticalDashboard2() {
         const windMph = parseFloat(document.getElementById('bal-input-wind')?.value) || 0;
         const mv = parseFloat(document.getElementById('bal-input-mv')?.value) || 2600;
         const bc = parseFloat(document.getElementById('bal-input-bc')?.value) || 0.5;
-        const sightHgt = parseFloat(document.getElementById('bal-input-sh')?.value) || 1.5; 
+        const shInput = document.getElementById('bal-input-sh');
+        let sightHgt = parseFloat(shInput?.value) || 1.5; 
+        if (shInput && shInput.value && !shInput.value.includes('.') && shInput.value.length > 1) {
+            shInput.value = shInput.value.slice(0,1) + '.' + shInput.value.slice(1);
+            sightHgt = parseFloat(shInput.value);
+        }
         const zeroYds = parseFloat(document.getElementById('bal-input-zr')?.value) || 100;
 
         // ENVIRONMENTALS
@@ -4401,6 +4412,17 @@ function initializeTacticalDashboard2() {
         const relativeAngleDeg = windDirDeg - shotDirDeg;
         const angleRad = relativeAngleDeg * (Math.PI / 180);
         const rawSine = Math.sin(angleRad); 
+        
+        const windIndicatorEl = document.getElementById('bal-wind-dir-indicator');
+        if (windIndicatorEl) {
+            if (Math.abs(rawSine) < 0.1) {
+                windIndicatorEl.textContent = (Math.cos(angleRad) > 0) ? "HEADWIND ⬆" : "TAILWIND ⬇";
+            } else if (rawSine > 0) {
+                windIndicatorEl.textContent = "FROM R ⬅";
+            } else {
+                windIndicatorEl.textContent = "FROM L ➡";
+            }
+        }
         
         // Physics: Calculate basic drift magnitude in inches
         const crosswindFps = (windMph * Math.abs(rawSine)) * 1.4667;
@@ -4928,6 +4950,7 @@ function initializeTacticalDashboard2() {
                 primer: document.getElementById('ammo-primer'),
                 col: document.getElementById('ammo-col'),
                 velocity: document.getElementById('ammo-velocity'),
+                bc: document.getElementById('ammo-bc'),
                 count: document.getElementById('ammo-count')
             };
             Object.values(ammoInputs).forEach(input => { if(input) input.value = ''; });
@@ -4955,6 +4978,7 @@ function initializeTacticalDashboard2() {
                     primer: document.getElementById('ammo-primer'),
                     col: document.getElementById('ammo-col'),
                     velocity: document.getElementById('ammo-velocity'),
+                    bc: document.getElementById('ammo-bc'),
                     count: document.getElementById('ammo-count')
                 };
 
@@ -4965,6 +4989,7 @@ function initializeTacticalDashboard2() {
                 if(ammoForm.primer) ammoForm.primer.value = p.primer || '';
                 if(ammoForm.col) ammoForm.col.value = p.col || '';
                 if(ammoForm.velocity) ammoForm.velocity.value = p.velocity || '';
+                if(ammoForm.bc) ammoForm.bc.value = p.bc || '';
                 if(ammoForm.count) ammoForm.count.value = p.count || '0';
 
                 // Uncheck and hide buttons
@@ -4993,17 +5018,19 @@ function initializeTacticalDashboard2() {
                 const name = cb.dataset.profileName;
                 const p = profiles[name];
                 if (p) {
-                    const ammoSvgBase64 = "data:image/svg+xml;base64," + btoa(`<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
-                        <rect width="300" height="300" fill="#052e16"/>
-                        <rect x="10" y="10" width="280" height="280" fill="none" stroke="#10b981" stroke-width="4"/>
-                        <text x="50%" y="40" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-size="22" font-weight="bold" fill="#34d399">${name.substring(0, 20)}</text>
+                    const ammoSvgBase64 = "data:image/svg+xml;base64," + btoa(`<svg xmlns="http://www.w3.org/2000/svg" width="300" height="320" viewBox="0 0 300 320">
+                        <rect width="300" height="320" fill="#000000"/>
+                        <rect x="10" y="10" width="280" height="300" fill="none" stroke="#10b981" stroke-width="3" rx="10"/>
+                        <text x="50%" y="40" dominant-baseline="middle" text-anchor="middle" font-family="monospace" font-size="22" font-weight="bold" fill="#ffffff">${name.substring(0, 20)}</text>
                         <line x1="20" y1="60" x2="280" y2="60" stroke="#10b981" stroke-width="2" />
-                        <text x="20" y="100" font-family="monospace" font-size="16" fill="#a7f3d0">B: ${p.bullet || '--'}</text>
-                        <text x="20" y="130" font-family="monospace" font-size="16" fill="#a7f3d0">P: ${p.powder || '--'}</text>
-                        <text x="20" y="160" font-family="monospace" font-size="16" fill="#a7f3d0">PR: ${p.primer || '--'}</text>
-                        <text x="20" y="190" font-family="monospace" font-size="16" fill="#a7f3d0">COL: ${p.col || '--'}</text>
-                        <text x="20" y="220" font-family="monospace" font-size="16" fill="#a7f3d0">V: ${p.velocity || '--'} FPS</text>
-                        <text x="20" y="250" font-family="monospace" font-size="16" fill="#a7f3d0">C: ${p.caliber || '--'}</text>
+                        <text x="20" y="90" font-family="monospace" font-size="14" fill="#6ee7b7">Caliber: ${p.caliber || '--'}</text>
+                        <text x="20" y="120" font-family="monospace" font-size="14" fill="#a7f3d0">Projectile: ${p.bullet || '--'}</text>
+                        <text x="20" y="150" font-family="monospace" font-size="14" fill="#a7f3d0">Propellant: ${p.powder || '--'}</text>
+                        <text x="20" y="180" font-family="monospace" font-size="14" fill="#a7f3d0">Ignition: ${p.primer || '--'}</text>
+                        <text x="20" y="210" font-family="monospace" font-size="14" fill="#a7f3d0">Overall Length: ${p.col || '--'}</text>
+                        <text x="20" y="240" font-family="monospace" font-size="14" fill="#34d399">Muzzle Velocity: ${p.velocity || '--'} FPS</text>
+                        <text x="20" y="270" font-family="monospace" font-size="14" fill="#10b981">BC: ${p.bc || '--'}</text>
+                        <text x="20" y="300" font-family="monospace" font-size="14" fill="#10b981">Box Count: ${p.count || '--'}</text>
                     </svg>`);
 
                     const profileMetadata = Object.assign({}, p, { originalName: name, isAmmo: true });
@@ -5627,7 +5654,7 @@ function initializeTacticalDashboard2() {
     };
 
     // --- REMARKS NOTEPAD LOGIC ---
-    const remarksIconBtn = document.getElementById('remarks-icon-btn');
+    {
     const remarksModal = document.getElementById('remarks-modal');
     const remarksCloseBtn = document.getElementById('remarks-close-btn');
     const remarksTitleInput = document.getElementById('remarks-title-input');
@@ -5635,13 +5662,17 @@ function initializeTacticalDashboard2() {
     const remarksCounter = document.getElementById('remarks-counter');
     const remarksSaveBtn = document.getElementById('remarks-save-btn');
 
-    if (remarksIconBtn && remarksModal) {
-        remarksIconBtn.addEventListener('click', () => {
+    // Use event delegation for bulletproof button clicks anywhere in the app
+    document.addEventListener('click', (e) => {
+        const btn = e.target.closest('.remarks-toggle-btn');
+        if (btn && remarksModal) {
+            e.preventDefault();
             remarksModal.classList.toggle('hidden');
-            if (!remarksModal.classList.contains('hidden')) {
+            if (!remarksModal.classList.contains('hidden') && remarksInput) {
                 remarksInput.focus();
             }
-        });
+        }
+    });
 
         remarksCloseBtn.addEventListener('click', () => remarksModal.classList.add('hidden'));
 
