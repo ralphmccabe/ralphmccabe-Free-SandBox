@@ -187,8 +187,7 @@
                         <div class="col-span-1"><label for="time" class="sr-only">Time</label><input type="time" id="time" class="input-field"></div>
                     </div>
 
-                    <h2 class="section-label">Reload Data</h2>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                                 <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
                         <div class="col-span-1"><input type="text" id="caliber" class="input-field" placeholder="Caliber" maxlength="20"></div>
                         <div class="col-span-1"><input type="text" id="zero" class="input-field" placeholder="Zero Range" maxlength="20"></div>
                         <div class="col-span-1"><label for="sidebar-bal-input-alt" class="sr-only">Alt (ft)</label><input type="text" inputmode="decimal" id="sidebar-bal-input-alt" class="input-field" placeholder="Alt (ft)"></div>
@@ -528,7 +527,15 @@
                 <div id="mobile-live-preview-complete" class="space-y-6 mt-8 border-t border-gray-700 pt-8 pb-10">
                     <div class="bg-white text-black p-4 rounded shadow-lg font-mono">
                         <div class="flex justify-between border-b-2 border-black pb-2 mb-2 text-black">
-                             <div class="flex flex-col"><h2 class="text-xl font-black uppercase leading-none text-black">RELOAD DATA</h2><div class="text-[10px] font-bold">NOTES: <span id="mobile-display-header-notes" class="font-handwriting text-blue-800"></span></div></div>
+                             <div class="flex flex-col">
+                                 <h2 class="text-xl font-black uppercase leading-none text-black">RELOAD DATA</h2>
+                                 <div class="text-[10px] font-bold">NOTES: <span id="mobile-display-header-notes" class="font-handwriting text-blue-800"></span></div>
+                                 <div class="flex gap-2 text-[8px] font-bold text-gray-600 uppercase mt-0.5">
+                                     <div>Alt: <span id="mobile-display-sidebar-bal-input-alt" class="text-blue-800"></span> ft</div>
+                                     <div>Temp: <span id="mobile-display-sidebar-bal-input-temp" class="text-blue-800"></span> °F</div>
+                                     <div>Baro: <span id="mobile-display-sidebar-bal-input-baro" class="text-blue-800"></span> inHg</div>
+                                 </div>
+                             </div>
                              <div class="flex flex-col items-end"><span class="text-[8px] uppercase">SHOOTER / COMPANY</span><span id="mobile-display-shooter-name" class="font-handwriting text-blue-800 font-bold text-right"></span></div>
                         </div>
                         <div class="grid grid-cols-[1.4fr_0.8fr_0.8fr] gap-x-2 gap-y-1 text-[10px] font-bold text-black">
@@ -607,14 +614,21 @@
                     
                     <div class="flex justify-between items-end mb-6 border-b-2 border-black pb-2 text-black">
                         <div class="flex items-center gap-8">
-                            <div class="flex flex-col"><h2 class="text-4xl font-extrabold uppercase leading-none text-black">Reload Data</h2><p class="text-[10px] text-orange-500 font-bold italic">TACTICAL SYSTEM UPGRADE</p></div>
-                            <div class="text-xl font-bold text-black">NOTES : <span id="display-header-notes" class="font-handwriting text-blue-800"></span></div>
+                            <div class="flex flex-col"><h2 class="text-4xl font-extrabold uppercase leading-none text-black">Reload Data</h2></div>
+                            <div class="flex flex-col gap-0.5">
+                                <div class="text-xl font-bold text-black">NOTES : <span id="display-header-notes" class="font-handwriting text-blue-800"></span></div>
+                                <div class="flex gap-4 text-[10px] font-bold text-gray-600 uppercase tracking-widest">
+                                    <div>Alt: <span id="display-sidebar-bal-input-alt" class="text-blue-800 text-sm"></span> <span class="text-[8px] normal-case ml-0.5 text-gray-500">ft</span></div>
+                                    <div>Temp: <span id="display-sidebar-bal-input-temp" class="text-blue-800 text-sm"></span> <span class="text-[8px] normal-case ml-0.5 text-gray-500">°F</span></div>
+                                    <div>Baro: <span id="display-sidebar-bal-input-baro" class="text-blue-800 text-sm"></span> <span class="text-[8px] normal-case ml-0.5 text-gray-500">inHg</span></div>
+                                </div>
+                            </div>
                         </div>
                         <div class="flex flex-col items-end pb-1 text-black"><span class="text-[10px] font-bold uppercase tracking-widest">Shooter / Company</span><span id="display-shooter-name" class="font-handwriting text-blue-800 font-bold text-xl leading-none text-right"></span></div>
                     </div>
 
                     <div class="flex gap-4 h-[40%] text-black">
-                        <div class="w-1/2 grid grid-cols-[1.4fr_0.8fr_0.8fr] gap-x-2 gap-y-1 text-[11px] font-bold content-start text-black">
+                        <div class="w-1/2 grid grid-cols-[1.4fr_0.8fr_0.8fr] gap-x-2 gap-y-[2px] text-[11px] font-bold content-start text-black">
                             <div class="flex flex-col min-w-0"><span>Timestamp</span><div class="flex gap-1 min-w-0"><span id="display-date" class="text-blue-800 font-normal leading-normal"></span><span>@</span><span id="display-time" class="text-blue-800 font-normal leading-normal"></span></div></div>
                             <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Zero Range</span><span id="display-zero" class="text-blue-800 font-normal leading-normal"></span></div>
                             <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Caliber</span><span id="display-caliber" class="text-blue-800 font-normal leading-normal"></span></div>
@@ -631,7 +645,7 @@
                             <div class="flex flex-col min-w-0"><span class="text-[8px] text-gray-600">Rings</span><span id="display-rings" class="text-blue-800 font-normal leading-normal"></span></div>
                             <div class="flex flex-col col-span-2 min-w-0"><span class="text-[8px] text-gray-600">Group</span><span id="display-groupSize" class="text-blue-800 font-normal leading-normal"></span></div>
                             <div class="flex flex-col border border-neon-green/30 bg-neon-green/5 px-1 pb-0.5 rounded-sm justify-center min-w-0"><span class="text-[8px] font-black text-green-800">BOX RDS</span><span id="display-box-count-input" class="text-green-900 font-black text-center text-[12px] leading-none break-words"></span></div>
-                            <div class="col-span-3 mt-2 grid grid-cols-2 gap-2 bg-gray-50 p-2 pb-3 border border-black rounded-sm">
+                            <div class="col-span-3 mt-1 grid grid-cols-2 gap-2 bg-gray-50 p-2 pb-1.5 border border-black rounded-sm">
                                 <div class="flex justify-between text-black min-w-0"><span>ELEV:</span> <span id="display-elevation" class="text-blue-800 font-bold leading-normal text-right"></span></div>
                                 <div class="flex justify-between text-black min-w-0"><span>HOLD:</span> <span id="display-hold-data" class="text-blue-800 font-bold leading-normal text-right"></span></div>
                                 <div class="col-span-2 flex justify-between items-center bg-black text-white px-2 py-2 mt-2 min-w-0 rounded-sm"><span class="text-[10px] font-bold text-neon-green shrink-0">FINAL DOPE:</span><span id="display-final-dope" class="text-sm font-bold text-right ml-2 leading-normal"></span></div>
@@ -658,7 +672,7 @@
                         </div>
                     </div>
 
-                    <div class="flex-1 flex gap-4 mt-4 overflow-hidden text-black">
+                    <div class="flex-1 flex gap-4 mt-2 overflow-hidden text-black">
                         <div class="w-1/3 border-2 border-black flex flex-col"><div class="grid grid-cols-5 bg-black text-white text-center text-[10px] py-1"><div>CLICKS</div><div class="col-span-2">RANGE</div><div class="col-span-2">UD-LR</div></div><div id="distance-table-body" class="flex-1 flex flex-col text-[10px] font-bold text-black"></div></div>
                         <div class="flex-1 relative border border-black bg-gray-50/50 overflow-hidden text-black">
                             <span class="absolute top-1 left-1/2 -translate-x-1/2 font-bold text-[10px] z-20">N 0°</span>
@@ -1513,7 +1527,7 @@
                         <div id="geo-measure-stage" class="flex flex-col w-full h-full relative bg-gray-950">
                             
                             <!-- Top Toolkit Bar (Style Hardened for Mobile Visibility) -->
-                            <div id="geo-toolkit-bar" class="hidden shrink-0 bg-gray-900 border-b border-gray-800 flex items-center px-2 justify-between overflow-x-auto" style="height: 40px; z-index: 1000;">
+                            <div id="geo-toolkit-bar" class="hidden shrink-0 bg-gray-900 border-b border-gray-800 flex items-center px-2 justify-between overflow-x-auto" style="height: 40px; z-index: 1000;" data-html2canvas-ignore="true">
                                 <div class="flex gap-1.5 items-center whitespace-nowrap">
                                     <button onclick="window.toggleFullscreen('panel-measuring')" class="bg-red-950/80 border border-red-800 text-red-400 text-[8px] px-2 py-1 rounded font-black uppercase hover:bg-red-700 hover:text-white transition-all flex items-center gap-1">
                                         <i data-lucide="log-out" class="w-2.5 h-2.5"></i> EXIT
@@ -1544,8 +1558,12 @@
                             </div>
 
                             <!-- INTERACTIVE LIVE MAP WORKSPACE -->
-                            <div class="flex-1 relative z-0 bg-gray-900 pointer-events-none" id="live-sat-map-container" style="min-height: 0 !important; height: 100%;">
-                                <!-- Leaflet gets mounted directly onto this div -->
+                            <div class="flex-1 relative z-0 flex min-h-0 h-full w-full">
+                                <div class="w-full h-full relative z-0 bg-gray-900 pointer-events-none" id="live-sat-map-container"></div>
+                                <div class="absolute text-pink-500 font-black text-2xl drop-shadow-md pointer-events-none" style="z-index: 1000; top: 1rem; left: 50%; transform: translateX(-50%);">N</div>
+                                <div class="absolute text-pink-500 font-black text-2xl drop-shadow-md pointer-events-none" style="z-index: 1000; bottom: 1rem; left: 50%; transform: translateX(-50%);">S</div>
+                                <div class="absolute text-pink-500 font-black text-2xl drop-shadow-md pointer-events-none" style="z-index: 1000; right: 1rem; top: 50%; transform: translateY(-50%);">E</div>
+                                <div class="absolute text-pink-500 font-black text-2xl drop-shadow-md pointer-events-none" style="z-index: 1000; left: 1rem; top: 50%; transform: translateY(-50%);">W</div>
                             </div>
                             
                             <!-- Live Readout Footer (Style Hardened for Mobile Visibility) -->
@@ -1753,7 +1771,7 @@
     <!-- PWA SERVICE WORKER REGISTRATION & API UPDATE CHECK -->
 
     <script>
-        window.APP_VERSION = 'v3.0.22';
+        window.APP_VERSION = 'v3.0.26';
         if(document.getElementById('header-version-display')) {
             document.getElementById('header-version-display').innerText = window.APP_VERSION;
         }
@@ -2011,8 +2029,14 @@
             <button id="remarks-save-btn" class="bg-yellow-950/50 border border-yellow-800 text-yellow-500 text-[8px] font-black uppercase px-2 py-1 rounded hover:bg-yellow-600 hover:text-black transition-all flex items-center gap-1"><i data-lucide="save" class="w-2.5 h-2.5"></i> SAVE TO VAULT</button>
         </div>
     </div>
+    <!-- COMMS RX AUDIO ELEMENT FOR IOS UNLOCK -->
+    <audio id="comms-rx-audio" class="hidden" playsinline></audio>
 </body>
 </html>
+
+
+
+
 
 
 

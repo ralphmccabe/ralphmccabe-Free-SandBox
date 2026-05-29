@@ -336,3 +336,31 @@ v3.0.22 - DEPLOYED 2026-05-29 00:14:36
 * Service Worker cache updated to: trc-vv3.0.22
 * All tactical systems: OPERATIONAL
 * Toast updater: ACTIVE - users will see update prompt on next app open
+
+============================================================
+v3.0.23 - DEPLOYED 2026-05-29 10:31:30
+* Version auto-bumped from v3.0.22
+* Service Worker cache updated to: trc-vv3.0.23
+* All tactical systems: OPERATIONAL
+* Toast updater: ACTIVE - users will see update prompt on next app open
+
+============================================================
+v3.0.24 - DEPLOYED 2026-05-29 10:35:08
+* Version auto-bumped from v3.0.23
+* Service Worker cache updated to: trc-vv3.0.24
+* All tactical systems: OPERATIONAL
+* Toast updater: ACTIVE - users will see update prompt on next app open
+
+============================================================
+v3.0.25 - DEPLOYED 2026-05-29 12:54:12
+* Version auto-bumped from v3.0.24
+* Service Worker cache updated to: trc-vv3.0.25
+* All tactical systems: OPERATIONAL
+* Toast updater: ACTIVE - users will see update prompt on next app open
+
+============================================================
+v3.0.26 - DEPLOYED 2026-05-29 12:55:07
+* Version auto-bumped from v3.0.25
+* Service Worker cache updated to: trc-vv3.0.26
+* All tactical systems: OPERATIONAL
+* Toast updater: ACTIVE - users will see update prompt on next app open

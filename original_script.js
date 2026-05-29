@@ -977,7 +977,7 @@ function initializeTacticalDashboard1() {
         // DELAY for layout reflow and animation suppression
         setTimeout(() => {
             html2canvas(container, {
-                scale: 2,
+                scale: window.innerWidth < 768 ? 1.5 : 2,
                 backgroundColor: '#ffffff',
                 useCORS: true,
                 logging: true,
@@ -1397,7 +1397,7 @@ function initializeTacticalDashboard1() {
 
             // NEW CODE STARTS HERE
             html2canvas(container, {
-                scale: 3,             // Higher resolution for clearer text
+                scale: window.innerWidth < 768 ? 1.5 : 3, // Prevent mobile memory crash
                 backgroundColor: '#ffffff',
                 useCORS: true,        // Critical for CDN icons
                 allowTaint: false,    // Security handshake
@@ -2436,7 +2436,7 @@ function initializeTacticalDashboard2() {
 
             setTimeout(() => {
                 html2canvas(container, {
-                    scale: 2,
+                    scale: window.innerWidth < 768 ? 1.5 : 2,
                     backgroundColor: '#ffffff',
                     useCORS: true,
                     logging: true,
@@ -3560,7 +3560,7 @@ function initializeTacticalDashboard2() {
 
                 const canvas = await html2canvas(target, {
                     useCORS: true,
-                    scale: 2, // DOUBLE density for crystal clarity on text
+                    scale: window.innerWidth < 768 ? 1.5 : 2, // DOUBLE density for crystal clarity on text
                     backgroundColor: '#030712',
                     logging: false,
                     allowTaint: true,
@@ -5311,6 +5311,14 @@ function initializeTacticalDashboard2() {
             localStorage.setItem('trc_team_secret', passcode);
             commsUser = { id: `u_${Date.now()}`, callsign, role, team };
 
+            // === UNLOCK IOS AUDIO ON CLICK ===
+            const rxAudio = document.getElementById('comms-rx-audio');
+            if (rxAudio) {
+                // Play a 1-byte silent wav file to unlock the HTML5 audio element for this session
+                rxAudio.src = "data:audio/wav;base64,UklGRigAAABXQVZFZm10IBIAAAABAAEARKwAAIhYAQACABAAAABkYXRhAgAAAAEA";
+                rxAudio.play().catch(e => console.log("Audio unlock muted/failed."));
+            }
+
             initSupabaseComms(team, passcode);
         });
     }
@@ -5368,11 +5376,20 @@ function initializeTacticalDashboard2() {
             const dec = TacticalCrypto.decrypt(payload.payload.data);
             if (dec && dec.audio && dec.user.id !== commsUser.id) {
                 window.pushTacLog(`RX VOICE: ${dec.user.callsign}`, "SYS");
-                const audio = new Audio(dec.audio);
-                audio.play().catch(e => {
-                    console.error("Audio playback failed:", e);
-                    window.pushTacLog("RX VOICE BLOCKED BY BROWSER (TAP PAGE TO UNLOCK)", "ERROR");
-                });
+                const rxAudio = document.getElementById('comms-rx-audio');
+                if (rxAudio) {
+                    rxAudio.src = dec.audio;
+                    rxAudio.play().catch(e => {
+                        console.error("Audio playback failed:", e);
+                        window.pushTacLog("RX VOICE BLOCKED BY BROWSER (TAP PAGE TO UNLOCK)", "ERROR");
+                    });
+                } else {
+                    const audio = new Audio(dec.audio);
+                    audio.play().catch(e => {
+                        console.error("Audio playback failed:", e);
+                        window.pushTacLog("RX VOICE BLOCKED BY BROWSER (TAP PAGE TO UNLOCK)", "ERROR");
+                    });
+                }
             }
         });
 
@@ -5472,7 +5489,14 @@ function initializeTacticalDashboard2() {
                 if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
                     throw new Error("SECURE_CONTEXT_REQUIRED");
                 }
-                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    audio: { 
+                        channelCount: 1, 
+                        sampleRate: 16000,
+                        echoCancellation: true,
+                        noiseSuppression: true
+                    } 
+                });
                 
                 // If user already released the button while we were waiting for permissions, abort.
                 if (!pttBtn.classList.contains('border-emerald-500')) {
@@ -5480,14 +5504,22 @@ function initializeTacticalDashboard2() {
                     return;
                 }
 
-                mediaRecorder = new MediaRecorder(stream);
+                // Force lowest possible bitrate for Supabase Broadcast limits
+                let options = {};
+                if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+                    options = { mimeType: 'audio/webm;codecs=opus', audioBitsPerSecond: 16000 };
+                } else if (MediaRecorder.isTypeSupported('audio/mp4')) {
+                    options = { mimeType: 'audio/mp4', audioBitsPerSecond: 16000 };
+                }
+                mediaRecorder = new MediaRecorder(stream, options);
                 audioChunks = [];
                 mediaRecorder.ondataavailable = evt => {
                     if (evt.data.size > 0) audioChunks.push(evt.data);
                 };
                 mediaRecorder.onstop = () => {
                     if (audioChunks.length > 0) {
-                        const audioBlob = new Blob(audioChunks, { type: mediaRecorder.mimeType || 'audio/webm' });
+                        const nativeType = audioChunks[0].type || mediaRecorder.mimeType || 'audio/webm';
+                        const audioBlob = new Blob(audioChunks, { type: nativeType });
                         const reader = new FileReader();
                         reader.readAsDataURL(audioBlob);
                         reader.onloadend = () => {
