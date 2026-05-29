@@ -5438,7 +5438,7 @@ function initializeTacticalDashboard2() {
                 document.getElementById('comms-dashboard').classList.remove('hidden');
                 document.getElementById('comms-dashboard').classList.add('grid');
                 
-                const disconnectBtn = document.getElementById('comms-disconnect-btn');
+                const disconnectBtn = document.getElementById('comms-terminate-link-btn');
                 if (disconnectBtn) {
                     disconnectBtn.classList.remove('hidden');
                     disconnectBtn.onclick = () => {
