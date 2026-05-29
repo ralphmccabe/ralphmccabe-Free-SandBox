@@ -982,9 +982,7 @@ function initializeTacticalDashboard1() {
                 useCORS: true,
                 logging: true,
                 scrollX: 0,
-                scrollY: 0,
-                windowWidth: 1200,
-                windowHeight: 800
+                scrollY: 0
             }).then(canvas => {
                 // Restore context
                 document.body.classList.remove('is-capturing');
@@ -1390,9 +1388,7 @@ function initializeTacticalDashboard1() {
                 backgroundColor: '#ffffff',
                 useCORS: true,
                 scrollX: 0,
-                scrollY: 0,
-                windowWidth: 1000,
-                windowHeight: 750
+                scrollY: 0
             })*/setTimeout(() => {
             // FIX: Force Lucide icons to draw before the "camera" clicks
             if (typeof lucide !== 'undefined') {
@@ -1408,8 +1404,6 @@ function initializeTacticalDashboard1() {
                 logging: true,        // Prints errors to F12 Console
                 scrollX: 0,
                 scrollY: 0,
-                windowWidth: 1200,
-                windowHeight: 800,
                 onclone: (clonedDoc) => {
                     // This forces the "X" and "Pencil" to be visible in the capture
                     const icons = clonedDoc.querySelectorAll('[data-lucide]');
@@ -2018,7 +2012,6 @@ function initializeTacticalDashboard2() {
     
     if (toggleReconMapperBtn) {
         toggleReconMapperBtn.addEventListener('click', () => {
-            if (document.getElementById('remarks-modal')) document.getElementById('remarks-modal').classList.add('hidden');
             isReconActive = !isReconActive;
             if (isReconActive) {
                 toggleReconMapperBtn.innerHTML = '<i data-lucide="crosshair" class="w-4 h-4"></i> BACK TO RANGE CARD';
@@ -2448,9 +2441,7 @@ function initializeTacticalDashboard2() {
                     useCORS: true,
                     logging: true,
                     scrollX: 0,
-                    scrollY: 0,
-                    windowWidth: 1200,
-                    windowHeight: 800
+                    scrollY: 0
                 }).then(canvas => {
                     document.body.classList.remove('is-capturing');
                     previewPanel.style.transition = originalTransition;
@@ -2633,7 +2624,6 @@ function initializeTacticalDashboard2() {
     // --- HUD Control & Open/Close ---
     if (launchDualHudBtn && dualHudView) {
         launchDualHudBtn.addEventListener('click', () => {
-            if (document.getElementById('remarks-modal')) document.getElementById('remarks-modal').classList.add('hidden');
             dualHudView.classList.remove('hidden');
             document.body.style.overflow = 'hidden'; // Lock main scroll
             if (window.lucide) window.lucide.createIcons();
@@ -2749,7 +2739,6 @@ function initializeTacticalDashboard2() {
 
     if (launchBtn && dashShell) {
         launchBtn.addEventListener('click', () => {
-            if (document.getElementById('remarks-modal')) document.getElementById('remarks-modal').classList.add('hidden');
             dashShell.classList.remove('hidden');
             dashShell.classList.add('flex');
             document.body.classList.add('tactical-dashboard-active');
@@ -2768,7 +2757,6 @@ function initializeTacticalDashboard2() {
 
     if (exitBtn && dashShell) {
         exitBtn.addEventListener('click', () => {
-            if (document.getElementById('remarks-modal')) document.getElementById('remarks-modal').classList.add('hidden');
             dashShell.classList.add('hidden');
             dashShell.classList.remove('flex');
             document.body.classList.remove('tactical-dashboard-active');
@@ -3297,6 +3285,9 @@ function initializeTacticalDashboard2() {
     let mapMarkers = [];
     let mapPolyline = null;
     let mapLabelMarker = null;
+    let isMultiTargetMode = false;
+    let mapPolylines = [];
+    let mapLabelMarkers = [];
 
     function initGeoCanvas() {
         // Redirect call from the old function name to new Map engine
@@ -3378,9 +3369,16 @@ function initializeTacticalDashboard2() {
     function handleMapClick(e) {
         const latlng = e.latlng;
 
-        // Cycle limit to 2 points (Starting new measure sequence on 3rd click)
-        if (mapMarkers.length >= 2) {
-            clearMapMeasurements();
+        if (!isMultiTargetMode) {
+            // Cycle limit to 2 points (Starting new measure sequence on 3rd click)
+            if (mapMarkers.length >= 2) {
+                clearMapMeasurements();
+            }
+        } else {
+            // Hub and Spoke (1 Origin + up to 10 targets)
+            if (mapMarkers.length >= 11) {
+                clearMapMeasurements();
+            }
         }
 
         // Create visual point (HIGH CONTRAST PINK OVERRIDE)
@@ -3394,8 +3392,7 @@ function initializeTacticalDashboard2() {
 
         mapMarkers.push(marker);
 
-        // If we have two points, calculate accurate real world geodesic distance!
-        if (mapMarkers.length === 2) {
+        if (mapMarkers.length >= 2) {
             drawMapLine();
         } else {
             document.getElementById('live-map-dist').textContent = "--.--";
@@ -3407,41 +3404,63 @@ function initializeTacticalDashboard2() {
 
         if (mapPolyline) orbitalMap.removeLayer(mapPolyline);
         if (mapLabelMarker) orbitalMap.removeLayer(mapLabelMarker);
+        mapPolylines.forEach(p => orbitalMap.removeLayer(p));
+        mapLabelMarkers.forEach(l => orbitalMap.removeLayer(l));
+        mapPolylines = [];
+        mapLabelMarkers = [];
 
-        const latlng1 = mapMarkers[0].getLatLng();
-        const latlng2 = mapMarkers[1].getLatLng();
+        const origin = mapMarkers[0].getLatLng();
+        let lastDisplayDistance = "--.--";
 
-        // Create Visual Path Line (HOT PINK DOTTED OVERRIDE)
-        mapPolyline = L.polyline([latlng1, latlng2], {
-            color: '#ff1493', // HOT PINK
-            weight: 3,
-            dashArray: '6, 8',
-            opacity: 0.9
-        }).addTo(orbitalMap);
+        for (let i = 1; i < mapMarkers.length; i++) {
+            const target = mapMarkers[i].getLatLng();
 
-        // === MIDPOINT LABEL INJECTION (HOT PINK DISTANCE) ===
-        const midLat = (latlng1.lat + latlng2.lat) / 2;
-        const midLng = (latlng1.lng + latlng2.lng) / 2;
-        
-        // Spherical Earth Math
-        const distanceMeters = latlng1.distanceTo(latlng2);
-        let displayDistance;
-        if (geoDistanceUnit === 'YDS') {
-            displayDistance = (distanceMeters * 1.09361).toFixed(1);
-        } else {
-            displayDistance = distanceMeters.toFixed(1);
+            // Create Visual Path Line (HOT PINK DOTTED OVERRIDE)
+            const polyline = L.polyline([origin, target], {
+                color: '#ff1493', // HOT PINK
+                weight: 3,
+                dashArray: '6, 8',
+                opacity: 0.9
+            }).addTo(orbitalMap);
+
+            if (!isMultiTargetMode) {
+                mapPolyline = polyline;
+            } else {
+                mapPolylines.push(polyline);
+            }
+
+            // === MIDPOINT LABEL INJECTION (HOT PINK DISTANCE) ===
+            const midLat = (origin.lat + target.lat) / 2;
+            const midLng = (origin.lng + target.lng) / 2;
+            
+            // Spherical Earth Math
+            const distanceMeters = origin.distanceTo(target);
+            let displayDistance;
+            if (geoDistanceUnit === 'YDS') {
+                displayDistance = (distanceMeters * 1.09361).toFixed(1);
+            } else {
+                displayDistance = distanceMeters.toFixed(1);
+            }
+            lastDisplayDistance = displayDistance;
+
+            const labelHtml = `<div style="color:#ff1493; font-family:'JetBrains Mono', monospace; font-weight:900; font-size:12px; text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; white-space:nowrap;">${displayDistance} ${geoDistanceUnit}</div>`;
+            const customIcon = L.divIcon({
+                html: labelHtml,
+                className: 'geo-midpoint-label',
+                iconSize: null,
+                iconAnchor: [30, -10]
+            });
+
+            const marker = L.marker([midLat, midLng], { icon: customIcon }).addTo(orbitalMap);
+
+            if (!isMultiTargetMode) {
+                mapLabelMarker = marker;
+            } else {
+                mapLabelMarkers.push(marker);
+            }
         }
-        const labelHtml = `<div style="color:#ff1493; font-family:'JetBrains Mono', monospace; font-weight:900; font-size:12px; text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; white-space:nowrap;">${displayDistance} ${geoDistanceUnit}</div>`;
-        const customIcon = L.divIcon({
-            html: labelHtml,
-            className: 'geo-midpoint-label',
-            iconSize: null,
-            iconAnchor: [30, -10]
-        });
 
-        mapLabelMarker = L.marker([midLat, midLng], { icon: customIcon }).addTo(orbitalMap);
-
-        document.getElementById('live-map-dist').textContent = displayDistance;
+        document.getElementById('live-map-dist').textContent = lastDisplayDistance;
         if(document.getElementById('live-map-unit')) document.getElementById('live-map-unit').textContent = geoDistanceUnit;
         
         window.pushTacLog(`ORBITAL VECTOR SECURED:  .`, "LOCK");
@@ -3452,15 +3471,15 @@ function initializeTacticalDashboard2() {
             minimized.innerHTML = `
                 <div class="w-full h-full bg-emerald-950/20 flex flex-col items-center justify-center p-2 text-center relative group-hover:bg-emerald-500/5 transition-all">
                     <div class="absolute top-1 left-1 text-[6px] text-emerald-500 font-black uppercase opacity-60">VECTOR LOCK</div>
-                    <span class="text-2xl font-black text-white font-mono tracking-tighter leading-none">${formattedYards}</span>
-                    <span class="text-[8px] font-black text-emerald-400 uppercase tracking-[0.2em] mt-1">YARDS</span>
+                    <span class="text-2xl font-black text-white font-mono tracking-tighter leading-none">${lastDisplayDistance}</span>
+                    <span class="text-[8px] font-black text-emerald-400 uppercase tracking-[0.2em] mt-1">${geoDistanceUnit}</span>
                     <div class="absolute bottom-1 right-1 text-[6px] text-gray-600 font-mono">GEO_FIX</div>
                 </div>
             `;
         }
 
         // Adjust camera briefly to see both points perfectly
-        const group = new L.featureGroup([mapMarkers[0], mapMarkers[1]]);
+        const group = new L.featureGroup(mapMarkers);
         orbitalMap.fitBounds(group.getBounds().pad(0.2));
     }
 
@@ -3470,10 +3489,14 @@ function initializeTacticalDashboard2() {
             mapMarkers.forEach(m => orbitalMap.removeLayer(m));
             if (mapPolyline) orbitalMap.removeLayer(mapPolyline);
             if (mapLabelMarker) orbitalMap.removeLayer(mapLabelMarker);
+            mapPolylines.forEach(p => orbitalMap.removeLayer(p));
+            mapLabelMarkers.forEach(l => orbitalMap.removeLayer(l));
         }
         mapMarkers = [];
         mapPolyline = null;
         mapLabelMarker = null;
+        mapPolylines = [];
+        mapLabelMarkers = [];
         document.getElementById('live-map-dist').textContent = "--.--";
 
         // Reset Minimized View Back to Idle State
@@ -3495,6 +3518,28 @@ function initializeTacticalDashboard2() {
 
     const clearMapBtn = document.getElementById('geo-clear-map-btn');
     if (clearMapBtn) { clearMapBtn.addEventListener('click', (e) => { e.stopPropagation(); clearMapMeasurements(); }); }
+
+    const geoUnitBtn = document.getElementById('geo-unit-toggle-btn');
+    if (geoUnitBtn) {
+        geoUnitBtn.addEventListener('click', (e) => { 
+            e.stopPropagation(); 
+            geoDistanceUnit = geoDistanceUnit === 'YDS' ? 'M' : 'YDS'; 
+            document.getElementById('geo-unit-label').textContent = geoDistanceUnit; 
+            if(document.getElementById('live-map-unit')) 
+                document.getElementById('live-map-unit').textContent = geoDistanceUnit; 
+            if (typeof drawMapLine === 'function') drawMapLine(); 
+        });
+    }
+
+    const geoModeBtn = document.getElementById('geo-mode-toggle-btn');
+    if (geoModeBtn) {
+        geoModeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            isMultiTargetMode = !isMultiTargetMode;
+            document.getElementById('geo-mode-label').textContent = isMultiTargetMode ? 'MULTI' : 'SINGLE';
+            if (typeof clearMapMeasurements === 'function') clearMapMeasurements();
+        });
+    }
 
     // Master Snapshot Bridge Button (Window 3 to Window 4)
     const mapSnapBtn = document.getElementById('geo-snapshot-btn');
@@ -3519,8 +3564,6 @@ function initializeTacticalDashboard2() {
                     backgroundColor: '#030712',
                     logging: false,
                     allowTaint: true,
-                    windowWidth: 1200,
-                    windowHeight: 800,
                     onclone: (clonedDoc) => {
                         // Force cloned text to display strongly in clone before snapshot
                         const distSpan = clonedDoc.getElementById('live-map-dist');
@@ -3846,6 +3889,7 @@ function initializeTacticalDashboard2() {
 
     // --- TACTICAL HUD SENSOR LOGIC ---
     let hudAnimationId = null;
+    let hudGeoWatchId = null;
     let currentHudHeading = 0;
     let currentHudPitch = 0;
     let deviceOrientationActive = false;
@@ -3960,6 +4004,19 @@ function initializeTacticalDashboard2() {
         } else {
             deviceOrientationActive = false;
         }
+        
+        // Start GPS tracking for HUD
+        if (navigator.geolocation) {
+            hudGeoWatchId = navigator.geolocation.watchPosition((pos) => {
+                const latEl = document.getElementById('hud-gps-lat');
+                const lonEl = document.getElementById('hud-gps-lon');
+                if (latEl) latEl.textContent = pos.coords.latitude.toFixed(6);
+                if (lonEl) lonEl.textContent = pos.coords.longitude.toFixed(6);
+            }, (err) => {
+                console.warn("HUD GPS Error:", err);
+            }, { enableHighAccuracy: true });
+        }
+        
         hudAnimationId = requestAnimationFrame(updateTacticalHUD);
     }
 
@@ -3967,6 +4024,12 @@ function initializeTacticalDashboard2() {
         if (hudAnimationId) cancelAnimationFrame(hudAnimationId);
         window.removeEventListener('deviceorientationabsolute', handleOrientation, true);
         window.removeEventListener('deviceorientation', handleOrientation, true);
+        
+        // Stop GPS tracking for HUD
+        if (hudGeoWatchId !== null && navigator.geolocation) {
+            navigator.geolocation.clearWatch(hudGeoWatchId);
+            hudGeoWatchId = null;
+        }
     }
     // --- END TACTICAL HUD SENSOR LOGIC ---
 
@@ -5905,13 +5968,6 @@ if (document.readyState === 'loading') {
 } else {
     initializeTacticalDashboard2();
 }
-
-
-document.getElementById('geo-unit-toggle-btn')?.addEventListener('click', (e) => { e.stopPropagation(); geoDistanceUnit = geoDistanceUnit === 'YDS' ? 'M' : 'YDS'; document.getElementById('geo-unit-label').textContent = geoDistanceUnit; if(document.getElementById('live-map-unit')) document.getElementById('live-map-unit').textContent = geoDistanceUnit; if (typeof drawMapLine === 'function') drawMapLine(); });
-
-
-
-
 
 
 

@@ -1,10 +1,10 @@
-/* TRC-VERSION - v3.0.21 */
-const CACHE_NAME = 'trc-v3.0.21';
+/* TRC-VERSION - v3.0.22 */
+const CACHE_NAME = 'trc-v3.0.22';
 const ASSETS = [
     './',
     './index.html?v=6.1',
     './style.css?v=1.7',
-    './original_script.min.js?v=2.2',
+    './original_script.min.js?v=2.7',
     './manifest.json',
     './icon-512.png',
     './icon-192.png',
@@ -92,6 +92,7 @@ self.addEventListener('fetch', event => {
         })
     );
 });
+
 
 
 
