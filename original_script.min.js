@@ -977,7 +977,7 @@ function initializeTacticalDashboard1() {
         // DELAY for layout reflow and animation suppression
         setTimeout(() => {
             html2canvas(container, {
-                scale: window.innerWidth < 768 ? 1.5 : 2,
+                scale: window.innerWidth < 768 ? 1 : 2,
                 backgroundColor: '#ffffff',
                 useCORS: true,
                 logging: true,
@@ -996,7 +996,7 @@ function initializeTacticalDashboard1() {
                 container.style.transform = originalTransform;
                 window.scrollTo(0, originalScrollY);
 
-                const snapshot = canvas.toDataURL("image/jpeg", 0.7);
+                const snapshot = canvas.toDataURL("image/jpeg", 0.95);
                 const data = { snapshot };
 
                 inputs.forEach(id => {
@@ -1397,7 +1397,7 @@ function initializeTacticalDashboard1() {
 
             // NEW CODE STARTS HERE
             html2canvas(container, {
-                scale: window.innerWidth < 768 ? 1.5 : 3, // Prevent mobile memory crash
+                scale: window.innerWidth < 768 ? 1 : 2, // Prevent mobile memory crash
                 backgroundColor: '#ffffff',
                 useCORS: true,        // Critical for CDN icons
                 allowTaint: false,    // Security handshake
@@ -1816,7 +1816,7 @@ function initializeTacticalDashboard2() {
                 
                 <div class="space-y-3 text-left mt-3">
                     <div class="flex justify-between items-start border-b border-emerald-500/20 pb-3 mb-2">
-                        <div class="pl-12">
+                        <div style="padding-left: 48px;">
                             <h4 class="text-white font-black uppercase text-base tracking-widest truncate max-w-[150px] drop-shadow-[0_0_2px_rgba(255,255,255,0.8)]">${key}</h4>
                             <span class="text-[10px] text-emerald-400 font-mono uppercase tracking-widest bg-emerald-500/10 px-1.5 py-0.5 rounded-sm">${p.caliber || 'General'}</span>
                         </div>
@@ -2436,7 +2436,7 @@ function initializeTacticalDashboard2() {
 
             setTimeout(() => {
                 html2canvas(container, {
-                    scale: window.innerWidth < 768 ? 1.5 : 2,
+                    scale: window.innerWidth < 768 ? 1 : 2,
                     backgroundColor: '#ffffff',
                     useCORS: true,
                     logging: true,
@@ -2453,7 +2453,7 @@ function initializeTacticalDashboard2() {
                     container.style.transform = originalTransform;
                     window.scrollTo(0, originalScrollY);
 
-                    const snapshotUrl = canvas.toDataURL("image/jpeg", 0.7);
+                    const snapshotUrl = canvas.toDataURL("image/jpeg", 0.95);
 
                     const markers = [];
                     document.querySelectorAll('.recon-marker:not(.mobile-recon-marker)').forEach(m => {
@@ -2816,12 +2816,13 @@ function initializeTacticalDashboard2() {
                 // UNCONDITIONAL FORCED VISIBILITY INJECTION
                 document.getElementById('geo-toolkit-bar')?.classList.remove('hidden');
                 document.getElementById('geo-ruler-footer')?.classList.remove('hidden');
-                document.getElementById('live-sat-map-container')?.classList.remove('pointer-events-none');
                 setTimeout(() => { if(orbitalMap) orbitalMap.invalidateSize(); }, 600);
             } else if (panelId === 'panel-vault') {
                 document.getElementById('vault-selector-grid').classList.remove('hidden');
                 document.getElementById('vault-selector-grid').classList.add('flex');
                 refreshVaultGrid();
+            } else if (panelId === 'panel-comms') {
+                setTimeout(() => { if(commsMapInstance) commsMapInstance.invalidateSize(); }, 600);
             }
         } else {
             // === CLEANUP SPECIFIC PANEL LOGIC ON CLOSE ===
@@ -2835,11 +2836,12 @@ function initializeTacticalDashboard2() {
                 // UNCONDITIONAL FORCED HIDE INJECTION FOR MINIMIZED MODE
                 document.getElementById('geo-toolkit-bar')?.classList.add('hidden');
                 document.getElementById('geo-ruler-footer')?.classList.add('hidden');
-                document.getElementById('live-sat-map-container')?.classList.add('pointer-events-none');
                 setTimeout(() => { if(orbitalMap) orbitalMap.invalidateSize(); }, 600);
             } else if (panelId === 'panel-vault') {
                 document.getElementById('vault-selector-grid').classList.add('hidden');
                 document.getElementById('vault-selector-grid').classList.remove('flex');
+            } else if (panelId === 'panel-comms') {
+                setTimeout(() => { if(commsMapInstance) commsMapInstance.invalidateSize(); }, 600);
             }
         }
         
@@ -3560,17 +3562,26 @@ function initializeTacticalDashboard2() {
 
                 const canvas = await html2canvas(target, {
                     useCORS: true,
-                    scale: window.innerWidth < 768 ? 1.5 : 2, // DOUBLE density for crystal clarity on text
+                    scale: window.innerWidth < 768 ? 2 : 2.5, // Crisp HD scale that DOES NOT crash mobile
                     backgroundColor: '#030712',
                     logging: false,
-                    allowTaint: true,
+                    allowTaint: false, // Critical to avoid SecurityErrors
                     onclone: (clonedDoc) => {
                         // Force cloned text to display strongly in clone before snapshot
                         const distSpan = clonedDoc.getElementById('live-map-dist');
                         if(distSpan) {
                             distSpan.style.color = "#ffffff";
-                            distSpan.style.fontSize = "14px";
+                            distSpan.style.fontSize = "28px";
                             distSpan.style.fontWeight = "bold";
+                        }
+                        const footer = clonedDoc.getElementById('geo-ruler-footer');
+                        if(footer) {
+                            footer.style.fontSize = "22px";
+                            footer.style.height = "50px";
+                        }
+                        const unitSpan = clonedDoc.getElementById('live-map-unit');
+                        if(unitSpan) {
+                            unitSpan.style.fontSize = "22px";
                         }
                     }
                 });
@@ -5309,7 +5320,9 @@ function initializeTacticalDashboard2() {
 
             // Lock in the team secret
             localStorage.setItem('trc_team_secret', passcode);
-            commsUser = { id: `u_${Date.now()}`, callsign, role, team };
+            // Force a deterministic ID based on Team + Callsign so Supabase overwrites ghost presences on reconnect
+            const deterministicId = 'u_' + (team + callsign).replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            commsUser = { id: deterministicId, callsign, role, team };
 
             // === UNLOCK IOS AUDIO ON CLICK ===
             const rxAudio = document.getElementById('comms-rx-audio');
@@ -6007,4 +6020,86 @@ if (document.readyState === 'loading') {
 
 
 
+
+// --- GLOBAL IMAGE ZOOM MODAL ---
+document.addEventListener('DOMContentLoaded', () => {
+    const zoomModal = document.getElementById('global-zoom-modal');
+    const zoomImg = document.getElementById('global-zoom-image');
+    const closeBtn = document.getElementById('close-zoom-modal');
+    const zoomInBtn = document.getElementById('zoom-in-btn');
+    const zoomOutBtn = document.getElementById('zoom-out-btn');
+    const resetBtn = document.getElementById('zoom-reset-btn');
+    const scrollContainer = document.getElementById('zoom-scroll-container');
+    
+    let currentScale = 1;
+    let isDragging = false;
+    let startX, startY, scrollLeft, scrollTop;
+
+    if(!zoomModal || !zoomImg) return;
+
+    // Attach click listeners to all clickable images
+    document.body.addEventListener('click', (e) => {
+        // Target Intel Vault images, Comms feed images, etc.
+        const targetImg = e.target.closest('#intel-vault-grid img, #chat-messages img, #ammoLibraryList img');
+        if(targetImg) {
+            e.stopPropagation();
+            openZoomModal(targetImg.src);
+        }
+    });
+
+    function openZoomModal(src) {
+        zoomImg.src = src;
+        currentScale = 1;
+        updateTransform();
+        zoomModal.classList.remove('hidden', 'pointer-events-none', 'opacity-0');
+        zoomModal.classList.add('flex', 'opacity-100');
+        if (window.lucide) lucide.createIcons();
+    }
+
+    function closeZoomModal() {
+        zoomModal.classList.remove('opacity-100');
+        zoomModal.classList.add('opacity-0', 'pointer-events-none');
+        setTimeout(() => {
+            zoomModal.classList.add('hidden');
+            zoomModal.classList.remove('flex');
+            zoomImg.src = '';
+        }, 300);
+    }
+
+    closeBtn.addEventListener('click', closeZoomModal);
+    
+    // Zoom Controls
+    zoomInBtn.addEventListener('click', () => { currentScale = Math.min(currentScale + 0.5, 5); updateTransform(); });
+    zoomOutBtn.addEventListener('click', () => { currentScale = Math.max(currentScale - 0.5, 0.5); updateTransform(); });
+    resetBtn.addEventListener('click', () => { currentScale = 1; updateTransform(); });
+
+    function updateTransform() {
+        zoomImg.style.transform = "scale(${currentScale})";
+        zoomImg.style.transform = 'scale(' + currentScale + ')';
+    }
+
+    // Drag to pan
+    zoomImg.addEventListener('mousedown', (e) => {
+        if(currentScale <= 1) return;
+        isDragging = true;
+        startX = e.pageX - scrollContainer.offsetLeft;
+        startY = e.pageY - scrollContainer.offsetTop;
+        scrollLeft = scrollContainer.scrollLeft;
+        scrollTop = scrollContainer.scrollTop;
+    });
+
+    zoomImg.addEventListener('mouseleave', () => isDragging = false);
+    zoomImg.addEventListener('mouseup', () => isDragging = false);
+
+    zoomImg.addEventListener('mousemove', (e) => {
+        if(!isDragging || currentScale <= 1) return;
+        e.preventDefault();
+        const x = e.pageX - scrollContainer.offsetLeft;
+        const y = e.pageY - scrollContainer.offsetTop;
+        const walkX = (x - startX) * 2;
+        const walkY = (y - startY) * 2;
+        scrollContainer.scrollLeft = scrollLeft - walkX;
+        scrollContainer.scrollTop = scrollTop - walkY;
+    });
+});
 
