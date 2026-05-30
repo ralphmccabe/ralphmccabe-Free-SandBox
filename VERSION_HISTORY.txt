@@ -462,3 +462,10 @@ v3.0.40 - DEPLOYED 2026-05-30 09:08:09
 * Service Worker cache updated to: trc-vv3.0.40
 * All tactical systems: OPERATIONAL
 * Toast updater: ACTIVE - users will see update prompt on next app open
+
+============================================================
+v3.0.41 - DEPLOYED 2026-05-30 11:52:23
+* Version auto-bumped from v3.0.40
+* Service Worker cache updated to: trc-vv3.0.41
+* All tactical systems: OPERATIONAL
+* Toast updater: ACTIVE - users will see update prompt on next app open

@@ -4367,7 +4367,7 @@ function initializeTacticalDashboard2() {
     // THROTLED TICKER LOG FOR SOLVER SPAM PROTECTION
     let solverLogThrottle = null;
 
-    function runSolverMatrix() {
+    window.runSolverMatrix = function runSolverMatrix() {
         // 0. Inform Ticker of live processing (Debounced once per 3s during fast typing)
         if (!solverLogThrottle) {
             window.pushTacLog("PARAMETERS MODIFIED -> RE-SOLVING BALLISTIC MATRIX...", "INFO");
@@ -5558,9 +5558,9 @@ function initializeTacticalDashboard2() {
     }
 
     // COMMS NOTIFICATION SYSTEM
-    let chatAlertState = 0; // 0: Off, 1: Chime, 2: Vibrate, 3: Both
-    const chatAlertLabels = ["Alerts: Off", "Alerts: Chime", "Alerts: Vibrate", "Alerts: Both"];
-    const chatAlertIcons = ["bell-off", "bell", "smartphone", "bell-ring"];
+    let chatAlertState = 0; // 0: Off, 1: Flash, 2: Vibrate, 3: Chime
+    const chatAlertLabels = ["Alerts: Off", "Alerts: Flash", "Alerts: Vibrate", "Alerts: Chime"];
+    const chatAlertIcons = ["bell-off", "zap", "smartphone", "volume-2"];
     
     window.cycleChatAlerts = function() {
         chatAlertState = (chatAlertState + 1) % 4;
@@ -5572,15 +5572,16 @@ function initializeTacticalDashboard2() {
     };
 
     window.playChatAlert = function() {
-        if (chatAlertState === 1 || chatAlertState === 3) {
-            playSynthesizedChime();
-        }
-        if (chatAlertState === 2 || chatAlertState === 3) {
+        if (chatAlertState === 0) return;
+        
+        if (chatAlertState === 1) {
+            triggerVisualFlash();
+        } else if (chatAlertState === 2) {
             if (navigator.vibrate) {
                 navigator.vibrate([300, 100, 300]);
-            } else {
-                console.log("Vibration API not supported on this device (likely iOS).");
             }
+        } else if (chatAlertState === 3) {
+            playSynthesizedChime();
         }
     };
 
@@ -5611,6 +5612,37 @@ function initializeTacticalDashboard2() {
             console.log("Audio synthesis failed:", e);
         }
     }
+
+    function triggerVisualFlash() {
+        let flash = document.getElementById('tactical-visual-flash');
+        if (!flash) {
+            flash = document.createElement('div');
+            flash.id = 'tactical-visual-flash';
+            flash.style.position = 'fixed';
+            flash.style.top = '0';
+            flash.style.left = '0';
+            flash.style.width = '100vw';
+            flash.style.height = '100vh';
+            flash.style.pointerEvents = 'none';
+            flash.style.zIndex = '999999';
+            flash.style.transition = 'opacity 0.1s ease-out, box-shadow 0.1s ease-out';
+            flash.style.opacity = '0';
+            flash.style.boxShadow = 'inset 0 0 150px 30px rgba(16, 185, 129, 0.9)'; // Neon Green border glow
+            document.body.appendChild(flash);
+        }
+        
+        // Strobe effect: Double rapid flash
+        flash.style.opacity = '1';
+        setTimeout(() => {
+            flash.style.opacity = '0';
+            setTimeout(() => {
+                flash.style.opacity = '1';
+                setTimeout(() => {
+                    flash.style.opacity = '0';
+                }, 100);
+            }, 100);
+        }, 100);
+    };
 
     // PTT LOGIC
     let mediaRecorder = null;
@@ -6244,9 +6276,231 @@ window.closeBriefingModal = function() {
     localStorage.setItem('trc_has_seen_briefing', 'true');
 };
 
-document.addEventListener('DOMContentLoaded', () => {
+function initializeBriefingModal() {
     if (!localStorage.getItem('trc_has_seen_briefing')) {
-        setTimeout(window.openBriefingModal, 1500); // Small delay so UI loads first
+        setTimeout(window.openBriefingModal, 1500);
     }
-});
+}
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeBriefingModal);
+} else {
+    initializeBriefingModal();
+}
+
+// --- AI SPOTTER VOICE LOGIC (PROTOTYPE) ---
+let aiSpotterRecognition = null;
+let aiSpotterActive = false;
+let aiSpotterState = 'IDLE';
+
+function aiSpeak(text) {
+    if ('speechSynthesis' in window) {
+        // Cancel any ongoing speech
+        window.speechSynthesis.cancel();
+        const msg = new SpeechSynthesisUtterance(text);
+        msg.pitch = 0.9;
+        msg.rate = 1.1;
+        window.speechSynthesis.speak(msg);
+    }
+}
+
+window.toggleAISpotter = function() {
+    const btn = document.getElementById('ai-spotter-btn');
+    
+    if (aiSpotterActive) {
+        // Turn off
+        aiSpotterActive = false;
+        if (aiSpotterRecognition) aiSpotterRecognition.stop();
+        btn.classList.remove('text-red-500', 'animate-pulse');
+        btn.classList.add('text-gray-500');
+        aiSpeak("Spotter standing down.");
+        if (window.pushTacLog) window.pushTacLog("AI SPOTTER: OFFLINE", "SYS");
+        return;
+    }
+
+    // Turn on
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        alert("Voice commands are not supported on this browser. Please use Chrome on Android or Desktop.");
+        return;
+    }
+
+    if (!aiSpotterRecognition) {
+        aiSpotterRecognition = new SpeechRecognition();
+        aiSpotterRecognition.continuous = true;
+        aiSpotterRecognition.interimResults = false;
+        aiSpotterRecognition.lang = 'en-US';
+
+        aiSpotterRecognition.onstart = function() {
+            btn.classList.remove('text-gray-500');
+            btn.classList.add('text-red-500', 'animate-pulse');
+            if (window.pushTacLog) window.pushTacLog("AI SPOTTER: LISTENING...", "SUCCESS");
+        };
+
+        aiSpotterRecognition.onresult = function(event) {
+            // Get the most recent transcript
+            let currentTranscript = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    currentTranscript += event.results[i][0].transcript;
+                }
+            }
+            
+            const command = currentTranscript.trim().toLowerCase();
+            if (!command) return;
+            
+            console.log("Voice Command Heard:", command);
+            if (window.pushTacLog) window.pushTacLog(`HEARD: "${command}"`, "INFO");
+            
+            if (command.includes("spotter") || command.includes("spider") || command.includes("spot")) {
+                let curRange = document.getElementById('bal-input-range')?.value;
+                curRange = (curRange && curRange.trim() !== '') ? curRange : "zero";
+                
+                let curWind = document.getElementById('bal-input-wind')?.value;
+                curWind = (curWind && curWind.trim() !== '') ? curWind : "zero";
+                
+                let curDir = document.getElementById('bal-input-wind-dir')?.value;
+                curDir = (curDir && curDir.trim() !== '') ? curDir : "zero";
+                
+                let elev = document.getElementById('sol-elev-mil')?.innerText || "zero";
+                let elevDir = document.getElementById('sol-elev-label-code')?.innerText || "U";
+                elevDir = elevDir === 'U' ? "Up" : (elevDir === 'D' ? "Down" : "Up");
+                
+                let solWind = document.getElementById('sol-wind-mil')?.innerText || "zero";
+                let solWindDir = document.getElementById('sol-wind-label-code')?.innerText || "L";
+                solWindDir = solWindDir === 'L' ? "Left" : (solWindDir === 'R' ? "Right" : "Hold");
+                
+                if (elev !== '--.-') {
+                    aiSpeak(`Target ${curRange}, wind ${curWind} from ${curDir}. ${elevDir} ${elev}. ${solWindDir} ${solWind}.`);
+                } else {
+                    aiSpeak(`Target ${curRange}, wind ${curWind} from ${curDir}. No DOPE available.`);
+                }
+
+                aiSpotterState = 'IDLE';
+                const panel = document.getElementById('panel-ballistics');
+                if (panel && panel.classList.contains('hidden')) window.toggleSection('panel-ballistics');
+            } 
+            else if (command.includes("range card")) {
+                aiSpeak("Yes");
+                aiSpotterState = 'IDLE';
+            }
+            else if (command.includes("new dope")) {
+                aiSpeak("Ready");
+                aiSpotterState = 'WAITING_FOR_DOPE';
+            }
+            else if (command.includes("read dope") || command.includes("solution")) {
+                let elev = document.getElementById('sol-elev-mil')?.innerText;
+                let elevDir = document.getElementById('sol-elev-label-code')?.innerText;
+                let wind = document.getElementById('sol-wind-mil')?.innerText;
+                let windDir = document.getElementById('sol-wind-label-code')?.innerText;
+
+                if (!elev || elev === '--.-') {
+                    // Fall back to original setup inputs if solver is empty
+                    elev = document.getElementById('elevation')?.value || "zero";
+                    wind = document.getElementById('hold-data')?.value || "zero";
+                    elevDir = "Up";
+                    windDir = "Hold";
+                } else {
+                    elevDir = elevDir === 'U' ? "Up" : (elevDir === 'D' ? "Down" : "Up");
+                    windDir = windDir === 'L' ? "Left" : (windDir === 'R' ? "Right" : "Hold");
+                }
+                
+                aiSpeak(`${elevDir} ${elev}. ${windDir} ${wind}.`);
+            }
+            else if (aiSpotterState === 'WAITING_FOR_DOPE' && command.match(/\d+/)) {
+                let updated = false;
+                
+                // 1. Parse Range (e.g. "300 yards" or "target 300")
+                let rMatch = command.match(/(\d+)\s*(?:yard|yards|meter|meters|y|m)/) || command.match(/(?:target|range)\s*(\d+)/);
+                if (rMatch) {
+                    const rInput = document.getElementById('bal-input-range');
+                    if (rInput) { rInput.value = rMatch[1]; updated = true; }
+                }
+                
+                // 2. Parse Wind Speed (e.g. "wind 10" or "10 mph")
+                let wMatch = command.match(/(?:wind|speed)\s*(\d+)/) || command.match(/(\d+)\s*(?:mph|miles per hour)/);
+                if (wMatch) {
+                    const wInput = document.getElementById('bal-input-wind');
+                    if (wInput) { wInput.value = wMatch[1]; updated = true; }
+                }
+                
+                // 3. Parse Wind Direction (e.g. "from 170" or "direction 170")
+                let dMatch = command.match(/(?:from|direction|dir)\s*(\d+)/);
+                if (dMatch) {
+                    const dInput = document.getElementById('bal-input-wind-dir');
+                    if (dInput) { dInput.value = dMatch[1]; updated = true; }
+                }
+                
+                // 4. Fallback if no keywords matched
+                if (!updated) {
+                    const nums = command.match(/\d+/g);
+                    if (nums && nums.length > 0) {
+                        const rInput = document.getElementById('bal-input-range');
+                        if (rInput && nums[0]) { rInput.value = nums[0]; updated = true; }
+                        
+                        const wInput = document.getElementById('bal-input-wind');
+                        if (wInput && nums[1]) { wInput.value = nums[1]; updated = true; }
+                        
+                        const dInput = document.getElementById('bal-input-wind-dir');
+                        if (dInput && nums[2]) { dInput.value = nums[2]; updated = true; }
+                    }
+                }
+
+                if (updated) {
+                    // Force a change event to trigger calculations
+                    if (typeof window.runSolverMatrix === 'function') window.runSolverMatrix();
+                    
+                    // Clear existing timer if they are speaking in chunks
+                    if (window.dopeReadoutTimer) clearTimeout(window.dopeReadoutTimer);
+                    
+                    // Read back the calculated solution after a 1.5s delay to allow them to finish the sentence
+                    window.dopeReadoutTimer = setTimeout(() => {
+                        let elev = document.getElementById('sol-elev-mil')?.innerText || "zero";
+                        let elevDir = document.getElementById('sol-elev-label-code')?.innerText || "U";
+                        elevDir = elevDir === 'U' ? "Up" : (elevDir === 'D' ? "Down" : "Up");
+                        
+                        let solWind = document.getElementById('sol-wind-mil')?.innerText || "zero";
+                        let solWindDir = document.getElementById('sol-wind-label-code')?.innerText || "L";
+                        solWindDir = solWindDir === 'L' ? "Left" : (solWindDir === 'R' ? "Right" : "Hold");
+                        
+                        const finalRange = document.getElementById('bal-input-range')?.value || "unknown";
+                        
+                        if (elev !== '--.-') {
+                            aiSpeak(`Target ${finalRange}. ${elevDir} ${elev}. ${solWindDir} ${solWind}.`);
+                            if (window.pushTacLog) window.pushTacLog(`AI SPOTTER: Range ${finalRange}y -> ${elevDir} ${elev}, ${solWindDir} ${solWind}`, "INFO");
+                        } else {
+                            aiSpeak(`Target ${finalRange}. Calculation failed.`);
+                            if (window.pushTacLog) window.pushTacLog(`AI SPOTTER: Calc failed for ${finalRange}y`, "SYS");
+                        }
+                        
+                        // Close the waiting window after we provide the final solution
+                        aiSpotterState = 'IDLE';
+                    }, 1500);
+                }
+            }
+        };
+
+        aiSpotterRecognition.onerror = function(event) {
+            console.error("Speech Recognition Error:", event.error);
+            if (window.pushTacLog) window.pushTacLog(`MIC ERROR: ${event.error}`, "SYS");
+            
+            if (event.error === 'not-allowed') {
+                aiSpotterActive = false;
+                btn.classList.remove('text-red-500', 'animate-pulse');
+                btn.classList.add('text-gray-500');
+                aiSpeak("Microphone access denied.");
+            }
+        };
+
+        aiSpotterRecognition.onend = function() {
+            // Auto-restart if still active (continuous listening loop)
+            if (aiSpotterActive) {
+                try { aiSpotterRecognition.start(); } catch(e) {}
+            }
+        };
+    }
+
+    aiSpotterActive = true;
+    aiSpeak("Spotter online.");
+    try { aiSpotterRecognition.start(); } catch(e) {}
+};
 

@@ -1131,7 +1131,12 @@
                 <div class="dash-panel flex-1" id="panel-ballistics">
                     <div class="dash-panel-header">
                         <span class="dash-panel-title"><i data-lucide="target" class="inline w-3 h-3 mr-1 text-emerald-400"></i> Ballistic Solver</span>
-                        <button class="maximize-btn text-gray-500 hover:text-emerald-400 transition-colors flex items-center" onclick="toggleFullscreen('panel-ballistics')"><span class="close-label font-black text-[9px] uppercase tracking-widest bg-emerald-950/80 px-2 py-1 rounded border border-emerald-600/50 text-emerald-400 mr-2">CLOSE WINDOW</span><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i></button>
+                        <div class="flex items-center">
+                            <button id="ai-spotter-btn" onclick="toggleAISpotter()" class="text-gray-500 hover:text-emerald-400 transition-colors flex items-center mr-3" title="AI Spotter (Voice Commands)">
+                                <i data-lucide="mic" id="ai-spotter-icon" class="w-4 h-4"></i>
+                            </button>
+                            <button class="maximize-btn text-gray-500 hover:text-emerald-400 transition-colors flex items-center" onclick="toggleFullscreen('panel-ballistics')"><span class="close-label font-black text-[9px] uppercase tracking-widest bg-emerald-950/80 px-2 py-1 rounded border border-emerald-600/50 text-emerald-400 mr-2">CLOSE WINDOW</span><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i></button>
+                        </div>
                     </div>
                     <div class="dash-panel-content flex flex-col bg-black p-0 overflow-hidden" id="ballistic-panel-content">
                         <!-- TACTICAL SOLVER GRID (MIRROR REFERENCE) -->
@@ -1761,7 +1766,7 @@
     </div>
 
     <!-- MAIN SCRIPT -->
-    <script src="original_script.min.js?v=2.7" defer></script>
+    <script src="./original_script.min.js?v=4.0" defer></script>
     <script>
         // Set header version display
         window.addEventListener('DOMContentLoaded', () => {
@@ -1790,7 +1795,7 @@
     <!-- PWA SERVICE WORKER REGISTRATION & API UPDATE CHECK -->
 
     <script>
-        window.APP_VERSION = 'v3.0.40';
+        window.APP_VERSION = 'v3.0.41';
         if(document.getElementById('header-version-display')) {
             document.getElementById('header-version-display').innerText = window.APP_VERSION;
         }
@@ -1827,11 +1832,14 @@
         };
 
         window.addEventListener('load', () => {
-            // Register SW silently for offline support
+            // UNREGISTER SW FOR DEVELOPMENT SO WE DON'T NEED TO BUMP VERSIONS
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('./sw.js?v=' + window.APP_VERSION).catch(err => console.log('SW reg failed', err));
+                navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                    for(let registration of registrations) {
+                        registration.unregister();
+                    }
+                });
             }
-
             // MANDATORY EULA/UPDATE CHECK
             // If the app silently updated in the background, force the toast for the new version.
             const acceptedVersion = localStorage.getItem('twa_accepted_version');
@@ -2058,7 +2066,7 @@
       <div class="bg-gray-950 border-2 border-neon-green rounded-lg shadow-[0_0_30px_rgba(34,197,94,0.3)] max-w-md w-full font-mono overflow-hidden flex flex-col">
           <div class="bg-gray-900 border-b border-neon-green p-3 flex items-center justify-between">
               <h2 class="text-neon-green font-black uppercase tracking-widest flex items-center gap-2 text-sm"><i data-lucide="terminal" class="w-4 h-4"></i> MISSION BRIEFING</h2>
-              <button onclick="closeBriefingModal()" class="text-gray-400 hover:text-white transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
+              <button onclick="closeBriefingModal()" aria-label="Close Briefing" class="text-gray-400 hover:text-white transition-colors"><i data-lucide="x" class="w-5 h-5"></i></button>
           </div>
           <div class="p-6 text-gray-300 text-xs leading-relaxed space-y-4">
               <p>Welcome to the <span class="text-white font-bold">Tactical Range Card</span>.</p>
@@ -2071,7 +2079,7 @@
               <p class="text-neon-green font-bold text-center mt-4 border-t border-gray-800 pt-4">GOOD HUNTING.</p>
           </div>
           <div class="p-4 bg-gray-900 border-t border-gray-800 flex justify-end">
-              <button onclick="closeBriefingModal()" class="bg-neon-green text-gray-900 font-bold px-6 py-2 rounded shadow hover:bg-green-500 transition-colors uppercase tracking-widest text-xs">Acknowledge</button>
+              <button onclick="closeBriefingModal()" class="bg-neon-green text-gray-950 font-extrabold px-6 py-2 rounded shadow hover:bg-green-500 transition-colors uppercase tracking-widest text-xs">Acknowledge</button>
           </div>
       </div>
   </div>
@@ -2093,6 +2101,7 @@
     <audio id="comms-rx-audio" class="hidden" playsinline></audio>
 </body>
 </html>
+
 
 
 
