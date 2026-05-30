@@ -2427,6 +2427,7 @@ function initializeTacticalDashboard2() {
 
             const originalTransform = container.style.transform;
             container.style.transform = 'none';
+
             const originalScrollY = window.scrollY;
             window.scrollTo(0, 0);
 
@@ -2435,21 +2436,89 @@ function initializeTacticalDashboard2() {
             document.body.classList.add('is-capturing');
 
             setTimeout(() => {
+                const scale = window.innerWidth < 768 ? 1 : 2;
                 html2canvas(container, {
-                    scale: window.innerWidth < 768 ? 1 : 2,
+                    scale: scale,
                     backgroundColor: '#ffffff',
                     useCORS: true,
                     logging: true,
                     scrollX: 0,
-                    scrollY: 0
+                    scrollY: 0,
+                    ignoreElements: (el) => {
+                        return el.id === 'recon-canvas' || (el.classList && el.classList.contains('recon-marker'));
+                    }
                 }).then(canvas => {
                     document.body.classList.remove('is-capturing');
+                    
+                    // --- NATIVE CANVAS COMPOSITE FOR OFFLINE EMOJIS AND DRAWINGS ---
+                    const ctx = canvas.getContext('2d');
+                    const workspace = document.getElementById('recon-map-workspace');
+                    if (workspace) {
+                        const containerRect = container.getBoundingClientRect();
+                        const workspaceRect = workspace.getBoundingClientRect();
+                        
+                        const offsetX = (workspaceRect.left - containerRect.left) * scale;
+                        const offsetY = (workspaceRect.top - containerRect.top) * scale;
+                        const workspaceW = workspaceRect.width * scale;
+                        const workspaceH = workspaceRect.height * scale;
+                        
+                        // 1. Draw the lines from reconCanvas
+                        const reconCanvas = document.getElementById('recon-canvas');
+                        if (reconCanvas) {
+                            ctx.drawImage(reconCanvas, offsetX, offsetY, workspaceW, workspaceH);
+                        }
+                        
+                        // 2. Draw the emojis natively to avoid html2canvas offline font crash
+                        const markerElements = workspace.querySelectorAll('.recon-marker:not(.mobile-recon-marker)');
+                        markerElements.forEach(m => {
+                            if (!m.dataset.emoji) return;
+                            const xPercent = parseFloat(m.style.left);
+                            const yPercent = parseFloat(m.style.top);
+                            const px = offsetX + (xPercent / 100) * workspaceW;
+                            const py = offsetY + (yPercent / 100) * workspaceH;
+                            
+                            ctx.font = `${24 * scale}px sans-serif`;
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            // Shadow for clarity against backgrounds
+                            ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+                            ctx.shadowBlur = 4 * scale;
+                            ctx.shadowOffsetX = 1 * scale;
+                            ctx.shadowOffsetY = 1 * scale;
+                            ctx.fillText(m.dataset.emoji, px, py - (2 * scale));
+                            ctx.shadowColor = 'transparent';
+                            
+                            if (m.dataset.note) {
+                                ctx.font = `bold ${8 * scale}px monospace`;
+                                const textMetrics = ctx.measureText(m.dataset.note.toUpperCase());
+                                const textW = textMetrics.width;
+                                const textH = 8 * scale;
+                                
+                                const rectW = textW + (8 * scale);
+                                const rectH = textH + (6 * scale);
+                                const rectX = px - rectW/2;
+                                const rectY = py + (12 * scale);
+                                
+                                ctx.fillStyle = 'rgba(2, 44, 34, 0.8)';
+                                ctx.fillRect(rectX, rectY, rectW, rectH);
+                                ctx.strokeStyle = 'rgba(16, 185, 129, 0.4)';
+                                ctx.lineWidth = 1 * scale;
+                                ctx.strokeRect(rectX, rectY, rectW, rectH);
+                                
+                                ctx.fillStyle = '#ffffff';
+                                ctx.fillText(m.dataset.note.toUpperCase(), px, rectY + rectH/2 + (0.5 * scale));
+                            }
+                        });
+                    }
+                    // ----------------------------------------------------------------
+
                     previewPanel.style.transition = originalTransition;
 
                     if (isVisuallyHidden) {
                         previewPanel.classList.add('opacity-0', 'pointer-events-none', 'absolute');
                         previewPanel.classList.remove('flex');
                     }
+                    
                     container.style.transform = originalTransform;
                     window.scrollTo(0, originalScrollY);
 
@@ -5381,6 +5450,9 @@ function initializeTacticalDashboard2() {
                 if (dec.image && dec.user.id !== commsUser.id) {
                     saveIntelSnapshot(`RX_INTEL_${dec.user.callsign}`, dec.image, dec.metadata || {});
                 }
+                if (dec.user.id !== commsUser.id) {
+                    if (window.playChatAlert) window.playChatAlert();
+                }
             }
         });
 
@@ -5483,6 +5555,61 @@ function initializeTacticalDashboard2() {
         `;
         feed.appendChild(entry);
         feed.scrollTop = feed.scrollHeight;
+    }
+
+    // COMMS NOTIFICATION SYSTEM
+    let chatAlertState = 0; // 0: Off, 1: Chime, 2: Vibrate, 3: Both
+    const chatAlertLabels = ["Alerts: Off", "Alerts: Chime", "Alerts: Vibrate", "Alerts: Both"];
+    const chatAlertIcons = ["bell-off", "bell", "smartphone", "bell-ring"];
+    
+    window.cycleChatAlerts = function() {
+        chatAlertState = (chatAlertState + 1) % 4;
+        const btn = document.getElementById('chat-alert-toggle');
+        if (btn) {
+            btn.innerHTML = `<i data-lucide="${chatAlertIcons[chatAlertState]}" class="w-2.5 h-2.5 inline-block"></i> <span>${chatAlertLabels[chatAlertState]}</span>`;
+            if (window.lucide) window.lucide.createIcons();
+        }
+    };
+
+    window.playChatAlert = function() {
+        if (chatAlertState === 1 || chatAlertState === 3) {
+            playSynthesizedChime();
+        }
+        if (chatAlertState === 2 || chatAlertState === 3) {
+            if (navigator.vibrate) {
+                navigator.vibrate([300, 100, 300]);
+            } else {
+                console.log("Vibration API not supported on this device (likely iOS).");
+            }
+        }
+    };
+
+    function playSynthesizedChime() {
+        try {
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            if (!AudioContext) return;
+            const ctx = new AudioContext();
+            if (ctx.state === 'suspended') ctx.resume();
+
+            const osc = ctx.createOscillator();
+            const gainNode = ctx.createGain();
+            
+            osc.connect(gainNode);
+            gainNode.connect(ctx.destination);
+            
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(880, ctx.currentTime);
+            osc.frequency.setValueAtTime(1046.50, ctx.currentTime + 0.1);
+            
+            gainNode.gain.setValueAtTime(0, ctx.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.3, ctx.currentTime + 0.05);
+            gainNode.gain.linearRampToValueAtTime(0, ctx.currentTime + 0.3);
+            
+            osc.start(ctx.currentTime);
+            osc.stop(ctx.currentTime + 0.3);
+        } catch(e) {
+            console.log("Audio synthesis failed:", e);
+        }
     }
 
     // PTT LOGIC
@@ -6101,5 +6228,25 @@ document.addEventListener('DOMContentLoaded', () => {
         scrollContainer.scrollLeft = scrollLeft - walkX;
         scrollContainer.scrollTop = scrollTop - walkY;
     });
+});
+
+// --- MISSION BRIEFING MODAL LOGIC ---
+window.openBriefingModal = function() {
+    const modal = document.getElementById('briefing-modal');
+    if (modal) modal.classList.remove('hidden');
+    if (modal) modal.classList.add('flex');
+};
+
+window.closeBriefingModal = function() {
+    const modal = document.getElementById('briefing-modal');
+    if (modal) modal.classList.add('hidden');
+    if (modal) modal.classList.remove('flex');
+    localStorage.setItem('trc_has_seen_briefing', 'true');
+};
+
+document.addEventListener('DOMContentLoaded', () => {
+    if (!localStorage.getItem('trc_has_seen_briefing')) {
+        setTimeout(window.openBriefingModal, 1500); // Small delay so UI loads first
+    }
 });
 
