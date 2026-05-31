@@ -2859,6 +2859,20 @@ function initializeTacticalDashboard2() {
                 if(!newI.className) newI.className = 'w-3.5 h-3.5';
                 icon.replaceWith(newI);
             }
+            // RUN CLEANUP ON PANELS BEING AUTO-CLOSED
+            if (el.id === 'panel-dope-select') {
+                document.getElementById('dope-cache-selector-grid').classList.add('hidden');
+                document.getElementById('dope-cache-selector-grid').classList.remove('flex');
+            } else if (el.id === 'panel-sat-select') {
+                document.getElementById('sat-archive-selector-grid').classList.add('hidden');
+                document.getElementById('sat-archive-selector-grid').classList.remove('flex');
+            } else if (el.id === 'panel-measuring') {
+                document.getElementById('geo-toolkit-bar')?.classList.add('hidden');
+                document.getElementById('geo-ruler-footer')?.classList.add('hidden');
+            } else if (el.id === 'panel-vault') {
+                document.getElementById('vault-selector-grid').classList.add('hidden');
+                document.getElementById('vault-selector-grid').classList.remove('flex');
+            }
         });
 
         if (!isMax) {
@@ -3438,6 +3452,10 @@ function initializeTacticalDashboard2() {
     }
 
     function handleMapClick(e) {
+        // Prevent accidental marker drops when clicking to expand the panel from the dashboard
+        const panel = document.getElementById('panel-measuring');
+        if (panel && !panel.classList.contains('is-maximized')) return;
+
         const latlng = e.latlng;
 
         if (!isMultiTargetMode) {
@@ -3514,7 +3532,7 @@ function initializeTacticalDashboard2() {
             }
             lastDisplayDistance = displayDistance;
 
-            const labelHtml = `<div style="color:#ff1493; font-family:'JetBrains Mono', monospace; font-weight:900; font-size:12px; text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; white-space:nowrap;">${displayDistance} ${geoDistanceUnit}</div>`;
+            const labelHtml = `<div style="color:#ff1493; font-family:'JetBrains Mono', monospace; font-weight:900; font-size:20px; text-shadow:-1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; white-space:nowrap;">${displayDistance} ${geoDistanceUnit}</div>`;
             const customIcon = L.divIcon({
                 html: labelHtml,
                 className: 'geo-midpoint-label',
@@ -3655,10 +3673,39 @@ function initializeTacticalDashboard2() {
                     }
                 });
                 
+                // --- INJECT MASSIVE WATERMARK SO IT IS ALWAYS READABLE IN THUMBNAILS ---
+                const ctx = canvas.getContext('2d');
+                const bannerHeight = window.innerWidth < 768 ? 120 : 160; 
+                
+                // Draw semi-transparent black banner at the very top
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+                ctx.fillRect(0, 0, canvas.width, bannerHeight);
+                
+                // Draw massive neon text inside the banner
+                ctx.fillStyle = '#10b981'; // Emerald
+                ctx.font = '900 ' + (bannerHeight * 0.5) + 'px monospace';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const distVal = document.getElementById('live-map-dist')?.textContent || "--.--";
+                const massiveText = `DISTANCE: ${distVal} ${geoDistanceUnit}`;
+                
+                // Add a black drop shadow
+                ctx.shadowColor = "black";
+                ctx.shadowBlur = 10;
+                ctx.lineWidth = 4;
+                ctx.strokeText(massiveText, canvas.width / 2, bannerHeight / 2);
+                ctx.shadowBlur = 0;
+                ctx.fillText(massiveText, canvas.width / 2, bannerHeight / 2);
+                // -----------------------------------------------------------------------
+
                 const dataUri = canvas.toDataURL('image/jpeg', 0.9);
                 
                 // Deliver directly to Vault system
-                saveIntelSnapshot("Orbital_Vector_" + Date.now().toString().slice(-4), dataUri);
+                let meta = {};
+                if(typeof mapMarkers !== 'undefined' && mapMarkers.length >= 2) {
+                    meta.markers = mapMarkers.map(m => m.getLatLng());
+                }
+                saveIntelSnapshot("Orbital_Vector_" + Date.now().toString().slice(-4), dataUri, meta);
                 
                 mapSnapBtn.innerHTML = `<i data-lucide="check" class="w-3 h-3"></i> SAVED TO VAULT`;
                 setTimeout(() => { mapSnapBtn.innerHTML = originalHtml; mapSnapBtn.disabled = false; if(window.lucide) lucide.createIcons(); }, 2000);
@@ -3705,6 +3752,58 @@ function initializeTacticalDashboard2() {
         }
     }
     initVaultFromDB();
+
+    // ========================================================================
+    // LOAD INTEL VAULT TO MAP
+    // ========================================================================
+    window.loadVaultToMap = function(item) {
+        if (!item || (!item.markers && !item.originLat)) {
+            alert("This snapshot does not contain valid map coordinates.");
+            return;
+        }
+
+        // 1. Switch to Map Panel
+        const panel = document.getElementById('panel-measuring');
+        if (panel && !panel.classList.contains('is-maximized')) {
+            window.toggleFullscreen('panel-measuring');
+        }
+
+        // 2. Clear Existing Map
+        if (typeof clearMapMeasurements === 'function') clearMapMeasurements();
+
+        // 3. Inject Markers
+        if (item.markers && Array.isArray(item.markers)) {
+            item.markers.forEach(ll => {
+                const m = L.circleMarker(L.latLng(ll.lat, ll.lng), {
+                    radius: 6, color: '#ff1493', fillColor: '#000', fillOpacity: 1, weight: 2
+                }).addTo(orbitalMap);
+                mapMarkers.push(m);
+            });
+        } else if (item.originLat && item.targetLat) {
+            const oLatlng = L.latLng(item.originLat, item.originLng);
+            const tLatlng = L.latLng(item.targetLat, item.targetLng);
+            const m1 = L.circleMarker(oLatlng, { radius: 6, color: '#ff1493', fillColor: '#000', fillOpacity: 1, weight: 2 }).addTo(orbitalMap);
+            const m2 = L.circleMarker(tLatlng, { radius: 6, color: '#ff1493', fillColor: '#000', fillOpacity: 1, weight: 2 }).addTo(orbitalMap);
+            mapMarkers = [m1, m2];
+        }
+
+        // Set correct mode
+        if (mapMarkers.length > 2) {
+            isMultiTargetMode = true;
+            document.getElementById('geo-mode-label').textContent = 'MULTI';
+        } else {
+            isMultiTargetMode = false;
+            document.getElementById('geo-mode-label').textContent = 'SINGLE';
+        }
+
+        // 4. Draw Line
+        if (typeof drawMapLine === 'function') drawMapLine();
+
+        // 5. Pan and Zoom to bounds
+        if (orbitalMap && mapMarkers.length > 0) {
+            orbitalMap.fitBounds(L.featureGroup(mapMarkers).getBounds(), { padding: [50, 50], maxZoom: 18 });
+        }
+    };
 
     async function saveIntelSnapshot(label, dataUri, metadata = {}) {
         if (vaultCache.length >= 50) { // Increased limit for IDB
@@ -3770,12 +3869,18 @@ function initializeTacticalDashboard2() {
                     <i data-lucide="edit-3" class="w-3 h-3"></i>
                 </button>
                 ` : ''}
+
+                ${(item.markers || (item.originLat && item.targetLat)) ? `
+                <button class="load-map-btn absolute bottom-7 left-1.5 bg-blue-600 text-white p-1.5 rounded border border-blue-400 shadow-lg hover:bg-blue-400 transition-all z-30" title="Load to Geo Matrix">
+                    <i data-lucide="map-pin" class="w-3 h-3"></i>
+                </button>
+                ` : ''}
             `;
             
             // Bind the entire card to selection
             el.addEventListener('click', (e) => {
                 // If they clicked the trash or checkbox or load-note specifically, don't maximize
-                if(e.target.closest('.delete-vault-btn') || e.target.closest('.vault-export-checkbox') || e.target.closest('.load-note-btn')) return;
+                if(e.target.closest('.delete-vault-btn') || e.target.closest('.vault-export-checkbox') || e.target.closest('.load-note-btn') || e.target.closest('.load-map-btn')) return;
                 e.stopPropagation();
                 selectVaultItem(item);
             });
@@ -3786,6 +3891,15 @@ function initializeTacticalDashboard2() {
                 loadBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     loadNoteBackToEditor(item);
+                });
+            }
+
+            // Bind Load Map handler
+            const loadMapBtn = el.querySelector('.load-map-btn');
+            if(loadMapBtn) {
+                loadMapBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    if(window.loadVaultToMap) window.loadVaultToMap(item);
                 });
             }
 
@@ -3816,6 +3930,12 @@ function initializeTacticalDashboard2() {
     function selectVaultItem(item) {
         // BROADCAST TO TICKER
         window.pushTacLog(`INTEL VAULT ACCESS: RELOADING SAVED SNAPSHOT`, "SYS");
+
+        // Auto-minimize Vault after selection so the user only sees the selected image outside
+        const panel = document.getElementById('panel-vault');
+        if (panel && panel.classList.contains('is-maximized')) {
+            window.toggleFullscreen('panel-vault');
+        }
 
         const target = document.getElementById('vault-active-display');
         if (!target) return;
@@ -6351,7 +6471,7 @@ window.toggleAISpotter = function() {
             console.log("Voice Command Heard:", command);
             if (window.pushTacLog) window.pushTacLog(`HEARD: "${command}"`, "INFO");
             
-            if (command.includes("spotter") || command.includes("spider") || command.includes("spot")) {
+            if (command.includes("spotter") || command.includes("spider") || command.includes("spot") || command.includes("read dope") || command.includes("solution")) {
                 let curRange = document.getElementById('bal-input-range')?.value;
                 curRange = (curRange && curRange.trim() !== '') ? curRange : "zero";
                 
@@ -6369,90 +6489,68 @@ window.toggleAISpotter = function() {
                 let solWindDir = document.getElementById('sol-wind-label-code')?.innerText || "L";
                 solWindDir = solWindDir === 'L' ? "Left" : (solWindDir === 'R' ? "Right" : "Hold");
                 
+                let curDirAim = document.getElementById('bal-input-shot-dir')?.value || "zero";
+                
                 if (elev !== '--.-') {
-                    aiSpeak(`Target ${curRange}, wind ${curWind} from ${curDir}. ${elevDir} ${elev}. ${solWindDir} ${solWind}.`);
+                    aiSpeak(`Direction ${curDirAim}. Target ${curRange}, wind ${curWind} from ${curDir}. ${elevDir} ${elev}. ${solWindDir} ${solWind}.`);
                 } else {
-                    aiSpeak(`Target ${curRange}, wind ${curWind} from ${curDir}. No DOPE available.`);
+                    aiSpeak(`Direction ${curDirAim}. Target ${curRange}, wind ${curWind} from ${curDir}. No DOPE available.`);
                 }
-
-                aiSpotterState = 'IDLE';
+                
                 const panel = document.getElementById('panel-ballistics');
                 if (panel && panel.classList.contains('hidden')) window.toggleSection('panel-ballistics');
             } 
             else if (command.includes("range card")) {
                 aiSpeak("Yes");
-                aiSpotterState = 'IDLE';
             }
-            else if (command.includes("new dope")) {
+            else if (command.includes("new dope") || command.includes("new target")) {
                 aiSpeak("Ready");
                 aiSpotterState = 'WAITING_FOR_DOPE';
+                window.dopeCommandBuffer = command.substring(command.indexOf("new dope") + 8).trim();
             }
-            else if (command.includes("read dope") || command.includes("solution")) {
-                let elev = document.getElementById('sol-elev-mil')?.innerText;
-                let elevDir = document.getElementById('sol-elev-label-code')?.innerText;
-                let wind = document.getElementById('sol-wind-mil')?.innerText;
-                let windDir = document.getElementById('sol-wind-label-code')?.innerText;
-
-                if (!elev || elev === '--.-') {
-                    // Fall back to original setup inputs if solver is empty
-                    elev = document.getElementById('elevation')?.value || "zero";
-                    wind = document.getElementById('hold-data')?.value || "zero";
-                    elevDir = "Up";
-                    windDir = "Hold";
-                } else {
-                    elevDir = elevDir === 'U' ? "Up" : (elevDir === 'D' ? "Down" : "Up");
-                    windDir = windDir === 'L' ? "Left" : (windDir === 'R' ? "Right" : "Hold");
+            
+            if (aiSpotterState === 'WAITING_FOR_DOPE') {
+                if (!command.includes("new dope") && !command.includes("new target")) {
+                    window.dopeCommandBuffer = (window.dopeCommandBuffer + " " + command).trim();
                 }
                 
-                aiSpeak(`${elevDir} ${elev}. ${windDir} ${wind}.`);
-            }
-            else if (aiSpotterState === 'WAITING_FOR_DOPE' && command.match(/\d+/)) {
+                const fullCommand = window.dopeCommandBuffer;
                 let updated = false;
                 
-                // 1. Parse Range (e.g. "300 yards" or "target 300")
-                let rMatch = command.match(/(\d+)\s*(?:yard|yards|meter|meters|y|m)/) || command.match(/(?:target|range)\s*(\d+)/);
+                // 1. Parse Range
+                let rMatch = fullCommand.match(/(\d+)\s*(?:yard|yards|meter|meters|y|m)/) || fullCommand.match(/(?:target|range)\s*(\d+)/);
                 if (rMatch) {
                     const rInput = document.getElementById('bal-input-range');
-                    if (rInput) { rInput.value = rMatch[1]; updated = true; }
+                    if (rInput && rInput.value !== rMatch[1]) { rInput.value = rMatch[1]; updated = true; }
                 }
                 
-                // 2. Parse Wind Speed (e.g. "wind 10" or "10 mph")
-                let wMatch = command.match(/(?:wind|speed)\s*(\d+)/) || command.match(/(\d+)\s*(?:mph|miles per hour)/);
+                // 2. Parse Wind Speed
+                let wMatch = fullCommand.match(/(?:wind|speed)\s*(\d+)/) || fullCommand.match(/(\d+)\s*(?:mph|miles per hour)/);
                 if (wMatch) {
                     const wInput = document.getElementById('bal-input-wind');
-                    if (wInput) { wInput.value = wMatch[1]; updated = true; }
+                    if (wInput && wInput.value !== wMatch[1]) { wInput.value = wMatch[1]; updated = true; }
                 }
                 
-                // 3. Parse Wind Direction (e.g. "from 170" or "direction 170")
-                let dMatch = command.match(/(?:from|direction|dir)\s*(\d+)/);
-                if (dMatch) {
-                    const dInput = document.getElementById('bal-input-wind-dir');
-                    if (dInput) { dInput.value = dMatch[1]; updated = true; }
-                }
-                
-                // 4. Fallback if no keywords matched
-                if (!updated) {
-                    const nums = command.match(/\d+/g);
-                    if (nums && nums.length > 0) {
-                        const rInput = document.getElementById('bal-input-range');
-                        if (rInput && nums[0]) { rInput.value = nums[0]; updated = true; }
-                        
-                        const wInput = document.getElementById('bal-input-wind');
-                        if (wInput && nums[1]) { wInput.value = nums[1]; updated = true; }
-                        
-                        const dInput = document.getElementById('bal-input-wind-dir');
-                        if (dInput && nums[2]) { dInput.value = nums[2]; updated = true; }
-                    }
+                // 3. Parse Wind Direction
+                let wDirMatch = fullCommand.match(/from\s*(\d+)/);
+                if (wDirMatch) {
+                    const wDirInput = document.getElementById('bal-input-wind-dir');
+                    if (wDirInput && wDirInput.value !== wDirMatch[1]) { wDirInput.value = wDirMatch[1]; updated = true; }
                 }
 
-                if (updated) {
-                    // Force a change event to trigger calculations
+                // 4. Parse Shot Direction
+                let dMatch = fullCommand.match(/(?:direction|facing|azimuth)\s*(\d+)/);
+                if (dMatch) {
+                    const dInput = document.getElementById('bal-input-shot-dir');
+                    if (dInput && dInput.value !== dMatch[1]) { dInput.value = dMatch[1]; updated = true; }
+                }
+                
+                if (updated || fullCommand.match(/\d+/)) {
                     if (typeof window.runSolverMatrix === 'function') window.runSolverMatrix();
                     
-                    // Clear existing timer if they are speaking in chunks
                     if (window.dopeReadoutTimer) clearTimeout(window.dopeReadoutTimer);
                     
-                    // Read back the calculated solution after a 1.5s delay to allow them to finish the sentence
+                    // 5-second silence timer to auto-read the result
                     window.dopeReadoutTimer = setTimeout(() => {
                         let elev = document.getElementById('sol-elev-mil')?.innerText || "zero";
                         let elevDir = document.getElementById('sol-elev-label-code')?.innerText || "U";
@@ -6462,19 +6560,21 @@ window.toggleAISpotter = function() {
                         let solWindDir = document.getElementById('sol-wind-label-code')?.innerText || "L";
                         solWindDir = solWindDir === 'L' ? "Left" : (solWindDir === 'R' ? "Right" : "Hold");
                         
+                        const finalDir = document.getElementById('bal-input-shot-dir')?.value || "zero";
                         const finalRange = document.getElementById('bal-input-range')?.value || "unknown";
+                        const finalWind = document.getElementById('bal-input-wind')?.value || "zero";
+                        const finalWindDir = document.getElementById('bal-input-wind-dir')?.value || "zero";
                         
                         if (elev !== '--.-') {
-                            aiSpeak(`Target ${finalRange}. ${elevDir} ${elev}. ${solWindDir} ${solWind}.`);
-                            if (window.pushTacLog) window.pushTacLog(`AI SPOTTER: Range ${finalRange}y -> ${elevDir} ${elev}, ${solWindDir} ${solWind}`, "INFO");
+                            aiSpeak(`Direction ${finalDir}. Target ${finalRange}, wind ${finalWind} from ${finalWindDir}. ${elevDir} ${elev}. ${solWindDir} ${solWind}.`);
+                            if (window.pushTacLog) window.pushTacLog(`AI SPOTTER: Dir ${finalDir}, Range ${finalRange}y -> ${elevDir} ${elev}, ${solWindDir} ${solWind}`, "INFO");
                         } else {
-                            aiSpeak(`Target ${finalRange}. Calculation failed.`);
-                            if (window.pushTacLog) window.pushTacLog(`AI SPOTTER: Calc failed for ${finalRange}y`, "SYS");
+                            aiSpeak(`Direction ${finalDir}. Target ${finalRange}. Calculation failed.`);
+                            if (window.pushTacLog) window.pushTacLog(`AI SPOTTER: Calc failed`, "SYS");
                         }
                         
-                        // Close the waiting window after we provide the final solution
                         aiSpotterState = 'IDLE';
-                    }, 1500);
+                    }, 5000);
                 }
             }
         };
