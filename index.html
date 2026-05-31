@@ -142,6 +142,9 @@
                     <button onclick="openBriefingModal()" class="text-blue-500 hover:text-blue-400 p-1 flex items-center justify-center transition-colors shrink-0 mr-2" title="Mission Briefing">
                         <i data-lucide="help-circle" class="w-6 h-6"></i>
                     </button>
+                    <button id="btn-tactical-hints" onclick="toggleTacticalHints()" class="text-emerald-500 hover:text-emerald-400 p-1 flex items-center justify-center transition-colors shrink-0 mr-2" title="Quick Reference & Conversions">
+                        <i data-lucide="info" class="w-6 h-6"></i>
+                    </button>
                     <button class="remarks-toggle-btn text-yellow-500 hover:text-yellow-400 p-1 flex items-center justify-center transition-colors shrink-0 mr-2" title="ReMarks Jotter">
                         <i data-lucide="edit-3" class="w-6 h-6"></i>
                     </button>
@@ -1120,10 +1123,15 @@
                             </div>
                         </div>
 
-                        <!-- Sync Action Trigger -->
-                        <button id="sync-wx-btn" class="mt-3 w-full bg-blue-950/40 hover:bg-blue-900/60 border border-blue-900/60 py-1.5 rounded text-[8px] font-black uppercase text-blue-300 flex items-center justify-center gap-1.5 tracking-[0.15em] transition-all active:scale-95">
-                            <i data-lucide="satellite-dish" class="w-3 h-3"></i> SYNC SATELLITE CLIMATE
-                        </button>
+                        <!-- Action Buttons -->
+                        <div class="mt-3 grid grid-cols-2 gap-2">
+                            <button id="sync-wx-btn" class="w-full bg-blue-950/40 hover:bg-blue-900/60 border border-blue-900/60 py-1.5 rounded text-[8px] font-black uppercase text-blue-300 flex items-center justify-center gap-1.5 tracking-[0.15em] transition-all active:scale-95">
+                                <i data-lucide="satellite-dish" class="w-3 h-3"></i> SYNC
+                            </button>
+                            <button id="btn-weather-to-vault" class="w-full bg-emerald-950/40 hover:bg-emerald-900/60 border border-emerald-900/60 py-1.5 rounded text-[8px] font-black uppercase text-emerald-300 flex items-center justify-center gap-1.5 tracking-[0.15em] transition-all active:scale-95">
+                                <i data-lucide="save" class="w-3 h-3"></i> VAULT
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -1132,6 +1140,9 @@
                     <div class="dash-panel-header">
                         <span class="dash-panel-title"><i data-lucide="target" class="inline w-3 h-3 mr-1 text-emerald-400"></i> Ballistic Solver</span>
                         <div class="flex items-center">
+                            <button id="btn-matrix-generator" onclick="toggleMatrixGenerator()" class="text-gray-500 hover:text-emerald-400 transition-colors flex items-center mr-3" title="Generate Ballistic Matrix">
+                                <i data-lucide="table" class="w-4 h-4"></i>
+                            </button>
                             <div class="relative group mr-3">
                                 <i data-lucide="help-circle" class="w-3 h-3 text-gray-600 hover:text-blue-400 cursor-help transition-colors"></i>
                                 <div class="absolute right-0 top-full mt-1 w-52 bg-gray-950 border border-blue-900/50 text-gray-300 text-[9px] p-2 rounded shadow-2xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-[100]">
@@ -1148,7 +1159,71 @@
                             <button class="maximize-btn text-gray-500 hover:text-emerald-400 transition-colors flex items-center" onclick="toggleFullscreen('panel-ballistics')"><span class="close-label font-black text-[9px] uppercase tracking-widest bg-emerald-950/80 px-2 py-1 rounded border border-emerald-600/50 text-emerald-400 mr-2">CLOSE WINDOW</span><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i></button>
                         </div>
                     </div>
-                    <div class="dash-panel-content flex flex-col bg-black p-0 overflow-hidden" id="ballistic-panel-content">
+                    <div class="dash-panel-content flex flex-col bg-black p-0 overflow-hidden relative" id="ballistic-panel-content">
+                        <!-- MATRIX GENERATOR LOCALIZED PANEL -->
+                        <div id="matrix-generator-modal" class="absolute inset-0 bg-gray-950 z-[150] hidden flex-col opacity-0 transition-opacity duration-300" style="margin:0;">
+                            <div class="flex-1 flex flex-col overflow-hidden w-full h-full" id="matrix-generator-panel">
+                                <!-- Header -->
+                                <div class="bg-blue-950 border-b border-blue-800 p-3 flex justify-between items-center shrink-0">
+                                    <h3 class="text-blue-400 font-black tracking-widest uppercase flex items-center gap-2"><i data-lucide="table" class="w-4 h-4"></i> Ballistic Matrix Generator</h3>
+                                    <button onclick="toggleMatrixGenerator()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+                                </div>
+                                <!-- Controls -->
+                                <div class="p-3 border-b border-gray-800 shrink-0 bg-gray-950 flex flex-wrap gap-2 justify-between items-end">
+                                    <div>
+                                        <label class="block text-[9px] text-gray-500 uppercase font-bold mb-1">Target Increment</label>
+                                        <div class="flex bg-gray-900 rounded border border-gray-700 p-0.5" id="matrix-increment-group">
+                                            <button class="matrix-inc-btn px-2 py-1 text-xs font-bold rounded transition-colors text-gray-400 hover:text-white" data-inc="10">10y</button>
+                                            <button class="matrix-inc-btn px-2 py-1 text-xs font-bold rounded transition-colors text-gray-400 hover:text-white" data-inc="25">25y</button>
+                                            <button class="matrix-inc-btn px-2 py-1 text-xs font-bold rounded transition-colors bg-blue-600 text-white" data-inc="50">50y</button>
+                                            <button class="matrix-inc-btn px-2 py-1 text-xs font-bold rounded transition-colors text-gray-400 hover:text-white" data-inc="100">100y</button>
+                                        </div>
+                                    </div>
+                                    <button id="btn-generate-matrix" class="bg-blue-600 text-white px-4 py-1.5 rounded font-black uppercase tracking-widest hover:bg-blue-500 transition-colors shadow-[0_0_15px_rgba(37,99,235,0.5)] flex items-center gap-2 text-xs">
+                                        <i data-lucide="zap" class="w-4 h-4"></i> Generate
+                                    </button>
+                                </div>
+                                <!-- Table Container (Snapshot Target) -->
+                                <div class="p-2 overflow-y-auto flex-1 bg-black" id="matrix-table-container">
+                                    <div id="matrix-snapshot-target" class="bg-black p-2 rounded border border-gray-800 min-h-[200px]">
+                                        <div class="text-center text-gray-600 font-mono text-xs mt-4" id="matrix-empty-state">
+                                            <i data-lucide="crosshair" class="w-8 h-8 mx-auto mb-2 opacity-20"></i>
+                                            Select increment and generate matrix to populate chart.<br>
+                                            <span class="text-[9px] text-gray-700 mt-2 block">Dormant - Uses current active DOPE inputs</span>
+                                        </div>
+                                        <table class="w-full text-left font-mono text-xs hidden" id="matrix-table">
+                                            <thead class="text-[9px] text-gray-500 uppercase border-b border-gray-700">
+                                                <tr>
+                                                    <th class="py-1 px-1 text-emerald-500">Dist</th>
+                                                    <th class="py-1 px-1 text-blue-400">Elev</th>
+                                                    <th class="py-1 px-1 text-red-400">Wind</th>
+                                                    <th class="py-1 px-1 hidden sm:table-cell">Vel</th>
+                                                    <th class="py-1 px-1 hidden sm:table-cell">Energy</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="matrix-tbody" class="text-gray-300 divide-y divide-gray-800">
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <!-- Footer / Action -->
+                                <div class="p-3 border-t border-gray-800 shrink-0 bg-gray-950 flex justify-end">
+                                    <button id="btn-matrix-to-vault" class="hidden bg-emerald-600 text-white px-4 py-2 rounded font-bold text-xs uppercase tracking-wider hover:bg-emerald-500 transition-colors shadow-[0_0_10px_rgba(16,185,129,0.4)] flex items-center gap-2">
+                                        <i data-lucide="save" class="w-4 h-4"></i> Save to Vault
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- AI LIVE TRANSCRIPT HUD (HIDDEN BY DEFAULT) -->
+                        <div id="ai-spotter-hud" class="hidden absolute top-0 inset-x-0 bg-black/90 border-b border-emerald-500/50 z-50 p-2 flex items-center gap-2 shadow-[0_4px_20px_rgba(0,0,0,0.8)] backdrop-blur-md">
+                            <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0"></div>
+                            <div class="flex-1 min-w-0">
+                                <span class="text-[7px] font-black text-emerald-500 uppercase tracking-widest block leading-none mb-0.5">AI SPOTTER LISTENING</span>
+                                <div id="ai-spotter-transcript" class="text-[10px] font-mono text-emerald-100 truncate italic">Awaiting voice command...</div>
+                            </div>
+                        </div>
+
                         <!-- TACTICAL SOLVER GRID (MIRROR REFERENCE) -->
                         <!-- WEAPON SYSTEM METADATA HEADERS -->
                         <div class="flex gap-2 p-1.5 border-b border-gray-800/50 bg-black/30 mb-2">
@@ -1776,7 +1851,7 @@
     </div>
 
     <!-- MAIN SCRIPT -->
-    <script src="./original_script.min.js?v=4.2" defer></script>
+    <script src="./original_script.min.js?v=4.7" defer></script>
     <script>
         // Set header version display
         window.addEventListener('DOMContentLoaded', () => {
@@ -1805,7 +1880,7 @@
     <!-- PWA SERVICE WORKER REGISTRATION & API UPDATE CHECK -->
 
     <script>
-        window.APP_VERSION = 'v3.0.42';
+        window.APP_VERSION = 'v3.0.43';
         if(document.getElementById('header-version-display')) {
             document.getElementById('header-version-display').innerText = window.APP_VERSION;
         }
@@ -2063,8 +2138,8 @@
                   <p>The developers of Tactical Range Card PRO shall not be held liable for any damages, injuries, negligence, or legal incidents resulting from the use or misuse of this software. This application is strictly a reference tool. The creators cannot be pursued in a court of law and hold absolute immunity from liability for any consequences, including but not limited to use during active shooter situations, tactical engagements, or emergency scenarios. By using this application, the user accepts total, unconditional liability for all outcomes in the field.</p>
               </div>
               <div>
-                  <h3 class="text-white font-bold mb-2">3. SUBSCRIPTION & ACCESS</h3>
-                  <p>Access to professional tactical features (Comms, Vault Sync) is subject to active subscription status. Failure to maintain a license may result in the suspension of tactical data links.</p>
+                  <h3 class="text-white font-bold mb-2">3. PREMIUM LICENSE & ACCESS</h3>
+                  <p>Access to professional tactical features (Encrypted Comms, Vault Sync, AI Spotter) requires a one-time premium license purchase. Your one-time purchase guarantees lifetime access to the core tactical suite. Specialized expansion modules may be offered as optional in-app purchases in the future.</p>
               </div>
           </div>
       </div>
@@ -2109,8 +2184,61 @@
     </div>
     <!-- COMMS RX AUDIO ELEMENT FOR IOS UNLOCK -->
     <audio id="comms-rx-audio" class="hidden" playsinline></audio>
-</body>
+    <!-- TACTICAL QUICK REFERENCE MODAL -->
+    <div id="tactical-hints-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[200] hidden items-center justify-center opacity-0 transition-opacity duration-300">
+        <div class="bg-gray-900 border-2 border-emerald-500 rounded-lg shadow-[0_0_30px_rgba(16,185,129,0.3)] w-[90%] max-w-md overflow-hidden transform scale-95 transition-transform duration-300 flex flex-col" id="tactical-hints-panel">
+            <div class="bg-emerald-950 border-b border-emerald-800 p-3 flex justify-between items-center shrink-0">
+                <h3 class="text-emerald-400 font-black tracking-widest uppercase flex items-center gap-2"><i data-lucide="book-open" class="w-4 h-4"></i> Tactical Reference</h3>
+                <button onclick="toggleTacticalHints()" class="text-gray-400 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="p-4 text-xs font-mono text-gray-300 space-y-4 max-h-[70vh] overflow-y-auto">
+                <div>
+                    <h4 class="text-emerald-500 font-bold border-b border-gray-700 pb-1 mb-2">CONVERSIONS</h4>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="bg-gray-950 p-2 rounded border border-gray-800"><span class="text-gray-500 text-[9px] block">MIL to MOA</span>1 MIL = 3.438 MOA</div>
+                        <div class="bg-gray-950 p-2 rounded border border-gray-800"><span class="text-gray-500 text-[9px] block">MOA to MIL</span>1 MOA = 0.29 MIL</div>
+                        <div class="bg-gray-950 p-2 rounded border border-gray-800"><span class="text-gray-500 text-[9px] block">Yards to Meters</span>1 Yd = 0.9144 M</div>
+                        <div class="bg-gray-950 p-2 rounded border border-gray-800"><span class="text-gray-500 text-[9px] block">Meters to Yards</span>1 M = 1.0936 Yd</div>
+                    </div>
+                </div>
+                <div>
+                    <h4 class="text-emerald-500 font-bold border-b border-gray-700 pb-1 mb-2">QUICK FORMULAS</h4>
+                    <ul class="space-y-2">
+                        <li class="bg-gray-950 p-2 rounded border border-gray-800">
+                            <strong class="text-blue-400">Angle Cosine (Slant)</strong><br>
+                            True Distance = Line of Sight &times; Cosine of Angle
+                        </li>
+                        <li class="bg-gray-950 p-2 rounded border border-gray-800">
+                            <strong class="text-blue-400">True MOA (TMOA) vs SMOA</strong><br>
+                            1 TMOA = 1.047" @ 100y<br>
+                            1 SMOA = 1.000" @ 100y
+                        </li>
+                        <li class="bg-gray-950 p-2 rounded border border-gray-800">
+                            <strong class="text-blue-400">Wind Value Clock</strong><br>
+                            Full Value (90&deg;) = 3, 9 o'clock<br>
+                            Half Value (45&deg;) = 1, 2, 4, 5, 7, 8, 10, 11 o'clock<br>
+                            No Value (0&deg;) = 12, 6 o'clock
+                        </li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-emerald-500 font-bold border-b border-gray-700 pb-1 mb-2">AI SPOTTER COMMANDS</h4>
+                    <div class="bg-gray-950 p-2 rounded border border-gray-800">
+                        1. Say <b class="text-white">"Spotter"</b> to read DOPE.<br>
+                        2. Say <b class="text-white">"New Dope"</b> then wait for "Ready".<br>
+                        3. Speak: <span class="text-emerald-400">"Direction 234, Target 300, Wind 5, From 60"</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </body>
 </html>
+
+
+
+
 
 
 
